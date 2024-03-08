@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/userRegistration.json",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "password": {
+      "type": "string",
+      "minLength": 5
+    },
+    "email": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 255,
+      "format": "email"
+    },
+    "firstName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "lastName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "user_type": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "preferences": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "isAdmin": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "username",
+    "password",
+    "email",
+    "firstName"
+  ]
+}
+
