@@ -1,17 +1,19 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/compositionNew.json",
-    "type": "object",
-    "properties": {
-      "title": { "type": "string", "minLength": 1 },
-      "composerId": { "type": "integer" },
-      "year": { "type": "integer" },
-      "description": { "type": "string" },
-      "duration": { "type": "string" },
-      "status": { "type": "string" },
-      "instrumentation": { "type": "object" },
-      "externalApiName": { "type": "string" }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/compositionNew.json",
+  "type": "object",
+  "properties": {
+    "title": { "type": "string", "minLength": 1 },
+    "composerId": { "type": "integer" },
+    "year": { "type": "integer" },
+    "description": { "type": "string" },
+    "duration": { "type": "integer" },
+    "status": { "type": "string" },
+    "instrumentation": {
+      "type": "array",
+      "items": { "type": "string" }
     },
-    "required": ["title"]
-  }
-  
+    "externalApiName": { "type": "string" }
+  },
+  "required": ["title", "instrumentation"]
+}

@@ -2,11 +2,11 @@ const axios = require('axios');
 const qs = require('querystring');
 require('dotenv').config({ path: __dirname + '/../.env' });
 const { Composition, syncCompositionModel } = require('../models/composition'); // Adjust path as necessary
-
 const { Composer, syncComposerModel } = require('../models/composer'); // Adjust the path as necessary
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
 
 async function getSpotifyAccessToken() {
     const tokenUrl = 'https://accounts.spotify.com/api/token';
@@ -37,7 +37,6 @@ async function fetchMusicDataFromSpotify(query) {
                 'Authorization': `Bearer ${accessToken}`
             }
         });
-
         console.log('Spotify API Response:', response.data); // Log the Spotify API response
         return response.data.tracks.items; // Directly return the tracks
     } catch (error) {
@@ -77,7 +76,6 @@ const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 year_of_composition: yearOfComposition,
                 description: `${track.name} from the album ${track.album.name} by ${composerName}.`,
                 duration: formattedDuration,
-                status: 'available',
                 instrumentation: JSON.stringify(["Not specified"]),
                 external_api_name: "www.spotify.com",
             };
@@ -111,14 +109,39 @@ async function fetchTracksByArtistAndProcess(artistName) {
     await processAndInsertData(tracks, composerName);
 }
 
+async function fetchTracksFromPlaylist(playlistId) {
+    const accessToken = await getSpotifyAccessToken();
+    const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=US&limit=50`;
+
+    try {
+        const response = await axios.get(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        console.log('Spotify Playlist Tracks API Response:', response.data);
+        // Adjusted the path to correctly access the items array
+        const tracks = response.data.tracks.items.map(item => item.track);
+        return tracks;
+    } catch (error) {
+        console.error('Failed to fetch playlist tracks from Spotify:', error);
+        throw error;
+    }
+}
 
 (async () => {
     try {
         await syncCompositionModel();
         await syncComposerModel();
         // Fetch and process tracks by a specific artist
-        await fetchTracksByArtistAndProcess("Du Yun");
+        // await fetchTracksByArtistAndProcess("Du Yun");
         
+    // Fetch and process tracks by a specific playlist
+        const playlistId = '0cvzO2xWgRjWRQ6zkY9ij5?si=2515637d83a34af7'; // https://open.spotify.com/playlist/4hOKQuZbraPDIfaGbM3lKI. The playlist ID is the alphanumeric string after playlist/, which in this example is 4hOKQuZbraPDIfaGbM3lKI.
+        const playlistTracks = await fetchTracksFromPlaylist(playlistId);
+        await processAndInsertData(playlistTracks);      
+
+
         // fetch and process classical genre tracks from a specific year range
         // const currentYear = new Date().getFullYear();
         // const classicalQuery = `genre:classical year:2014-${currentYear}`;

@@ -2,7 +2,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
 
-// Define the UserInteraction model with custom table name options
+
 const UserInteraction = sequelize.define('UserInteraction', {
     interaction_id: {
         type: DataTypes.INTEGER,
@@ -11,25 +11,44 @@ const UserInteraction = sequelize.define('UserInteraction', {
     },
     user_id: {
         type: DataTypes.INTEGER,
-        references: { model: 'users', key: 'user_id' }
+        references: {
+            model: 'users', // This should match the table name for the user
+            key: 'user_id'
+        }
     },
     target_id: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    target_type: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     interaction_type: {
         type: DataTypes.STRING,
         allowNull: false
     },
     content: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        allowNull: true // Assuming content could be optional
+    },
+    rating: {
+        type: DataTypes.INTEGER,
+        allowNull: true, // Assuming rating could be optional
+        validate: {
+            min: 1,
+            max: 5
+        }
     },
     interaction_date: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'user_interactions', // Make sure this matches the case exactly as in your database
-    freezeTableName: true // This prevents Sequelize from attempting to modify the table name
+    tableName: 'user_interactions',
+    freezeTableName: true,
+    timestamps: true, // Assuming you want Sequelize to automatically handle `createdAt` and `updatedAt`
+    underscored: true, // If your table uses snake_case
 });
 
 // Sync the model with the database

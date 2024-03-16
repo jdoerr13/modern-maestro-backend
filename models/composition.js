@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+// const { Composer } = require('./composer'); 
 
 const Composition = sequelize.define('Composition', {
     composition_id: {
@@ -9,8 +10,12 @@ const Composition = sequelize.define('Composition', {
     },
     composer_id: {
         type: DataTypes.INTEGER,
-        references: { model: 'composers', key: 'composer_id' }
-    },
+        // references: {
+        //   model: Composer,
+        //   key: 'composer_id'
+        // },
+        allowNull: false // Ensure composer_id is not null
+      },
     title: {
         type: DataTypes.STRING,
         allowNull: false
@@ -24,9 +29,6 @@ const Composition = sequelize.define('Composition', {
     duration: {
         type: DataTypes.STRING
     },
-    status: {
-        type: DataTypes.STRING
-    },
     instrumentation: {
         type: DataTypes.JSONB
     },
@@ -34,7 +36,7 @@ const Composition = sequelize.define('Composition', {
         type: DataTypes.STRING,
     }
 }, {
-    tableName: 'compositions', // Specify the table name here if it's not the default
+    tableName: 'compositions', 
     freezeTableName: true // This option prevents Sequelize from automatically pluralizing the table name
   });
 
@@ -48,5 +50,17 @@ async function syncCompositionModel() {
         console.error('Error syncing Composition model:', error);
     }
 }
+// Define the getCompositionById function directly here
+async function getCompositionById(id) {
+    try {
+        const composition = await Composition.findByPk(id);
+        if (!composition) {
+            throw new Error(`Composition with ID ${id} not found`);
+        }
+        return composition;
+    } catch (error) {
+        throw new Error(`Error fetching composition: ${error.message}`);
+    }
+}
 
-module.exports = { Composition, syncCompositionModel };
+module.exports = { Composition, syncCompositionModel, getCompositionById };

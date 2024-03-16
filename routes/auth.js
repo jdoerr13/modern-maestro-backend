@@ -26,7 +26,7 @@ router.post("/token", async function (req, res, next) {
     }
 
     const { username, password } = req.body;
-    const user = await User.findByUsername(username);
+    const user = await User.findOne({ where: { username: username } });
 
     if (!user) {
       throw new BadRequestError("Invalid username or password");

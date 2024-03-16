@@ -11,7 +11,7 @@ CREATE TABLE users (
     isAdmin BOOLEAN DEFAULT false
 );
 
--- Composers Table Adjustment for Optional User Reference
+-- Composers Table 
 CREATE TABLE composers (
     composer_id SERIAL PRIMARY KEY,
     user_id INT, -- This column is optional and references the users table
@@ -31,12 +31,11 @@ CREATE TABLE composers (
 -- Compositions Table
 CREATE TABLE compositions (
     composition_id SERIAL PRIMARY KEY,
-    composer_id INT REFERENCES composers(composer_id), -- Correct reference to composers
+    composer_id INT REFERENCES composers(composer_id) ON DELETE CASCADE, -- Correct reference to composers
     title VARCHAR(255) NOT NULL,
     year_of_composition INT,
     description TEXT,
     duration VARCHAR(255),
-    status VARCHAR(50),
     instrumentation JSONB NOT NULL,
     external_api_name VARCHAR(255),
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, 
@@ -51,20 +50,22 @@ CREATE TABLE performances (
     recording_date DATE,
     location TEXT,
     file_url TEXT NOT NULL,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Adding createdAt
-    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- Adding updatedAt
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, 
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP 
 );
 
 -- UserInteractions Table
 CREATE TABLE user_interactions (
     interaction_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id),
-    target_id INT,
-    interaction_type VARCHAR(50) NOT NULL,
+    target_id INT NOT NULL,
+    target_type VARCHAR(50) NOT NULL, -- 'composition', 'performance', or 'composer'
+    interaction_type VARCHAR(50) NOT NULL, -- E.g., 'comment', 'rating'
     content TEXT,
+    rating INT CHECK (rating >= 1 AND rating <= 5), 
     interaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Adding createdAt
-    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- Adding updatedAt
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- APIIntegrations Table
@@ -74,6 +75,6 @@ CREATE TABLE api_integrations (
     api_name VARCHAR(255) NOT NULL,
     api_key TEXT NOT NULL,
     settings JSONB,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Adding createdAt
-    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- Adding updatedAt
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, 
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP 
 );
