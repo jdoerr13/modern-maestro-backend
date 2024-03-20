@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/composerNew.json",
+    "type": "object",
+    "properties": {
+      "user_id": { "type": ["integer", "null"] },
+      "name": { "type": "string", "minLength": 1 },
+      "biography": { "type": "string" },
+      "website": { "type": "string", "format": "uri", "minLength": 0 },
+      "social_media_links": { 
+        "type": "object",
+        "additionalProperties": { "type": "string", "format": "uri" }
+      }
+    },
+    "required": ["name"]
+  }
+  

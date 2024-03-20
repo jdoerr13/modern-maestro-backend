@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Composer } = require('../models/composer');
 const { Composition }  = require('../models/composition');
-const { ensureLoggedIn, ensureAdmin } = require('../middleware/authMiddle');
+const { ensureLoggedIn, ensureAdmin, ensureCorrectUserOrAdmin } = require('../middleware/authMiddle');
 
 /** GET /composers  =>
  *   { composers: [ { composer_id, name, biography, website, social_media_links }, ...] }
@@ -78,21 +78,43 @@ router.post('/', ensureLoggedIn, async (req, res, next) => {
  *
  * Authorization required: Admin
  */
-router.patch('/:id', ensureAdmin, async (req, res, next) => {
+
+router.patch('/:id', async (req, res, next) => {
+  console.log("Request Params:", req.params);
+  console.log("Request Body:", req.body);
   try {
+    if (!res.locals.user) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Using res.locals.user now
+    const userId = res.locals.user.user_id; // Adjust this based on your token payload structure
     const { id } = req.params;
     const composer = await Composer.findByPk(id);
     if (!composer) {
       return res.status(404).json({ error: 'Composer not found' });
     }
 
-    const { biography, website, social_media_links } = req.body;
-    await composer.update({ biography, website, social_media_links });
+    // Check if the current user is the composer's user or an admin
+    // Ensure your payload and middleware set `user_id` and `role` appropriately
+    if (composer.userId !== userId && !res.locals.user.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Extract the necessary fields from req.body
+    const { name, biography, website, social_media_links } = req.body;
+    
+    // Proceed to update the composer with the provided fields
+    await composer.update({ name, biography, website, social_media_links });
+
+    // Respond with the updated composer information
     res.json({ composer });
   } catch (error) {
-    next(error);
+    console.error("Error in PATCH /composers/:id:", error);
+    return res.status(500).json({ error: error.message || 'Unknown error occurred' });
   }
 });
+
 
 /** PATCH /composers/:id/name  =>  { composer }
  *

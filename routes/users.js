@@ -2,9 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require('../models/user'); 
+const { Composer } = require ('../models/composer');
 const bcrypt = require('bcrypt');
 const jsonschema = require('jsonschema');
-const { ensureAdmin, ensureCorrectUserOrAdmin } = require('../middleware/authMiddle'); 
+const { ensureAdmin, ensureCorrectUserOrAdmin, ensureLoggedIn } = require('../middleware/authMiddle'); 
 const { BadRequestError } = require('../expressError'); 
 const userNewSchema = require('../schemas/userNew.json'); 
 const userUpdateSchema = require('../schemas/userUpdate.json'); 
@@ -33,31 +34,38 @@ router.post('/', ensureAdmin, async function (req, res, next) {
     }
 });
 
-// GET /users => { users: [...users] }
-// Route for listing all users, admin only
-router.get('/', ensureAdmin, async function (req, res, next) {
+
+        // GET /users => { users: [...users] }
+        // Route for listing all users, admin only
+        router.get('/', ensureAdmin, async function (req, res, next) {
+            try {
+                const users = await User.findAll();
+                return res.json({ users });
+            } catch (err) {
+                return next(err);
+            }
+        });
+
+router.get('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
     try {
-        const users = await User.findAll();
-        return res.json({ users });
+        const username = req.params.username;
+        // Fetch the user by username. Ensure the query includes all fields.
+        const user = await User.findOne({
+            where: { username: username },
+            attributes: ['user_id', 'username', 'email', 'firstName', 'lastName', 'user_type', 'preferences'] // Specify attributes to fetch
+        });
+
+        if (!user) {
+            throw new BadRequestError('User not found');
+        }
+
+        // Return the user object. Make sure to serialize if necessary to match the expected format.
+        return res.json({ user: user.toJSON() }); // Use .toJSON() if the object needs serialization
     } catch (err) {
         return next(err);
     }
 });
 
-// GET /users/:username => { user }
-// Route for retrieving a single user, with authorization
-router.get('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
-    try {
-        const username = req.params.username;
-        const user = await User.findOne({ where: { username } });
-        if (!user) {
-            throw new BadRequestError('User not found');
-        }
-        return res.json({ user });
-    } catch (err) {
-        return next(err);
-    }
-});
 
 // GET /users/search => { users: [...matchedUsers] }
 // Route for searching users based on certain criteria
@@ -98,20 +106,23 @@ router.patch('/:username', ensureCorrectUserOrAdmin, async function (req, res, n
             throw new BadRequestError('User not found');
         }
 
-        // Assuming password can be updated. Hash new password if present.
-        if (req.body.password) {
-            req.body.password_hash = await bcrypt.hash(req.body.password, 10);
-            delete req.body.password; // Remove plain password from the request body
+        const updateData = { ...req.body };
+        // Hash new password if present.
+        if (updateData.password) {
+            updateData.password_hash = await bcrypt.hash(updateData.password, 10);
+            delete updateData.password; // Remove plain password from the update object
         }
 
-        // Update user details
-        await user.update(req.body);
+        // Update user details with Sequelize's update method, which respects the model's field mappings.
+        await user.update(updateData);
 
         return res.json({ user });
     } catch (err) {
         return next(err);
     }
 });
+
+
 
 // DELETE /users/:username => { deleted: username }
 // Route for deleting a user, with authorization
@@ -129,5 +140,72 @@ router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, 
         return next(err);
     }
 });
+
+// This route assumes there's a user logged in who wishes to update their profile to indicate they are a composer
+router.patch('/:userId/composer', async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const { isComposer, composerDetails } = req.body; // Expecting isComposer boolean and optional composerDetails object
+
+        if (isComposer) {
+            // Check if the provided composer name already exists in the database
+            const existingComposer = await Composer.findOne({ where: { name: composerDetails.name } });
+
+            if (existingComposer) {
+                return res.status(400).json({ error: 'Composer name already exists. Please select a new name.' });
+            }
+
+            // Update user_type to 'composer' if isComposer is true
+            await user.update({ user_type: 'composer' });
+
+            // Logic to create or update the Composer entry linked to this User
+            let composer = await Composer.findOne({ where: { user_id: userId } });
+
+            if (composer) {
+                // Update existing composer record
+                await composer.update(composerDetails);
+            } else {
+                // Create new composer record linked to the user
+                composerDetails.user_id = userId; // Ensure this matches the foreign key column name in your schema
+                composer = await Composer.create(composerDetails);
+            }
+
+            return res.json({ user, composer }); // Respond with both user and composer information
+        }
+
+        // If not a composer, update user_type to 'normal'
+        await user.update({ user_type: 'normal' });
+
+        // Remove composer record if exists
+        await Composer.destroy({ where: { user_id: userId } });
+
+        // Return updated user information
+        return res.json({ user });
+    } catch (error) {
+        next(error);
+    }
+});
+// GET /users/:userId/composer => { composer }
+// Route for fetching composer details by user ID
+router.get('/:userId/composer', ensureLoggedIn, async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        // Find the composer associated with the given user ID
+        const composer = await Composer.findOne({ where: { user_id: userId } });
+        if (!composer) {
+            return res.status(404).json({ error: 'Composer not found for the user' });
+        }
+        return res.json({ composer });
+    } catch (err) {
+        return next(err);
+    }
+});
+
 
 module.exports = router;

@@ -2,7 +2,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
 
-// Define the User model with custom table name options
+
 const User = sequelize.define('User', {
     user_id: {
         type: DataTypes.INTEGER,
@@ -21,7 +21,7 @@ const User = sequelize.define('User', {
     },
     lastName: {
         type: DataTypes.STRING,
-        allowNull: true, // Adjust based on your requirements
+        allowNull: true, 
         field: 'lastname' 
     },
     email: {

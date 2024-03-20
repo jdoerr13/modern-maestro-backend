@@ -1,5 +1,8 @@
 const jsonschema = require("jsonschema");
 const express = require("express");
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
 const { BadRequestError } = require("../expressError");
 const { ensureAdmin, ensureLoggedIn } = require("../middleware/authMiddle"); // Adjust based on your auth strategy
@@ -11,7 +14,24 @@ const compositionNewSchema = require("../schemas/compositionNew.json"); // Defin
 const compositionUpdateSchema = require("../schemas/compositionUpdate.json"); // Define this schema
 const compositionSearchSchema = require("../schemas/compositionSearch.json"); // Define this schema
 
+// Define the directory path where files should be saved
+const uploadsDir = path.join(__dirname, '../uploads'); // Adjust the path as needed
+
+// Set up multer for file storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir); // Use the uploadsDir variable
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage: storage });
+// app.use('/uploads', express.static('uploads'));
 const router = new express.Router();
+
+
 router.get("/instruments", async function (req, res, next) {
   try {
     // Directly return the static list of instruments
@@ -29,47 +49,54 @@ router.get("/instruments", async function (req, res, next) {
  *
  * Authorization required: admin (adjust as necessary)
  */
-router.post("/", ensureLoggedIn, async function (req, res, next) {
+router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req, res, next) {
+  console.log(req.file);
   try {
+    // Convert numeric fields from string to integer
+    req.body.composerId = parseInt(req.body.composerId, 10);
+    req.body.year = parseInt(req.body.year, 10);
+    req.body.duration = parseInt(req.body.duration, 10);
+
+    // Convert instrumentation from JSON string to array
+    if (typeof req.body.instrumentation === 'string') {
+      req.body.instrumentation = JSON.parse(req.body.instrumentation);
+    }
+
     const validator = jsonschema.validate(req.body, compositionNewSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
 
-    // Assuming `composerId` is part of your compositionNewSchema, you don't need to check for composer_name
-    // Ensure `composerId` is provided and valid. This step might involve finding the composer by ID
-    if (!req.body.composerId) {
-      throw new BadRequestError("Composer ID is required.");
-    }
-
+    // Ensure composer exists
     let composer = await Composer.findById(req.body.composerId);
     if (!composer) {
       throw new BadRequestError("Composer not found.");
     }
 
-    // Updated handling for the instrumentation field
-    let instrumentation = req.body.instrumentation || [];
-    if (!Array.isArray(instrumentation) || !instrumentation.every(instr => instrumentsList.includes(instr))) {
+    // Ensure instrumentation contains valid instruments
+    if (!req.body.instrumentation.every(instr => instrumentsList.includes(instr))) {
       throw new BadRequestError("Instrumentation contains invalid instruments.");
     }
 
-    // Convert the instrumentation array to a JSON string
-    const instrumentationJson = JSON.stringify(instrumentation);
-
     const compositionData = {
-      ...req.body,
-      composer_id: composer.composer_id,
-      instrumentation: instrumentationJson // Update the instrumentation field with the JSON string
+      title: req.body.title,
+      composer_id: req.body.composerId, // Make sure the field names match your database column names
+      year: req.body.year,
+      description: req.body.description,
+      duration: req.body.duration,
+      instrumentation: req.body.instrumentation, // No need to stringify again
+      audio_file_path: req.file ? req.file.path : null,
     };
 
-    // No need to delete composer_name as it's no longer part of the input
     const composition = await Composition.create(compositionData);
     return res.status(201).json({ composition });
   } catch (err) {
+    console.error(err);
     return next(err);
   }
 });
+
 
 
 

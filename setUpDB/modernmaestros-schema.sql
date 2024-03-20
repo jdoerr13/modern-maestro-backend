@@ -38,6 +38,7 @@ CREATE TABLE compositions (
     duration VARCHAR(255),
     instrumentation JSONB NOT NULL,
     external_api_name VARCHAR(255),
+    audio_file_path VARCHAR(255),
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, 
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP 
 );

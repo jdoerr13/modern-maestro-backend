@@ -34,7 +34,11 @@ const Composition = sequelize.define('Composition', {
     },
     external_api_name: {
         type: DataTypes.STRING,
-    }
+    },
+    audio_file_path: {
+        type: DataTypes.STRING,
+        allowNull: true // assuming the file upload is optional
+      }
 }, {
     tableName: 'compositions', 
     freezeTableName: true // This option prevents Sequelize from automatically pluralizing the table name

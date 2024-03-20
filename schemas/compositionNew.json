@@ -13,7 +13,8 @@
       "type": "array",
       "items": { "type": "string" }
     },
-    "externalApiName": { "type": "string" }
+    "externalApiName": { "type": "string" },
+    "audioFilePath": {"type": "string" }
   },
   "required": ["title", "instrumentation"]
 }

@@ -2,6 +2,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
 const { Composition } = require('./composition'); 
+const { User } = require('./user'); 
 
 // Define the Composer model with custom table name options
 const Composer = sequelize.define('Composer', {
@@ -9,6 +10,15 @@ const Composer = sequelize.define('Composer', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
+    },
+    user_id: { // Include user_id to establish the association between Composer and User
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: User,
+            key: 'user_id'
+        },
+        onDelete: 'SET NULL'
     },
     name: {
         type: DataTypes.STRING,
@@ -27,11 +37,14 @@ const Composer = sequelize.define('Composer', {
         allowNull: true
     }
 }, {
-  tableName: 'composers', // Make sure this matches the case exactly as in your database
-  freezeTableName: true,// This prevents Sequelize from attempting to modify the table name
-//   timestamps: false, // Disable automatic timestamping
+  tableName: 'composers',
+  freezeTableName: true,
+  // timestamps: true, // Assuming you want to enable Sequelize's automatic handling of createdAt and updatedAt
 });
 
+
+Composer.belongsTo(User, { foreignKey: 'user_id' }); // Composer belongs to User
+User.hasOne(Composer, { foreignKey: 'user_id' }); 
 Composer.hasMany(Composition, { foreignKey: 'composer_id' });
 Composition.belongsTo(Composer, { foreignKey: 'composer_id' });
 
@@ -58,5 +71,4 @@ async function syncComposerModel() {
     }
 }
 
-// Export the Composer model
 module.exports = { Composer, syncComposerModel };

@@ -9,7 +9,8 @@
       "duration": { "type": "string" },
       "status": { "type": "string" },
       "instrumentation": { "type": "object" },
-      "externalApiName": { "type": "string" }
+      "externalApiName": { "type": "string" },
+      "audioFilePath": {"type": "string" }
     }
   }
   
