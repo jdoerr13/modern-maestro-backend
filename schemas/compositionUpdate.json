@@ -8,7 +8,10 @@
       "description": { "type": "string" },
       "duration": { "type": "string" },
       "status": { "type": "string" },
-      "instrumentation": { "type": "object" },
+      "instrumentation": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
       "externalApiName": { "type": "string" },
       "audioFilePath": {"type": "string" }
     }

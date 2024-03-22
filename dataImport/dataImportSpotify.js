@@ -151,3 +151,12 @@ async function fetchTracksFromPlaylist(playlistId) {
         console.error('Error processing data:', error);
     }
 })();
+
+module.exports = {
+    getSpotifyAccessToken,
+    fetchMusicDataFromSpotify,
+    processAndInsertData,
+    findOrCreateComposer,
+    fetchTracksByArtistAndProcess, // Exporting the function here
+    fetchTracksFromPlaylist,
+};

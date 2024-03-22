@@ -61,6 +61,8 @@ router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req
     if (typeof req.body.instrumentation === 'string') {
       req.body.instrumentation = JSON.parse(req.body.instrumentation);
     }
+    console.log("Parsed instrumentation (POST):", req.body.instrumentation);
+
 
     const validator = jsonschema.validate(req.body, compositionNewSchema);
     if (!validator.valid) {
@@ -85,7 +87,7 @@ router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req
       year: req.body.year,
       description: req.body.description,
       duration: req.body.duration,
-      instrumentation: req.body.instrumentation, // No need to stringify again
+      instrumentation: Array.isArray(req.body.instrumentation) ? req.body.instrumentation : [req.body.instrumentation],
       audio_file_path: req.file ? req.file.path : null,
     };
 
@@ -96,10 +98,6 @@ router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req
     return next(err);
   }
 });
-
-
-
-
 
 
 router.get("/", async function (req, res, next) {
@@ -124,8 +122,6 @@ router.get("/", async function (req, res, next) {
     return next(err);
   }
 });
-
-
 
 
 // router.get("/with-composers", async function (req, res, next) {
@@ -213,27 +209,63 @@ router.get("/:id", async function (req, res, next) {
  * Authorization required: admin
  */
 
-router.patch("/:id", ensureAdmin, async function (req, res, next) {
+router.patch("/:id", [ensureLoggedIn, upload.single("audioFile")], async function (req, res, next) {
+  console.log("PATCH route hit for ID:", req.params.id);
+  const compositionId = req.params.id;
+
   try {
-    const validator = jsonschema.validate(req.body, compositionUpdateSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
+    // Initialize updateData with what's directly usable or needs minor adjustments
+    let updateData = {
+      title: req.body.title,
+      year_of_composition: req.body.year ? parseInt(req.body.year, 10) : undefined,
+      description: req.body.description,
+      duration: req.body.duration,
+      external_api_name: req.body.externalApiName,
+      instrumentation: Array.isArray(req.body.instrumentation) ? req.body.instrumentation : [req.body.instrumentation],
+     
+    };
+    console.log("Parsed instrumentation (PATCH):", updateData.instrumentation);
+    // Parsing JSON fields (e.g., instrumentation)
+    if (typeof req.body.instrumentation === 'string') {
+      try {
+        updateData.instrumentation = JSON.parse(req.body.instrumentation);
+      } catch (err) {
+        throw new BadRequestError("Invalid format for 'instrumentation'. Must be a JSON string.");
+      }
+    } else if (typeof req.body.instrumentation === 'object') {
+      updateData.instrumentation = req.body.instrumentation;
+    }
+    console.log("After parsing (POST/PATCH):", req.body.instrumentation);
+    // Handling file upload
+    if (req.file) {
+      updateData.audio_file_path = req.file.path;
     }
 
-    // Similar update handling for the instrumentation field as in the POST route
-    let instrumentation = req.body.instrumentation || [];
-    if (!Array.isArray(instrumentation) || !instrumentation.every(instr => instrumentsList.includes(instr))) {
-      throw new BadRequestError("Instrumentation contains invalid instruments.");
+    // Performing the update operation
+    const [numberOfAffectedRows] = await Composition.update(updateData, {
+      where: { composition_id: compositionId }, // Using correct column name for the primary key
+    });
+
+    if (numberOfAffectedRows === 0) {
+      return res.status(404).send({ error: "Composition not found" });
     }
 
-    const updatedData = { ...req.body, instrumentation };
-    const composition = await Composition.update(req.params.id, updatedData);
-    return res.json({ composition });
+    // Fetching the updated composition to return it in the response might need a separate query, depending on your ORM setup
+    const updatedComposition = await Composition.findByPk(compositionId);
+    if (!updatedComposition) {
+      throw new BadRequestError(`Composition with ID '${compositionId}' not found after update.`);
+    }
+
+    return res.json({ updatedComposition });
   } catch (err) {
+    console.error("Error updating composition:", err);
     return next(err);
   }
 });
+
+
+
+
 
 /** DELETE /[id]  =>  { deleted: id }
  *
