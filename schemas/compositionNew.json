@@ -7,7 +7,11 @@
     "composerId": { "type": "integer" },
     "year": { "type": "integer" },
     "description": { "type": "string" },
-    "duration": { "type": "integer" },
+    "duration": {
+      "type": "string"
+  
+    },
+    
     "status": { "type": "string" },
     "instrumentation": {
       "type": "array",
@@ -16,5 +20,5 @@
     "externalApiName": { "type": "string" },
     "audioFilePath": {"type": "string" }
   },
-  "required": ["title", "instrumentation"]
+  "required": ["title"]
 }

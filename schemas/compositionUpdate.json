@@ -6,7 +6,10 @@
       "title": { "type": "string", "minLength": 1 },
       "year": { "type": "integer" },
       "description": { "type": "string" },
-      "duration": { "type": "string" },
+      "duration": {
+        "type": "string"
+      },
+      
       "status": { "type": "string" },
       "instrumentation": {
         "type": "array",

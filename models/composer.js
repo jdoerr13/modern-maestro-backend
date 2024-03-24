@@ -60,6 +60,10 @@ Composer.findById = async function(composerId) {
     return await this.findByPk(composerId);
 };
 
+Composer.findByName = async function(name) {
+    return await this.findOne({ where: { name } });
+  };
+
 
 // Sync the model with the database
 async function syncComposerModel() {

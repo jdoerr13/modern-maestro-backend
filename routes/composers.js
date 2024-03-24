@@ -3,7 +3,17 @@ const router = express.Router();
 const { Composer } = require('../models/composer');
 const { Composition }  = require('../models/composition');
 const { ensureLoggedIn, ensureAdmin, ensureCorrectUserOrAdmin } = require('../middleware/authMiddle');
-const { fetchTracksByArtistAndProcess } = require('../dataImport/dataImportSpotify');
+const { fetchTracksByComposerName } = require('../dataImport/dataImportSpotify');
+
+
+
+
+
+
+
+
+
+
 /** GET /composers  =>
  *   { composers: [ { composer_id, name, biography, website, social_media_links }, ...] }
  *
@@ -17,38 +27,23 @@ router.get('/', async (req, res, next) => {
     next(error);
   }
 });
-/** GET /composers/fetch/:artistName
- * Fetches composer data from external APIs based on the artist name.
- * If the composer already exists, updates their details; otherwise, creates a new composer.
- * Returns the updated or created composer object.
- *
- * Authorization required: none
- */
-router.get('/fetch/:artistName', async (req, res, next) => {
+
+
+router.get('/tracks/byComposer/:composerName', async (req, res, next) => {
+  console.log(`Fetching tracks for composer: ${req.params.composerName}`);
   try {
-    const { artistName } = req.params;
-    const fetchedComposerData = await fetchTracksByArtistAndProcess(artistName); // Use your function to fetch data from Spotify or other APIs
-
-    // Check if the fetched data contains valid composer information
-    if (!fetchedComposerData || Object.keys(fetchedComposerData).length === 0) {
-      return res.status(404).json({ error: 'Composer data not found for the specified artist' });
-    }
-
-    // Check if the composer already exists in the database
-    let composer = await Composer.findOne({ where: { name: fetchedComposerData.name } });
-
-    // If the composer doesn't exist, create a new record; otherwise, update the existing record
-    if (!composer) {
-      composer = await Composer.create(fetchedComposerData);
-    } else {
-      await composer.update(fetchedComposerData);
-    }
-
-    res.json({ composer });
+    const { composerName } = req.params;
+    const tracks = await fetchTracksByComposerName(composerName);
+    res.json({ tracks }); // Send the fetched tracks back to the client
   } catch (error) {
-    next(error);
+    console.error('Error fetching tracks by composer:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
+
 /** GET /composers/:id  =>  { composer }
  *
  * Authorization required: none
@@ -96,6 +91,14 @@ router.get("/:composerId/compositions", async function (req, res, next) {
 router.post('/', ensureLoggedIn, async (req, res, next) => {
   try {
     const { name, biography, website, social_media_links } = req.body;
+
+    // Check for existing composer
+    const existingComposer = await Composer.findByName(name);
+    if (existingComposer) {
+      return res.status(409).json({ error: "Composer already exists." });
+    }
+
+    // Proceed with creation if no existing composer found
     const composer = await Composer.create({ name, biography, website, social_media_links });
     res.status(201).json({ composer });
   } catch (error) {

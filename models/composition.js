@@ -27,7 +27,7 @@ const Composition = sequelize.define('Composition', {
         type: DataTypes.TEXT
     },
     duration: {
-        type: DataTypes.STRING
+        type: DataTypes.INTEGER
     },
     instrumentation: {
         type: DataTypes.JSONB
@@ -44,6 +44,14 @@ const Composition = sequelize.define('Composition', {
     freezeTableName: true // This option prevents Sequelize from automatically pluralizing the table name
   });
 
+  Composition.findByTitleAndComposerId = async function(title, composerId) {
+    return await Composition.findOne({
+        where: {
+            title: title,
+            composer_id: composerId
+        }
+    });
+};
 
 // Sync the model with the database
 async function syncCompositionModel() {
@@ -66,5 +74,6 @@ async function getCompositionById(id) {
         throw new Error(`Error fetching composition: ${error.message}`);
     }
 }
+
 
 module.exports = { Composition, syncCompositionModel, getCompositionById };

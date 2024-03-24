@@ -55,13 +55,22 @@ router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req
     // Convert numeric fields from string to integer
     req.body.composerId = parseInt(req.body.composerId, 10);
     req.body.year = parseInt(req.body.year, 10);
-    req.body.duration = parseInt(req.body.duration, 10);
+  
 
-    // Convert instrumentation from JSON string to array
-    if (typeof req.body.instrumentation === 'string') {
-      req.body.instrumentation = JSON.parse(req.body.instrumentation);
-    }
-    console.log("Parsed instrumentation (POST):", req.body.instrumentation);
+// Handle optional instrumentation
+if (req.body.instrumentation) {
+  if (typeof req.body.instrumentation === 'string') {
+    req.body.instrumentation = JSON.parse(req.body.instrumentation);
+  }
+  // Ensure instrumentation contains valid instruments
+  if (!req.body.instrumentation.every(instr => instrumentsList.includes(instr))) {
+    throw new BadRequestError("Instrumentation contains invalid instruments.");
+  }
+} else {
+  // Default to an empty array if instrumentation is not provided
+  req.body.instrumentation = [];
+}
+console.log("Parsed instrumentation (POST):", req.body.instrumentation);
 
 
     const validator = jsonschema.validate(req.body, compositionNewSchema);
@@ -80,7 +89,11 @@ router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req
     if (!req.body.instrumentation.every(instr => instrumentsList.includes(instr))) {
       throw new BadRequestError("Instrumentation contains invalid instruments.");
     }
-
+    const existingComposition = await Composition.findByTitleAndComposerId(req.body.title, req.body.composerId);
+    if (existingComposition) {
+      return res.status(400).json({ error: "Composition already exists for this composer." });
+    }
+    
     const compositionData = {
       title: req.body.title,
       composer_id: req.body.composerId, // Make sure the field names match your database column names
