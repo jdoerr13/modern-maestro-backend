@@ -22,10 +22,10 @@ router.post('/', ensureAdmin, async function (req, res, next) {
             throw new BadRequestError(errs);
         }
 
-        const { username, email, password, user_type, preferences } = req.body;
+        const { username, email, password, user_type } = req.body;
         const password_hash = await bcrypt.hash(password, 10); // Hash password
 
-        const user = await User.findOrCreateUser(username, email, password_hash, user_type, preferences);
+        const user = await User.findOrCreateUser(username, email, password_hash, user_type );
         const token = createToken(user); // Ensure your createToken method can handle Sequelize models
 
         return res.status(201).json({ user, token });
@@ -46,13 +46,13 @@ router.post('/', ensureAdmin, async function (req, res, next) {
             }
         });
 
-router.get('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.get('/:username', async function (req, res, next) {
     try {
         const username = req.params.username;
         // Fetch the user by username. Ensure the query includes all fields.
         const user = await User.findOne({
             where: { username: username },
-            attributes: ['user_id', 'username', 'email', 'firstName', 'lastName', 'user_type', 'preferences'] // Specify attributes to fetch
+            attributes: ['user_id', 'username', 'email', 'firstName', 'lastName', 'user_type'] // Specify attributes to fetch
         });
 
         if (!user) {
@@ -92,7 +92,7 @@ router.get('/search', ensureAdmin, async function (req, res, next) {
 
 // PATCH /users/:username => { user }
 // Route for updating a user, with authorization
-router.patch('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.patch('/:username', async function (req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, userUpdateSchema);
         if (!validator.valid) {
@@ -141,71 +141,61 @@ router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, 
     }
 });
 
-// This route assumes there's a user logged in who wishes to update their profile to indicate they are a composer
-router.patch('/:userId/composer', async (req, res, next) => {
+router.patch('/:userId/composer', async (req, res) => {
+    const { userId } = req.params;
+    const { isComposer, composerDetails } = req.body;
+
     try {
-        const { userId } = req.params;
-        const user = await User.findByPk(userId);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        const { isComposer, composerDetails } = req.body; // Expecting isComposer boolean and optional composerDetails object
+        let composer = await Composer.findOne({ where: { user_id: userId } });
+        let user = await User.findByPk(userId);  // Assuming you have a User model to handle user data
 
         if (isComposer) {
-            // Check if the provided composer name already exists in the database
-            const existingComposer = await Composer.findOne({ where: { name: composerDetails.name } });
-
-            if (existingComposer) {
-                return res.status(400).json({ error: 'Composer name already exists. Please select a new name.' });
-            }
-
-            // Update user_type to 'composer' if isComposer is true
-            await user.update({ user_type: 'composer' });
-
-            // Logic to create or update the Composer entry linked to this User
-            let composer = await Composer.findOne({ where: { user_id: userId } });
-
             if (composer) {
-                // Update existing composer record
-                await composer.update(composerDetails);
+                await composer.update({ ...composerDetails });
             } else {
-                // Create new composer record linked to the user
-                composerDetails.user_id = userId; // Ensure this matches the foreign key column name in your schema
-                composer = await Composer.create(composerDetails);
+                await Composer.create({ ...composerDetails, user_id: userId });
             }
-
-            return res.json({ user, composer }); // Respond with both user and composer information
+            if (user && user.user_type !== 'composer') {
+                await user.update({ user_type: 'composer' });  // Update the user_type
+            }
+        } else {
+            if (user && user.user_type !== 'normal') {
+                await user.update({ user_type: 'normal' });  // Change back to normal if not a composer
+            }
+            // Optionally handle the case where the user is no longer a composer
+            // e.g., remove the composer record or set a flag
         }
 
-        // If not a composer, update user_type to 'normal'
-        await user.update({ user_type: 'normal' });
-
-        // Remove composer record if exists
-        await Composer.destroy({ where: { user_id: userId } });
-
-        // Return updated user information
-        return res.json({ user });
+        return res.status(200).send('Composer status and user type updated');
     } catch (error) {
-        next(error);
+        console.error(error);
+        return res.status(500).send('An error occurred');
     }
 });
-// GET /users/:userId/composer => { composer }
-// Route for fetching composer details by user ID
-router.get('/:userId/composer', ensureLoggedIn, async (req, res, next) => {
+
+
+
+
+
+
+  router.get('/:userId/composer', ensureLoggedIn, async (req, res, next) => {
     try {
         const { userId } = req.params;
+        console.log(`Fetching composer for user ID: ${userId}`);
+        
         // Find the composer associated with the given user ID
         const composer = await Composer.findOne({ where: { user_id: userId } });
         if (!composer) {
             return res.status(404).json({ error: 'Composer not found for the user' });
         }
+
         return res.json({ composer });
     } catch (err) {
         return next(err);
     }
 });
+
+
 
 
 module.exports = router;

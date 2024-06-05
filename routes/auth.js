@@ -9,7 +9,6 @@ const userRegisterSchema = require("../schemas/userRegister.json");
 const { BadRequestError } = require("../expressError");
 const { Composer } = require('../models/composer'); // Adjust the path as needed
 
-
 /** POST /auth/token:  { username, password } => { token }
  *
  * Returns JWT token which can be used to authenticate further requests.
@@ -29,17 +28,18 @@ router.post("/token", async function (req, res, next) {
     const user = await User.findOne({ where: { username: username } });
 
     if (!user) {
-      throw new BadRequestError("Invalid username or password");
+      return res.status(400).json({ message: "Invalid username or password" });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
-      throw new BadRequestError("Invalid username or password");
+      return res.status(400).json({ message: "Invalid username or password" });
     }
 
     const token = createToken(user);
     return res.json({ token });
   } catch (err) {
+    console.error("Authentication error:", err);
     return next(err);
   }
 });
@@ -60,18 +60,23 @@ router.post("/register", async function (req, res, next) {
 
     const validator = jsonschema.validate(req.body, userRegisterSchema);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
+      const errs = validator.errors.map((e) => e.stack);
       console.error("Validation errors:", errs);
       throw new BadRequestError(errs);
     }
 
-    const { username, email, firstName, lastName, password, user_type, preferences, isAdmin } = req.body;
+    const { username, email, firstName, lastName, password, user_type = 'normal', isAdmin } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ where: { email: email } });
+    // Check if username or email already exists
+    const existingUser = await User.findOne({ where: { username } });
     if (existingUser) {
-      throw new BadRequestError("User already exists");
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    const existingEmail = await User.findOne({ where: { email } });
+    if (existingEmail) {
+      return res.status(400).json({ message: 'Email already exists' });
     }
 
     // Create the user
@@ -81,8 +86,7 @@ router.post("/register", async function (req, res, next) {
       lastName,
       email,
       password_hash: hashedPassword,
-      user_type,
-      preferences,
+      user_type, // user_type will be 'normal' unless explicitly provided
       isAdmin: isAdmin || false,
     });
 
@@ -95,9 +99,4 @@ router.post("/register", async function (req, res, next) {
   }
 });
 
-
-
-
-
 module.exports = router;
-

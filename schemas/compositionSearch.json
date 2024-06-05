@@ -3,7 +3,7 @@
     "$id": "http://example.com/compositionSearch.json",
     "type": "object",
     "properties": {
-      "year": { "type": "integer" },
+      "year": { "type": "string" },
       "status": { "type": "string" },
       "composerId": { "type": "integer" }
     }

@@ -4,7 +4,7 @@
     "type": "object",
     "properties": {
       "title": { "type": "string", "minLength": 1 },
-      "year": { "type": "integer" },
+      "year": { "type": "string" },
       "description": { "type": "string" },
       "duration": {
         "type": "string"

@@ -28,14 +28,13 @@
       "minLength": 1,
       "maxLength": 255
     },
-    "preferences": {
-      "type": "object"
+
+    "user_type": {
+      "type": "string",
+      "enum": ["normal", "composer"]
     },
     "isAdmin": {
       "type": "boolean"
-    },
-    "user_type": {
-      "type": "string"
     }
   },
   "additionalProperties": false

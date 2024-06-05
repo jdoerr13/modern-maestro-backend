@@ -34,12 +34,9 @@ const User = sequelize.define('User', {
         allowNull: false
     },
     user_type: {
-        type: DataTypes.JSONB,
-        allowNull: true // Changed to true to allow null
-    },
-    preferences: {
-        type: DataTypes.JSONB,
-        allowNull: true // Changed to true to allow null
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'normal' // Add a default value for user_type
     },
     isAdmin: {
         type: DataTypes.BOOLEAN,
@@ -52,21 +49,7 @@ const User = sequelize.define('User', {
     freezeTableName: true, // This prevents Sequelize from attempting to modify the table name
     timestamps: false 
 
-    // // Define findOrCreateUser method inside the User model
-    // classMethods: {
-    //     findOrCreateUser: async function(userInfo) {
-    //         const [user, created] = await this.findOrCreate({
-    //           where: { username: userInfo.username, email: userInfo.email },
-    //           defaults: { // other fields to set upon creation
-    //             password_hash: userInfo.password_hash,
-    //             user_type: userInfo.user_type,
-    //             preferences: userInfo.preferences,
-    //             isAdmin: userInfo.isAdmin
-    //           }
-    //         });
-    //         return { user, created };
-    //     }
-    // }
+
 });
   
 // Sync the model with the database

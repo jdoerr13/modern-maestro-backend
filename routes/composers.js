@@ -6,14 +6,6 @@ const { ensureLoggedIn, ensureAdmin, ensureCorrectUserOrAdmin } = require('../mi
 const { fetchTracksByComposerName } = require('../dataImport/dataImportSpotify');
 
 
-
-
-
-
-
-
-
-
 /** GET /composers  =>
  *   { composers: [ { composer_id, name, biography, website, social_media_links }, ...] }
  *
@@ -42,8 +34,6 @@ router.get('/tracks/byComposer/:composerName', async (req, res, next) => {
 });
 
 
-
-
 /** GET /composers/:id  =>  { composer }
  *
  * Authorization required: none
@@ -61,8 +51,6 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Additional import may be required depending on how you've structured your code
-// Assuming Composition model has a method to find by composerId
 
 /** GET /composers/:composerId/compositions => { compositions: [...] }
  *
@@ -81,6 +69,7 @@ router.get("/:composerId/compositions", async function (req, res, next) {
     return next(err);
   }
 });
+
 
 /** POST /composers  =>  { composer }
  *
@@ -106,48 +95,39 @@ router.post('/', ensureLoggedIn, async (req, res, next) => {
   }
 });
 
-/** PATCH /composers/:id  =>  { composer }
- *
- * Updates an existing composer's details except for the name.
- *
- * Authorization required: Admin
- */
 
-router.patch('/:id', async (req, res, next) => {
-  console.log("Request Params:", req.params);
-  console.log("Request Body:", req.body);
+
+
+router.patch('/:composerId', async (req, res) => {
+  console.log("Received composerId:", req.params.composerId);
+  console.log("Request body:", req.body);
+
+  const { composerId } = req.params;
   try {
-    if (!res.locals.user) {
-      return res.status(401).json({ error: "User not authenticated" });
-    }
-
-    // Using res.locals.user now
-    const userId = res.locals.user.user_id; // Adjust this based on your token payload structure
-    const { id } = req.params;
-    const composer = await Composer.findByPk(id);
+    let composer = await Composer.findByPk(composerId); // Assuming findByPk expects the primary key value, not the field name.
     if (!composer) {
-      return res.status(404).json({ error: 'Composer not found' });
+      return res.status(404).json({ error: "Composer not found." });
     }
 
-    // Check if the current user is the composer's user or an admin
-    // Ensure your payload and middleware set `user_id` and `role` appropriately
-    if (composer.userId !== userId && !res.locals.user.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
+    // Here, you're using the parameter to find a record, which should be independent of the database's field naming.
+    // The updateObject construction and the update logic shouldn't be affected by whether the DB uses composer_id or another naming convention.
 
-    // Extract the necessary fields from req.body
-    const { name, biography, website, social_media_links } = req.body;
-    
-    // Proceed to update the composer with the provided fields
-    await composer.update({ name, biography, website, social_media_links });
+    const fieldsToUpdate = ['name', 'biography', 'website', 'social_media_links'];
+    let updateObject = {};
+    fieldsToUpdate.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateObject[field] = req.body[field];
+      }
+    });
 
-    // Respond with the updated composer information
-    res.json({ composer });
+    await composer.update(updateObject);
+    return res.json({ composer });
   } catch (error) {
-    console.error("Error in PATCH /composers/:id:", error);
-    return res.status(500).json({ error: error.message || 'Unknown error occurred' });
+    console.error("Error handling composer update:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 /** PATCH /composers/:id/name  =>  { composer }

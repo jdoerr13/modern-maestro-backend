@@ -5,7 +5,6 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     user_type JSONB,
-    preferences JSONB,
     firstName VARCHAR(255),
     lastName VARCHAR(255),
     isAdmin BOOLEAN DEFAULT false
@@ -33,7 +32,7 @@ CREATE TABLE compositions (
     composition_id SERIAL PRIMARY KEY,
     composer_id INT REFERENCES composers(composer_id) ON DELETE CASCADE, -- Correct reference to composers
     title VARCHAR(255) NOT NULL,
-    year_of_composition INT,
+    year_of_composition VARCHAR(255),
     description TEXT,
     duration VARCHAR(255),
     instrumentation JSONB NOT NULL,

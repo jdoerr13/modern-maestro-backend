@@ -29,12 +29,8 @@
       "maxLength": 255
     },
     "user_type": {
-      "type": ["object", "null"],
-      "additionalProperties": true
-    },
-    "preferences": {
-      "type": ["object", "null"],
-      "additionalProperties": true
+      "type": "string",
+      "enum": ["normal", "composer", "...otherTypes"]
     },
     "isAdmin": {
       "type": "boolean"

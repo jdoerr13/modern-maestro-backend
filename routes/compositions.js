@@ -54,7 +54,7 @@ router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req
   try {
     // Convert numeric fields from string to integer
     req.body.composerId = parseInt(req.body.composerId, 10);
-    req.body.year = parseInt(req.body.year, 10);
+  
   
 
 // Handle optional instrumentation
@@ -137,35 +137,6 @@ router.get("/", async function (req, res, next) {
 });
 
 
-// router.get("/with-composers", async function (req, res, next) {
-//   try {
-//     // Fetch all compositions along with their composer's name
-//     const compositions = await Composition.findAll({
-//       include: [{
-//         model: Composer,
-//         attributes: ['name'], // Just get the composer's name
-//       }]
-//     });
-
-//     // Prepare and send the response
-//     const result = compositions.map(comp => {
-//       return {
-//         compositionId: comp.composition_id,
-//         title: comp.title,
-//         yearOfComposition: comp.year_of_composition,
-//         description: comp.description,
-//         duration: comp.duration,
-//         instrumentation: comp.instrumentation,
-//         externalApiName: comp.external_api_name,
-//         composerName: comp.Composer.name // Access the included Composer name
-//       };
-//     });
-
-//     res.json(result);
-//   } catch (err) {
-//     next(err);
-//   }
-// });
 
 // /** GET /  =>
 //  *   { compositions: [ { id, title, composerId, year, description, duration, status, instrumentation }, ...] }
@@ -195,9 +166,7 @@ router.get("/", async function (req, res, next) {
 // });
 
 /** GET /[id]  =>  { composition }
- *
  *  Composition is { id, title, composerId, year, description, duration, status, instrumentation }
- *
  * Authorization required: none
  */
 
