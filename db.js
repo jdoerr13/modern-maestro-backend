@@ -1,28 +1,33 @@
 /** Database setup for modern-meastros. */
-const { Client } = require("pg");
+const { Pool } = require("pg");
 const { getDatabaseUri } = require("./config");
 
-let db;
+let pool;
 
 if (process.env.NODE_ENV === "production") {
-  db = new Client({
+  pool = new Pool({
     connectionString: getDatabaseUri(),
     ssl: {
       rejectUnauthorized: false
     }
   });
 } else {
-  db = new Client({
+  pool = new Pool({
     connectionString: getDatabaseUri()
   });
 }
 
-db.connect(err => {
-  if (err) {
-    console.error('Connection error', err.stack);
-  } else {
-    console.log('Connected to database');
-  }
+pool.on('connect', () => {
+  console.log('Connected to database');
 });
 
-module.exports = db;
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
+
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  getClient: () => pool.connect(),
+  end: () => pool.end(),
+};

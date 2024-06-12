@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
-// const { Composer } = require('./composer'); 
+const { User } = require('./user'); 
+const { Composer } = require('./composer'); // Import Composer model
 
 const Composition = sequelize.define('Composition', {
     composition_id: {
@@ -27,7 +28,7 @@ const Composition = sequelize.define('Composition', {
         type: DataTypes.TEXT
     },
     duration: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
     },
     instrumentation: {
         type: DataTypes.JSONB

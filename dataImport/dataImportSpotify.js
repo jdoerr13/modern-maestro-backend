@@ -128,8 +128,6 @@ async function fetchTracksFromPlaylist(playlistId) {
     }
 }
 
-
-//USED ONLY FOR FRONT END
 //USED ONLY FOR FRONT END
 async function fetchTracksByComposerName(composerName) {
     const accessToken = await getSpotifyAccessToken();
@@ -170,7 +168,7 @@ function formatDuration(durationMs) {
         await syncCompositionModel();
         await syncComposerModel();
         // Fetch and process tracks by a specific artist
-        // await fetchTracksByArtistAndProcess("Hans Zimmer");
+        await fetchTracksByArtistAndProcess("Hans Zimmer");
         
     // Fetch and process tracks by a specific playlist
         // const playlistId = '0cvzO2xWgRjWRQ6zkY9ij5?si=2515637d83a34af7'; // https://open.spotify.com/playlist/4hOKQuZbraPDIfaGbM3lKI. The playlist ID is the alphanumeric string after playlist/, which in this example is 4hOKQuZbraPDIfaGbM3lKI.

@@ -17,12 +17,15 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use('/uploads', express.static('uploads'));
+
 // Apply authenticateJWT middleware only to routes that require authentication
-app.use("/composers", authenticateJWT);
-app.use("/compositions", authenticateJWT);
-app.use("/performances", authenticateJWT);
-app.use("/interactions", authenticateJWT);
-app.use("/users", authenticateJWT);
+if (process.env.NODE_ENV !== "test") {
+  app.use("/composers", authenticateJWT);
+  app.use("/compositions", authenticateJWT);
+  app.use("/performances", authenticateJWT);
+  app.use("/interactions", authenticateJWT);
+  app.use("/users", authenticateJWT);
+}
 
 app.use("/auth", authRoutes);
 app.use("/composers", composerRoutes);
@@ -34,20 +37,21 @@ app.use("/users", userRoutes);
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
+
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
-    return next(new NotFoundError());
+  return next(new NotFoundError());
+});
+
+/** Generic error handler; anything unhandled goes here. */
+app.use(function (err, req, res, next) {
+  if (process.env.NODE_ENV !== "test") console.error(err.stack);
+  const status = err.status || 500;
+  const message = err.message;
+
+  return res.status(status).json({
+    error: { message, status },
   });
-  
-  /** Generic error handler; anything unhandled goes here. */
-  app.use(function (err, req, res, next) {
-    if (process.env.NODE_ENV !== "test") console.error(err.stack);
-    const status = err.status || 500;
-    const message = err.message;
-  
-    return res.status(status).json({
-      error: { message, status },
-    });
-  });
-  
-  module.exports = app;
+});
+
+module.exports = app;

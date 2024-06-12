@@ -39,7 +39,7 @@ const Composer = sequelize.define('Composer', {
 }, {
   tableName: 'composers',
   freezeTableName: true,
-  // timestamps: true, // Assuming you want to enable Sequelize's automatic handling of createdAt and updatedAt
+  timestamps: true, 
 });
 
 
