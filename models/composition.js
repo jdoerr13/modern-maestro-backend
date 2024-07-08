@@ -1,7 +1,7 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
-const { User } = require('./user'); 
-const { Composer } = require('./composer'); // Import Composer model
+// const { Sequelize, DataTypes } = require('sequelize');
+// const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
 
 const Composition = sequelize.define('Composition', {
     composition_id: {

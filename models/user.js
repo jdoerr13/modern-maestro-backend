@@ -1,5 +1,8 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+// const { Sequelize, DataTypes } = require('sequelize');
+// const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
 
 const User = sequelize.define('User', {
   user_id: {
