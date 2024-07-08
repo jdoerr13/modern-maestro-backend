@@ -1,14 +1,8 @@
 // Import Sequelize library
-// const { Sequelize, DataTypes } = require('sequelize');
-// const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
-
-
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
-
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
 const { Composition } = require('./composition'); 
 const { User } = require('./user'); 
-
 
 // Define the Composer model with custom table name options
 const Composer = sequelize.define('Composer', {

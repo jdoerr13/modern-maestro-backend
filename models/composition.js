@@ -1,7 +1,6 @@
-// const { Sequelize, DataTypes } = require('sequelize');
-// const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+
 
 const Composition = sequelize.define('Composition', {
     composition_id: {
