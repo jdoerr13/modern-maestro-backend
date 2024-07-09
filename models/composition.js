@@ -14,7 +14,7 @@ const Composition = sequelize.define('Composition', {
         //   model: Composer,
         //   key: 'composer_id'
         // },
-        allowNull: false // Ensure composer_id is not null
+        allowNull: false 
       },
     title: {
         type: DataTypes.STRING,
@@ -37,7 +37,7 @@ const Composition = sequelize.define('Composition', {
     },
     audio_file_path: {
         type: DataTypes.STRING,
-        allowNull: true // assuming the file upload is optional
+        allowNull: true 
       }
 }, {
     tableName: 'compositions', 

@@ -1,0 +1,2823 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.6 (Postgres.app)
+-- Dumped by pg_dump version 15.6 (Postgres.app)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = ''UTF8'';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config(''search_path'', '''', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '''';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: api_integrations; Type: TABLE; Schema: public; Owner: jdboss
+--
+
+CREATE TABLE public.api_integrations (
+    integration_id integer NOT NULL,
+    user_id integer,
+    api_name character varying(255) NOT NULL,
+    api_key text NOT NULL,
+    settings jsonb,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.api_integrations OWNER TO jdboss;
+
+--
+-- Name: api_integrations_integration_id_seq; Type: SEQUENCE; Schema: public; Owner: jdboss
+--
+
+CREATE SEQUENCE public.api_integrations_integration_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.api_integrations_integration_id_seq OWNER TO jdboss;
+
+--
+-- Name: api_integrations_integration_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jdboss
+--
+
+ALTER SEQUENCE public.api_integrations_integration_id_seq OWNED BY public.api_integrations.integration_id;
+
+
+--
+-- Name: composers; Type: TABLE; Schema: public; Owner: jdboss
+--
+
+CREATE TABLE public.composers (
+    composer_id integer NOT NULL,
+    user_id integer,
+    name character varying(255) NOT NULL,
+    biography text,
+    website character varying(255),
+    social_media_links jsonb,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.composers OWNER TO jdboss;
+
+--
+-- Name: composers_composer_id_seq; Type: SEQUENCE; Schema: public; Owner: jdboss
+--
+
+CREATE SEQUENCE public.composers_composer_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.composers_composer_id_seq OWNER TO jdboss;
+
+--
+-- Name: composers_composer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jdboss
+--
+
+ALTER SEQUENCE public.composers_composer_id_seq OWNED BY public.composers.composer_id;
+
+
+--
+-- Name: compositions; Type: TABLE; Schema: public; Owner: jdboss
+--
+
+CREATE TABLE public.compositions (
+    composition_id integer NOT NULL,
+    composer_id integer,
+    title character varying(255) NOT NULL,
+    year_of_composition character varying(255),
+    description text,
+    duration character varying(255),
+    instrumentation jsonb NOT NULL,
+    external_api_name character varying(255),
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    audio_file_path character varying(255)
+);
+
+
+ALTER TABLE public.compositions OWNER TO jdboss;
+
+--
+-- Name: compositions_composition_id_seq; Type: SEQUENCE; Schema: public; Owner: jdboss
+--
+
+CREATE SEQUENCE public.compositions_composition_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.compositions_composition_id_seq OWNER TO jdboss;
+
+--
+-- Name: compositions_composition_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jdboss
+--
+
+ALTER SEQUENCE public.compositions_composition_id_seq OWNED BY public.compositions.composition_id;
+
+
+--
+-- Name: performances; Type: TABLE; Schema: public; Owner: jdboss
+--
+
+CREATE TABLE public.performances (
+    performance_id integer NOT NULL,
+    composition_id integer,
+    user_id integer,
+    recording_date date,
+    location text,
+    file_url text NOT NULL,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.performances OWNER TO jdboss;
+
+--
+-- Name: performances_performance_id_seq; Type: SEQUENCE; Schema: public; Owner: jdboss
+--
+
+CREATE SEQUENCE public.performances_performance_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.performances_performance_id_seq OWNER TO jdboss;
+
+--
+-- Name: performances_performance_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jdboss
+--
+
+ALTER SEQUENCE public.performances_performance_id_seq OWNED BY public.performances.performance_id;
+
+
+--
+-- Name: user_interactions; Type: TABLE; Schema: public; Owner: jdboss
+--
+
+CREATE TABLE public.user_interactions (
+    interaction_id integer NOT NULL,
+    user_id integer,
+    target_id integer NOT NULL,
+    target_type character varying(50) NOT NULL,
+    interaction_type character varying(50) NOT NULL,
+    content text,
+    rating integer,
+    interaction_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT user_interactions_rating_check CHECK (((rating >= 1) AND (rating <= 5)))
+);
+
+
+ALTER TABLE public.user_interactions OWNER TO jdboss;
+
+--
+-- Name: user_interactions_interaction_id_seq; Type: SEQUENCE; Schema: public; Owner: jdboss
+--
+
+CREATE SEQUENCE public.user_interactions_interaction_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_interactions_interaction_id_seq OWNER TO jdboss;
+
+--
+-- Name: user_interactions_interaction_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jdboss
+--
+
+ALTER SEQUENCE public.user_interactions_interaction_id_seq OWNED BY public.user_interactions.interaction_id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: jdboss
+--
+
+CREATE TABLE public.users (
+    user_id integer NOT NULL,
+    username character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    password_hash text NOT NULL,
+    user_type character varying(255),
+    firstname character varying(255),
+    lastname character varying(255),
+    isadmin boolean DEFAULT false
+);
+
+
+ALTER TABLE public.users OWNER TO jdboss;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: jdboss
+--
+
+CREATE SEQUENCE public.users_user_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_user_id_seq OWNER TO jdboss;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jdboss
+--
+
+ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
+
+
+--
+-- Name: api_integrations integration_id; Type: DEFAULT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.api_integrations ALTER COLUMN integration_id SET DEFAULT nextval(''public.api_integrations_integration_id_seq''::regclass);
+
+
+--
+-- Name: composers composer_id; Type: DEFAULT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.composers ALTER COLUMN composer_id SET DEFAULT nextval(''public.composers_composer_id_seq''::regclass);
+
+
+--
+-- Name: compositions composition_id; Type: DEFAULT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.compositions ALTER COLUMN composition_id SET DEFAULT nextval(''public.compositions_composition_id_seq''::regclass);
+
+
+--
+-- Name: performances performance_id; Type: DEFAULT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.performances ALTER COLUMN performance_id SET DEFAULT nextval(''public.performances_performance_id_seq''::regclass);
+
+
+--
+-- Name: user_interactions interaction_id; Type: DEFAULT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.user_interactions ALTER COLUMN interaction_id SET DEFAULT nextval(''public.user_interactions_interaction_id_seq''::regclass);
+
+
+--
+-- Name: users user_id; Type: DEFAULT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval(''public.users_user_id_seq''::regclass);
+
+
+--
+-- Data for Name: api_integrations; Type: TABLE DATA; Schema: public; Owner: jdboss
+--
+
+COPY public.api_integrations (integration_id, user_id, api_name, api_key, settings, "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: composers; Type: TABLE DATA; Schema: public; Owner: jdboss
+--
+
+COPY public.composers (composer_id, user_id, name, biography, website, social_media_links, "createdAt", "updatedAt") FROM stdin;
+163	81	J	I am from a small town		{}	2024-06-07 11:22:09.109-04	2024-06-07 11:22:50.318-04
+199	\N	Joby Talbot			""	2024-06-07 15:00:48.903-04	2024-06-07 15:00:48.903-04
+200	\N	Mark-Anthony Turnage			""	2024-06-07 15:02:05.213-04	2024-06-07 15:02:05.213-04
+201	\N	Julia Wolfe			""	2024-06-07 15:07:27.889-04	2024-06-07 15:07:27.889-04
+203	\N	Missy Mazzoli			""	2024-06-07 15:16:28.735-04	2024-06-07 15:16:28.735-04
+204	\N	David T. Little			""	2024-06-07 15:18:02.375-04	2024-06-07 15:18:02.375-04
+205	\N	Du Yun			""	2024-06-07 15:18:13.573-04	2024-06-07 15:18:13.573-04
+208	\N	john			""	2024-06-11 08:40:07.396-04	2024-06-11 08:40:07.396-04
+217	\N	Avner Dorman			""	2024-06-11 09:15:18.905-04	2024-06-11 09:15:18.905-04
+218	\N	Caroline Shaw			""	2024-06-11 09:15:38.02-04	2024-06-11 09:15:38.02-04
+219	\N	Sarah Kirkland Snider			""	2024-06-11 09:15:49.108-04	2024-06-11 09:15:49.108-04
+220	\N	Dai Fujikura			""	2024-06-11 09:15:59.862-04	2024-06-11 09:15:59.862-04
+221	\N	John Mackey			""	2024-06-11 09:16:12.667-04	2024-06-11 09:16:12.667-04
+165	\N	John Williams	John Williams, born on February 8, 1932, in Queens, New York, is a renowned American composer and conductor. He is famous for creating iconic film scores such as those for "Star Wars," "Indiana Jones," "Jaws," and "Harry Potter." Williams has won five Academy Awards and received numerous other honors throughout his career.	http://johnwilliams.org	{}	2024-06-07 11:43:34.786-04	2024-06-07 11:43:34.786-04
+171	\N	Valerie Coleman	Valerie Coleman, born in 1970, is an American composer and flutist. She is a founding member of the wind quintet Imani Winds and has composed numerous works for chamber ensembles and orchestras.	http://valeriecoleman.com	{}	2024-06-07 12:03:27.249-04	2024-06-07 12:03:27.249-04
+173	\N	Jonathan Bailey Holland	Jonathan Bailey Holland, born in 1974, is an American composer whose works span various genres, including orchestral, chamber, and vocal music. He is a professor of composition and chair of the composition department at Boston Conservatory at Berklee.	http://jonathanbaileyholland.com	{}	2024-06-07 12:03:55.756-04	2024-06-07 12:03:55.756-04
+166	\N	Hans Zimmer	Hans Zimmer, born on September 12, 1957, in Frankfurt, Germany, is a celebrated film composer known for his work on movies such as "The Lion King," "Gladiator," "Inception," and "Interstellar." Zimmer has won multiple awards, including an Academy Award for "The Lion King."	http://hanszimmerlive.com	[{"url": "https://www.instagram.com/hanszimmer", "platform": "Instagram"}, {"url": "https://twitter.com/HansZimmer", "platform": "Twitter"}]	2024-06-07 12:00:06.13-04	2024-06-07 12:00:06.13-04
+167	\N	Eric Whitacre	Eric Whitacre, born on January 2, 1970, in Reno, Nevada, is an American composer and conductor known for his choral music. He has received international acclaim for his compositions and virtual choir projects.	http://ericwhitacre.com	[{"url": "https://www.instagram.com/ericwhitacre", "platform": "Instagram"}, {"url": "https://twitter.com/EricWhitacre", "platform": "Twitter"}]	2024-06-07 12:00:28.874-04	2024-06-07 12:00:28.874-04
+168	\N	Yuja Wang	Yuja Wang, born on February 10, 1987, in Beijing, China, is a renowned classical pianist known for her technical proficiency and charismatic stage presence. She frequently performs with leading orchestras and in major concert halls worldwide.	http://yujawang.com	[{"url": "https://www.instagram.com/yujawang.official", "platform": "Instagram"}, {"url": "https://twitter.com/YujaWang", "platform": "Twitter"}]	2024-06-07 12:00:48.741-04	2024-06-07 12:00:48.741-04
+169	\N	Gustavo Dudamel	Gustavo Dudamel, born on January 26, 1981, in Barquisimeto, Venezuela, is a prominent conductor and violinist. He is the music director of the Los Angeles Philharmonic and has received international recognition for his dynamic conducting style and educational initiatives.	http://gustavodudamel.com	[{"url": "https://www.instagram.com/gustavodudamel", "platform": "Instagram"}, {"url": "https://twitter.com/GustavoDudamel", "platform": "Twitter"}]	2024-06-07 12:01:41.277-04	2024-06-07 12:01:41.277-04
+170	\N	Hildur Guðnadóttir	Hildur Guðnadóttir, born on September 4, 1982, in Reykjavík, Iceland, is a composer and cellist known for her work on film and television scores, including "Joker" and "Chernobyl." She has won numerous awards, including an Academy Award for "Joker".	http://hildurness.com	[{"url": "https://www.instagram.com/hildurness", "platform": "Instagram"}]	2024-06-07 12:02:01.41-04	2024-06-07 12:02:01.41-04
+172	\N	Kevin Day 	Kevin Day, born in 1996, is an American composer and conductor known for his works for wind ensemble, orchestra, and chamber ensembles. His compositions have been performed by various prestigious ensembles and he is noted for his energetic and engaging style.	http://kevindaymusic.com	[{"url": "https://www.instagram.com/kevindaymusic", "platform": "Instagram"}, {"url": "https://twitter.com/kevindaymusic", "platform": "Twitter"}]	2024-06-07 12:03:41.46-04	2024-06-07 12:03:41.46-04
+177	\N	James MacMillan	James MacMillan, born on July 16, 1959, in Kilwinning, Scotland, is a renowned composer and conductor known for his symphonies, operas, and sacred music. His work often reflects his Scottish heritage and Roman Catholic faith. Notable works include "The Confession of Isobel Gowdie" and "Seven Last Words from the Cross."	http://www.boosey.com/composer/James+MacMillan	[]	2024-06-07 12:06:05.72-04	2024-06-07 12:06:05.72-04
+183	\N	Bryce Dessner	Bryce Dessner, born on April 23, 1976, in Cincinnati, Ohio, is an American composer and guitarist known for his work with the rock band The National and his contemporary classical compositions. His notable works include "Murder Ballades," "The Colorado," and the score for the film "The Revenant."	http://www.brycedessner.com	[]	2024-06-07 14:46:19.11-04	2024-06-07 14:46:19.11-04
+189	\N	Anders Hillborg	Anders Hillborg, born on May 31, 1954, in Sollentuna, Sweden, is a prominent Swedish composer known for his innovative and dynamic orchestral and choral works. His notable compositions include "Eleven Gates" and "King Tide." Hillborg has received several awards, including the Swedish Music Prize.	http://andershillborg.com	[]	2024-06-07 14:53:36.686-04	2024-06-07 14:53:36.686-04
+194	\N	Arvo Pärt	Arvo Pärt, born on September 11, 1935, in Paide, Estonia, is an Estonian composer known for his minimalist style and sacred music. His notable works include "Tabula Rasa" and "Fratres." Pärt has received numerous accolades, including the Praemium Imperiale.	http://arvopart.ee	[]	2024-06-07 14:54:52.792-04	2024-06-07 14:54:52.792-04
+192	\N	Magnus Lindberg	Magnus Lindberg, born on June 27, 1958, in Helsinki, Finland, is a prominent Finnish composer known for his orchestral and chamber music. His notable compositions include "Kraft" and "Concerto for Orchestra." Lindberg has received several awards, including the Wihuri Sibelius Prize.	http://magnuslindberg.com	[]	2024-06-07 14:54:19.903-04	2024-06-07 14:54:19.903-04
+211	\N	Michael Gordon	Michael Gordon, born on July 20, 1956, in Miami Beach, Florida, is an American composer known for his high-energy and rhythmically complex works. He is a co-founder of Bang on a Can and his notable compositions include "Decasia" and "Timber."	http://michaelgordonmusic.com	[]	2024-06-11 09:10:19.93-04	2024-06-11 09:10:19.93-04
+215	\N	Brett Dean	Brett Dean, born on October 23, 1961, in Brisbane, Australia, is a composer, violist, and conductor known for his contemporary classical works. His notable compositions include "The Lost Art of Letter Writing," which won the Grawemeyer Award, and the opera "Hamlet."	http://brettdean.com	[]	2024-06-11 09:14:41.718-04	2024-06-11 09:14:41.718-04
+174	\N	Hannah Kendall 	Hannah Kendall, born in 1984, is a British composer known for her orchestral, chamber, and vocal works. Her music often explores social and cultural themes, and she has received commissions from prominent ensembles and festivals.	http://hannahkendall.co.uk	[{"url": "https://twitter.com/hannahkendall", "platform": "Twitter"}]	2024-06-07 12:05:04.457-04	2024-06-07 12:05:04.457-04
+176	\N	Rachel Portman	Rachel Portman, born on December 11, 1960, in Haslemere, England, is a British composer who made history in 1996 by becoming the first female composer to win an Academy Award for Best Original Score for "Emma." She has composed over 100 scores for film, television, and theatre, including "The Cider House Rules," "Chocolat," and "Never Let Me Go."	http://rachelportman.co.uk	[]	2024-06-07 12:05:52.138-04	2024-06-07 12:05:52.138-04
+178	\N	John Adams	John Adams, born on February 15, 1947, in Worcester, Massachusetts, is an American composer known for his minimalist and post-minimalist compositions. His works include "Nixon in China," "Harmonielehre," and "Doctor Atomic." Adams has received numerous awards, including the Pulitzer Prize for Music.	https://www.earbox.com/	[]	2024-06-07 12:09:51.609-04	2024-06-07 12:09:51.609-04
+179	\N	Thomas Ades	Thomas Adès, born on March 1, 1971, in London, England, is a British composer, conductor, and pianist. His notable works include the operas "Powder Her Face" and "The Tempest," as well as the orchestral piece "Asyla." Adès has received numerous accolades, including the Grawemeyer Award for Music Composition.	https://www.fabermusic.com/we-represent/thomas-ades	[]	2024-06-07 12:10:08.833-04	2024-06-07 12:10:08.833-04
+180	\N	Mason Bates	Mason Bates, born on January 23, 1977, is an American composer known for his innovative use of electronics in orchestral music. His works include "Alternative Energy," "Anthology of Fantastic Zoology," and "The (R)evolution of Steve Jobs," which won a Grammy Award for Best Opera Recording.	http://www.masonbates.com	[]	2024-06-07 12:16:23.137-04	2024-06-07 12:16:23.137-04
+181	\N	Unsuk Chin	Unsuk Chin, born on July 14, 1961, in Seoul, South Korea, is a South Korean composer known for her contemporary classical compositions. Her notable works include the opera "Alice in Wonderland" and the orchestral piece "Violin Concerto," which won the prestigious Grawemeyer Award for Music Composition.	http://www.boosey.com/composer/Unsuk+Chin	[]	2024-06-07 12:17:11.285-04	2024-06-07 12:17:11.285-04
+182	\N	Anna Clyne	Anna Clyne, born on March 9, 1980, in London, England, is a British composer known for her dynamic and expressive orchestral works. Her notable compositions include "Night Ferry," "Masquerade," and "This Midnight Hour." Clyne has served as composer-in-residence for the Chicago Symphony Orchestra and other prestigious ensembles.	https://www.annaclyne.com	[]	2024-06-07 12:18:08.851-04	2024-06-07 12:18:08.851-04
+184	\N	Tan Dun	Tan Dun, born on August 18, 1957, in Changsha, China, is a Chinese composer and conductor known for blending Eastern and Western musical traditions. His works include the Oscar-winning score for "Crouching Tiger, Hidden Dragon" and the "Water Concerto" and "Paper Concerto."	http://www.tandun.com	[]	2024-06-07 14:50:01.114-04	2024-06-07 14:50:01.114-04
+185	\N	Gabriela Lena Frank	Gabriela Lena Frank, born on September 26, 1972, in Berkeley, California, is an American composer and pianist known for her works that explore her multicultural heritage, blending Latin American influences with Western classical music. Notable works include "Leyendas: An Andean Walkabout" and "Tres Homenajes: Compadrazgo."	https://www.schott-music.com/en/person/gabriela-lena-frank	[]	2024-06-07 14:52:32.017-04	2024-06-07 14:52:32.017-04
+186	\N	Osvaldo Golijov	Osvaldo Golijov, born on December 5, 1960, in La Plata, Argentina, is a composer known for his eclectic works that blend classical, Latin American, and popular music influences. His notable compositions include "La Pasión según San Marcos" and "Ainadamar." Golijov has received numerous awards, including the MacArthur Fellowship.	http://osvaldogolijov.com	[]	2024-06-07 14:52:45.622-04	2024-06-07 14:52:45.622-04
+187	\N	Sofia Gubaidulina	Sofia Gubaidulina, born on October 24, 1931, in Chistopol, Tatar Autonomous Soviet Socialist Republic, is a Russian composer renowned for her unique fusion of Russian and Central Asian musical traditions with Western classical music. Her notable works include "Offertorium" and "In Tempus Praesens." Gubaidulina is a recipient of the Praemium Imperiale and the Polar Music Prize.	http://sofia-gubaidulina.com	[]	2024-06-07 14:53:03.649-04	2024-06-07 14:53:03.649-04
+196	\N	Kaija Saariaho	Kaija Saariaho, born on October 14, 1952, in Helsinki, Finland, and passed away on June 2, 2023, in Paris, France, was a renowned Finnish composer. She was known for her work in spectral music, combining live instruments with electronics. Her notable compositions include "L’Amour de loin" and "Grâal Théâtre." Saariaho received numerous awards including the Grawemeyer Award, Wihuri Sibelius Prize, and Polar Music Prize.	http://saariaho.org	[{"url": "https://www.facebook.com/kaija.saariaho", "platform": "Facebook"}]	2024-06-07 14:57:32.344-04	2024-06-07 14:57:32.344-04
+193	\N	Nico Muhly	Nico Muhly, born on August 26, 1981, in Randolph, Vermont, is an American composer known for his diverse body of work including operas, orchestral pieces, and film scores. His notable works include "Two Boys" and "Marnie." Muhly has collaborated with various artists across different genres.	http://nicomuhly.com	[{"url": "https://www.instagram.com/nicomuhly", "platform": "Instagram"}, {"url": "https://twitter.com/nicomuhly", "platform": "Twitter"}]	2024-06-07 14:54:37.121-04	2024-06-07 14:54:37.121-04
+195	\N	Steve Reich	Steve Reich, born on October 3, 1936, in New York City, is an American composer known for his pioneering work in minimalism. His notable compositions include "Music for 18 Musicians" and "Different Trains." Reich has received numerous awards, including the Pulitzer Prize for Music.	http://stevereich.com	[]	2024-06-07 14:55:35.305-04	2024-06-07 14:55:35.305-04
+198	\N	Dmitri Smirnov	Dmitri Smirnov, born on November 2, 1948, in Minsk, Belarus, and passed away on April 9, 2020, in the UK, was a Russian-British composer known for his operas and orchestral works. His notable compositions include "The Four Seasons" and "Tiriel." Smirnov was recognized for blending Russian musical traditions with contemporary techniques.	http://dmitrismirnov.com	[]	2024-06-07 15:00:36.431-04	2024-06-07 15:00:36.431-04
+188	\N	Jennifer Higdon	Jennifer Higdon, born on December 31, 1962, in Brooklyn, New York, is an American composer known for her vibrant and accessible orchestral works. Her compositions include "blue cathedral," "Concerto for Orchestra," and the Pulitzer Prize-winning "Violin Concerto." Higdon is also a Grammy Award winner.	http://jenniferhigdon.com	[]	2024-06-07 14:53:21.198-04	2024-06-07 14:53:21.198-04
+190	\N	Vijay Iyer	Vijay Iyer, born on October 26, 1971, in Albany, New York, is an American composer, pianist, and bandleader known for his work in jazz and contemporary classical music. His notable albums include "Historicity" and "Mutations." Iyer has received numerous accolades, including a MacArthur Fellowship.	http://vijay-iyer.com	[]	2024-06-07 14:53:49.799-04	2024-06-07 14:53:49.799-04
+191	\N	Jörg Widmann	Jörg Widmann, born on June 19, 1973, in Munich, Germany, is a renowned composer, clarinetist, and conductor. His notable works include "Münchener Konzert" and "Armonica." Widmann has received numerous awards, including the Arnold Schönberg Prize.	http://joergwidmann.com	[{"url": "https://www.instagram.com/joergwidmann", "platform": "Instagram"}, {"url": "https://twitter.com/JorgWidmann", "platform": "Twitter"}]	2024-06-07 14:54:02.768-04	2024-06-07 14:54:02.768-04
+206	\N	Thomas Newman	Thomas Newman, born on October 20, 1955, in Los Angeles, California, is an American composer known for his film scores. His notable works include the scores for "The Shawshank Redemption," "American Beauty," and "Finding Nemo." Newman has won multiple Academy Awards.	http://thomasnewman.com	[]	2024-06-07 15:18:43.132-04	2024-06-07 15:18:43.132-04
+207	\N	Richard Reed Parry	Richard Reed Parry, born on October 4, 1977, in Toronto, Canada, is a composer and multi-instrumentalist best known as a member of the band Arcade Fire. His classical compositions often blend elements of folk and electronic music. His notable works include "Music for Heart and Breath" and "Quiet River of Dust."	http://richardreedparry.com	[{"url": "https://www.instagram.com/richardreedparry", "platform": "Instagram"}, {"url": "https://twitter.com/rreedparry", "platform": "Twitter"}]	2024-06-07 15:20:57.212-04	2024-06-07 15:20:57.212-04
+209	\N	Judd Greenstein	Judd Greenstein, born on March 24, 1979, is an American composer known for his genre-blending works that often incorporate elements of pop, hip-hop, and indie rock. He is a co-founder of New Amsterdam Records and his notable compositions include "Change" and "City Boy."	http://juddgreenstein.com	[{"url": "https://twitter.com/juddgreenstein", "platform": "Twitter"}]	2024-06-11 08:56:03.313-04	2024-06-11 08:56:03.313-04
+210	\N	Aaron Jay Kernis	Aaron Jay Kernis, born on January 15, 1960, in Philadelphia, Pennsylvania, is an American composer known for his richly expressive and eclectic works. His notable compositions include "Musica Celestis" and "Colored Field." Kernis has won numerous awards, including the Pulitzer Prize for Music and a Grammy Award.	http://aaronjaykernis.com	[]	2024-06-11 08:58:38.175-04	2024-06-11 08:58:38.175-04
+212	\N	Max Richter	Max Richter, born on March 22, 1966, in Hamelin, Germany, is a British composer known for his post-minimalist works that often incorporate electronic and ambient music. His notable compositions include "Sleep," "The Blue Notebooks," and the score for the TV series "The Leftovers."	http://maxrichtermusic.com	[{"url": "https://www.instagram.com/maxrichtermusic", "platform": "Instagram"}, {"url": "https://twitter.com/maxrichtermusic", "platform": "Twitter"}]	2024-06-11 09:13:18.903-04	2024-06-11 09:13:18.903-04
+213	\N	John Luther Adams	John Luther Adams, born on January 23, 1953, in Meridian, Mississippi, is an American composer whose music is deeply inspired by nature, especially the landscapes of Alaska where he lived for many years. His notable works include "Become Ocean," which won the Pulitzer Prize, and "Inuksuit."	https://johnlutheradams.net	[]	2024-06-11 09:13:56.012-04	2024-06-11 09:13:56.012-04
+214	\N	Rolf Wallin	Rolf Wallin, born on September 7, 1957, in Oslo, Norway, is a Norwegian composer known for his innovative and experimental works. His notable compositions include "Act" and "Stonewave." Wallin has received several prestigious awards, including the Nordic Council Music Prize.	http://rolfwallin.org	[{"url": "https://twitter.com/RolfWallin", "platform": "Twitter"}]	2024-06-11 09:14:23.284-04	2024-06-11 09:14:23.284-04
+216	\N	Mohammed Fairouz	Mohammed Fairouz, born on November 1, 1985, in New York City, is an American composer known for his symphonies, operas, and chamber works. His notable compositions include "Symphony No. 4 In the Shadow of No Towers" and "Zabur." Fairouz is recognized for his social and political engagement through music.	http://mohammedfairouz.com	[{"url": "https://twitter.com/m_fairouz", "platform": "Twitter"}, {"url": "https://www.instagram.com/mohammedfairouz", "platform": "Instagram"}]	2024-06-11 09:15:04.914-04	2024-06-11 09:15:04.914-04
+\.
+
+
+--
+-- Data for Name: compositions; Type: TABLE DATA; Schema: public; Owner: jdboss
+--
+
+COPY public.compositions (composition_id, composer_id, title, year_of_composition, description, duration, instrumentation, external_api_name, "createdAt", "updatedAt", audio_file_path) FROM stdin;
+2466	163	Dancing Trains	\N		\N	["Alto Flute", "Ocarina"]	\N	2024-06-07 11:24:21.713-04	2024-06-07 11:24:21.713-04	/Users/jdboss/Desktop/Code/Core II/53.Capstone2-ModernMaestro/backend/uploads/1717773861393-4-16 Pavanne To A Dead Princess.m4a
+2467	165	Duel of the Fates	\N	undefined	04:14	[]	\N	2024-06-07 11:43:46.079-04	2024-06-07 11:43:46.079-04	\N
+2468	165	The Imperial March (Darth Vader''s Theme)	\N	undefined	02:60	[]	\N	2024-06-07 11:43:46.097-04	2024-06-07 11:43:46.097-04	\N
+2469	165	Folsom Prison Blues	\N	undefined	02:49	[]	\N	2024-06-07 11:43:46.111-04	2024-06-07 11:43:46.111-04	\N
+2470	165	Across the Stars (Love Theme from "Star Wars: Attack of the Clones")	\N	undefined	05:33	[]	\N	2024-06-07 11:43:46.122-04	2024-06-07 11:43:46.122-04	\N
+2471	165	Theme From Jurassic Park	\N	undefined	03:27	[]	\N	2024-06-07 11:43:46.133-04	2024-06-07 11:43:46.133-04	\N
+2472	165	Cantina Band	\N	undefined	02:44	[]	\N	2024-06-07 11:43:46.148-04	2024-06-07 11:43:46.148-04	\N
+2473	165	Prologue	\N	undefined	02:10	[]	\N	2024-06-07 11:43:46.159-04	2024-06-07 11:43:46.159-04	\N
+2474	165	Theme (From "Schindler’s List")	\N	undefined	04:05	[]	\N	2024-06-07 11:43:46.167-04	2024-06-07 11:43:46.167-04	\N
+2475	165	Harry''s Wondrous World (From "Harry Potter And The Sorcerer''s Stone")	\N	undefined	04:49	[]	\N	2024-06-07 11:43:46.175-04	2024-06-07 11:43:46.175-04	\N
+2476	165	Main Theme From "Star Wars, Episode IV: A New Hope"	\N	undefined	05:35	[]	\N	2024-06-07 11:43:46.183-04	2024-06-07 11:43:46.183-04	\N
+2477	165	Bicycle Chase (From "E.T. The Extra-Terrestrial")	\N	undefined	03:51	[]	\N	2024-06-07 11:43:46.191-04	2024-06-07 11:43:46.191-04	\N
+2478	165	Main Themes From "Jurassic Park"	\N	undefined	05:22	[]	\N	2024-06-07 11:43:46.2-04	2024-06-07 11:43:46.2-04	\N
+2479	165	Luke And Leia (From "Star Wars, Episode V: The Empire Strikes Back")	\N	undefined	04:38	[]	\N	2024-06-07 11:43:46.207-04	2024-06-07 11:43:46.207-04	\N
+2480	165	Raiders'' March (From "Raiders Of The Lost Ark")	\N	undefined	05:13	[]	\N	2024-06-07 11:43:46.213-04	2024-06-07 11:43:46.213-04	\N
+2481	165	The Imperial March (From "Star Wars, Episode V: The Empire Strikes Back")	\N	undefined	02:55	[]	\N	2024-06-07 11:43:46.219-04	2024-06-07 11:43:46.219-04	\N
+2482	165	Main Themes From "Hook"	\N	undefined	04:11	[]	\N	2024-06-07 11:43:46.224-04	2024-06-07 11:43:46.224-04	\N
+2483	165	Across The Stars (From "Star Wars, Episode I: The Phantom Menace")	\N	undefined	03:15	[]	\N	2024-06-07 11:43:46.23-04	2024-06-07 11:43:46.23-04	\N
+2484	165	Battle Of The Heroes (From "Star Wars, Episode III: The Revenge Of The Sith")	\N	undefined	03:34	[]	\N	2024-06-07 11:43:46.238-04	2024-06-07 11:43:46.238-04	\N
+2485	165	The Planet Krypton (From "Superman")	\N	undefined	01:40	[]	\N	2024-06-07 11:43:46.244-04	2024-06-07 11:43:46.244-04	\N
+2486	165	Aunt Marge''s Waltz (From "Harry Potter And The Prisoner Of Azkaban")	\N	undefined	02:21	[]	\N	2024-06-07 11:43:46.25-04	2024-06-07 11:43:46.25-04	\N
+2487	165	Duel Of The Fates (From "Star Wars, Episode I: The Phantom Menace")	\N	undefined	04:18	[]	\N	2024-06-07 11:43:46.255-04	2024-06-07 11:43:46.255-04	\N
+2488	165	The Chamber Of Secrets (From "Harry Potter And The Chamber Of Secrets")	\N	undefined	04:09	[]	\N	2024-06-07 11:43:46.26-04	2024-06-07 11:43:46.26-04	\N
+2489	165	Music from "Space Camp"	\N	undefined	04:01	[]	\N	2024-06-07 11:43:46.265-04	2024-06-07 11:43:46.265-04	\N
+2490	165	Anakin''s Theme (From "Star Wars, Episode I: The Phantom Menace")	\N	undefined	02:31	[]	\N	2024-06-07 11:43:46.271-04	2024-06-07 11:43:46.271-04	\N
+2491	165	Cantina Band (From "Star Wars, Episode IV: A New Hope")	\N	undefined	02:13	[]	\N	2024-06-07 11:43:46.276-04	2024-06-07 11:43:46.276-04	\N
+2492	165	Princess Leia (From "Star Wars, Episode IV: A New Hope")	\N	undefined	04:08	[]	\N	2024-06-07 11:43:46.283-04	2024-06-07 11:43:46.283-04	\N
+2493	165	Parade Of The Slave Children (From "Indiana Jones And The Temple of Doom")	\N	undefined	02:20	[]	\N	2024-06-07 11:43:46.288-04	2024-06-07 11:43:46.288-04	\N
+2494	165	Escape From Venice (From "Indiana Jones And The Last Crusade")	\N	undefined	04:48	[]	\N	2024-06-07 11:43:46.294-04	2024-06-07 11:43:46.294-04	\N
+2495	165	Yoda''s Theme (From "Star Wars, Episode V: The Empire Strikes Back")	\N	undefined	03:17	[]	\N	2024-06-07 11:43:46.298-04	2024-06-07 11:43:46.298-04	\N
+2496	165	Hedwig''s Theme	\N	undefined	05:09	[]	\N	2024-06-07 11:43:46.302-04	2024-06-07 11:43:46.302-04	\N
+2497	165	Star Wars (Main Theme)	\N	undefined	05:47	[]	\N	2024-06-07 11:43:46.307-04	2024-06-07 11:43:46.307-04	\N
+2498	165	Anakin vs. Obi-Wan	\N	undefined	03:56	[]	\N	2024-06-07 11:43:46.312-04	2024-06-07 11:43:46.312-04	\N
+2499	165	Theme From Schindler''s List	\N	undefined	04:16	[]	\N	2024-06-07 11:43:46.317-04	2024-06-07 11:43:46.317-04	\N
+2500	165	The Mates of Soul (Remastered)	\N	undefined	03:60	[]	\N	2024-06-07 11:43:46.322-04	2024-06-07 11:43:46.322-04	\N
+2501	165	Leaving Hogwarts	\N	undefined	02:14	[]	\N	2024-06-07 11:43:46.327-04	2024-06-07 11:43:46.327-04	\N
+2502	165	Battle of the Heroes	\N	undefined	03:43	[]	\N	2024-06-07 11:43:46.332-04	2024-06-07 11:43:46.332-04	\N
+2503	165	Okie From Muskogee - Live	\N	undefined	01:36	[]	\N	2024-06-07 11:43:46.337-04	2024-06-07 11:43:46.337-04	\N
+2504	165	Rey''s Theme	\N	undefined	03:11	[]	\N	2024-06-07 11:43:46.342-04	2024-06-07 11:43:46.342-04	\N
+2505	165	Harry''s Wondrous World - Extended Version	\N	undefined	05:21	[]	\N	2024-06-07 11:43:46.348-04	2024-06-07 11:43:46.348-04	\N
+2506	165	Anakin''s Betrayal	\N	undefined	04:05	[]	\N	2024-06-07 11:43:46.352-04	2024-06-07 11:43:46.352-04	\N
+2507	165	A Window to the Past	\N	undefined	03:54	[]	\N	2024-06-07 11:43:46.357-04	2024-06-07 11:43:46.357-04	\N
+2508	165	March of the Resistance	\N	undefined	02:36	[]	\N	2024-06-07 11:43:46.364-04	2024-06-07 11:43:46.364-04	\N
+2509	165	Raiders March	\N	undefined	05:06	[]	\N	2024-06-07 11:43:46.37-04	2024-06-07 11:43:46.37-04	\N
+2510	165	The Throne Room and End Title	\N	undefined	05:34	[]	\N	2024-06-07 11:43:46.375-04	2024-06-07 11:43:46.375-04	\N
+2511	165	Yoda''s Theme	\N	undefined	03:28	[]	\N	2024-06-07 11:43:46.379-04	2024-06-07 11:43:46.379-04	\N
+2512	165	Princess Leia''s Theme	\N	undefined	04:23	[]	\N	2024-06-07 11:43:46.385-04	2024-06-07 11:43:46.385-04	\N
+2513	165	Anakin''s Dark Deeds	\N	undefined	04:04	[]	\N	2024-06-07 11:43:46.39-04	2024-06-07 11:43:46.39-04	\N
+2514	165	The Droid Invasion and the Appearance of Darth Maul	\N	undefined	05:11	[]	\N	2024-06-07 11:43:46.396-04	2024-06-07 11:43:46.396-04	\N
+2515	165	Sayuri''s Theme	\N	undefined	01:31	[]	\N	2024-06-07 11:43:46.401-04	2024-06-07 11:43:46.401-04	\N
+2516	165	The Arrival of Baby Harry	\N	undefined	04:25	[]	\N	2024-06-07 11:43:46.406-04	2024-06-07 11:43:46.406-04	\N
+2517	166	Cornfield Chase	\N	undefined	02:07	[]	\N	2024-06-07 12:00:07.544-04	2024-06-07 12:00:07.544-04	\N
+2518	166	Time	\N	undefined	04:36	[]	\N	2024-06-07 12:00:07.565-04	2024-06-07 12:00:07.565-04	\N
+2519	166	Day One (Interstellar Theme)	\N	undefined	03:19	[]	\N	2024-06-07 12:00:07.58-04	2024-06-07 12:00:07.58-04	\N
+2520	166	Hans Zimmer: Film Music Medley - From the Films "Inception", "Interstellar", "The DaVinci Code", "Gladiator" & "James Bond"	\N	undefined	06:12	[]	\N	2024-06-07 12:00:07.594-04	2024-06-07 12:00:07.594-04	\N
+2521	166	Klaus Badelt & Hans Zimmer: Medley of Pirates of the Caribbean - From the Film "Pirates of the Caribbean"	\N	undefined	04:06	[]	\N	2024-06-07 12:00:07.609-04	2024-06-07 12:00:07.609-04	\N
+2522	166	A Time of Quiet Between the Storms	\N	undefined	04:22	[]	\N	2024-06-07 12:00:07.625-04	2024-06-07 12:00:07.625-04	\N
+2523	166	Now We Are Free	\N	undefined	04:14	[]	\N	2024-06-07 12:00:07.638-04	2024-06-07 12:00:07.638-04	\N
+2524	166	This Land	\N	undefined	02:55	[]	\N	2024-06-07 12:00:07.647-04	2024-06-07 12:00:07.647-04	\N
+2525	166	Beginnings Are Such Delicate Times	\N	undefined	08:56	[]	\N	2024-06-07 12:00:07.656-04	2024-06-07 12:00:07.656-04	\N
+2526	166	Mountains	\N	undefined	03:39	[]	\N	2024-06-07 12:00:07.663-04	2024-06-07 12:00:07.663-04	\N
+2527	166	Kiss the Ring	\N	undefined	03:12	[]	\N	2024-06-07 12:00:07.668-04	2024-06-07 12:00:07.668-04	\N
+2528	166	Suite From The Lion King: King Of Pride Rock	\N	undefined	01:49	[]	\N	2024-06-07 12:00:07.675-04	2024-06-07 12:00:07.675-04	\N
+2529	166	S.T.A.Y.	\N	undefined	06:24	[]	\N	2024-06-07 12:00:07.682-04	2024-06-07 12:00:07.682-04	\N
+2530	166	Worm Ride	\N	undefined	02:20	[]	\N	2024-06-07 12:00:07.688-04	2024-06-07 12:00:07.688-04	\N
+2531	166	Honor Him	\N	undefined	01:20	[]	\N	2024-06-07 12:00:07.693-04	2024-06-07 12:00:07.693-04	\N
+2532	166	No Time for Caution	\N	undefined	04:06	[]	\N	2024-06-07 12:00:07.699-04	2024-06-07 12:00:07.699-04	\N
+2533	166	Oogway Ascends	\N	undefined	02:04	[]	\N	2024-06-07 12:00:07.705-04	2024-06-07 12:00:07.705-04	\N
+2534	166	Dream Is Collapsing	\N	undefined	02:24	[]	\N	2024-06-07 12:00:07.712-04	2024-06-07 12:00:07.712-04	\N
+2535	166	Arrival	\N	undefined	01:41	[]	\N	2024-06-07 12:00:07.718-04	2024-06-07 12:00:07.718-04	\N
+2536	166	One Day - From "Pirates of the Caribbean: At World''s End"/Score	\N	undefined	04:02	[]	\N	2024-06-07 12:00:07.723-04	2024-06-07 12:00:07.723-04	\N
+2537	166	Only I Will Remain	\N	undefined	06:44	[]	\N	2024-06-07 12:00:07.727-04	2024-06-07 12:00:07.727-04	\N
+2538	166	Davy Jones	\N	undefined	03:15	[]	\N	2024-06-07 12:00:07.737-04	2024-06-07 12:00:07.737-04	\N
+2539	166	Chevaliers De Sangreal - From The Da Vinci Code Original Motion Picture Soundtrack	\N	undefined	04:07	[]	\N	2024-06-07 12:00:07.742-04	2024-06-07 12:00:07.742-04	\N
+2540	166	Drink Up Me Hearties Yo Ho - From "Pirates of the Caribbean: At World''s End"/Score	\N	undefined	04:32	[]	\N	2024-06-07 12:00:07.748-04	2024-06-07 12:00:07.748-04	\N
+2541	166	Flight	\N	undefined	04:18	[]	\N	2024-06-07 12:00:07.753-04	2024-06-07 12:00:07.753-04	\N
+2542	166	Under the Stars	\N	undefined	03:45	[]	\N	2024-06-07 12:00:07.757-04	2024-06-07 12:00:07.757-04	\N
+2543	166	Ripples in the Sand	\N	undefined	05:15	[]	\N	2024-06-07 12:00:07.762-04	2024-06-07 12:00:07.762-04	\N
+2544	166	Lisan al Gaib	\N	undefined	06:37	[]	\N	2024-06-07 12:00:07.766-04	2024-06-07 12:00:07.766-04	\N
+2545	166	Eclipse	\N	undefined	05:14	[]	\N	2024-06-07 12:00:07.77-04	2024-06-07 12:00:07.77-04	\N
+2546	166	Stay	\N	undefined	06:52	[]	\N	2024-06-07 12:00:07.776-04	2024-06-07 12:00:07.776-04	\N
+2547	166	Hoist the Colours - From "Pirates of the Caribbean: At World''s End"/Soundtrack Version	\N	undefined	01:31	[]	\N	2024-06-07 12:00:07.783-04	2024-06-07 12:00:07.783-04	\N
+2548	166	First Step	\N	undefined	01:48	[]	\N	2024-06-07 12:00:07.787-04	2024-06-07 12:00:07.787-04	\N
+2549	166	Why Do We Fall?	\N	undefined	02:03	[]	\N	2024-06-07 12:00:07.792-04	2024-06-07 12:00:07.792-04	\N
+2550	166	Harkonnen Arena	\N	undefined	05:22	[]	\N	2024-06-07 12:00:07.797-04	2024-06-07 12:00:07.797-04	\N
+2551	166	Dust	\N	undefined	05:41	[]	\N	2024-06-07 12:00:07.802-04	2024-06-07 12:00:07.802-04	\N
+2552	166	Leaving Caladan	\N	undefined	01:55	[]	\N	2024-06-07 12:00:07.807-04	2024-06-07 12:00:07.807-04	\N
+2553	166	Jack Sparrow	\N	undefined	06:05	[]	\N	2024-06-07 12:00:07.813-04	2024-06-07 12:00:07.813-04	\N
+2554	166	Up Is Down - From "Pirates of the Caribbean: At World''s End"/Score	\N	undefined	02:42	[]	\N	2024-06-07 12:00:07.818-04	2024-06-07 12:00:07.818-04	\N
+2555	166	Harvester Attack	\N	undefined	03:40	[]	\N	2024-06-07 12:00:07.823-04	2024-06-07 12:00:07.823-04	\N
+2556	166	A Way of Life	\N	undefined	08:04	[]	\N	2024-06-07 12:00:07.828-04	2024-06-07 12:00:07.828-04	\N
+2557	166	Dreaming of the Crash	\N	undefined	03:56	[]	\N	2024-06-07 12:00:07.833-04	2024-06-07 12:00:07.833-04	\N
+2558	166	Worm Army	\N	undefined	03:33	[]	\N	2024-06-07 12:00:07.837-04	2024-06-07 12:00:07.837-04	\N
+2559	166	The Wormhole	\N	undefined	01:31	[]	\N	2024-06-07 12:00:07.842-04	2024-06-07 12:00:07.842-04	\N
+2560	166	...To Die For	\N	undefined	04:18	[]	\N	2024-06-07 12:00:07.847-04	2024-06-07 12:00:07.847-04	\N
+2561	166	Travel South	\N	undefined	01:10	[]	\N	2024-06-07 12:00:07.852-04	2024-06-07 12:00:07.852-04	\N
+2562	166	Paul''s Dream	\N	undefined	07:03	[]	\N	2024-06-07 12:00:07.856-04	2024-06-07 12:00:07.856-04	\N
+2563	166	Message from Home	\N	undefined	01:41	[]	\N	2024-06-07 12:00:07.862-04	2024-06-07 12:00:07.862-04	\N
+2564	166	The Sietch	\N	undefined	02:34	[]	\N	2024-06-07 12:00:07.867-04	2024-06-07 12:00:07.867-04	\N
+2565	166	Resurrection	\N	undefined	02:17	[]	\N	2024-06-07 12:00:07.872-04	2024-06-07 12:00:07.872-04	\N
+2566	167	Whitacre: The Seal Lullaby	\N	undefined	04:13	[]	\N	2024-06-07 12:00:29.921-04	2024-06-07 12:00:29.921-04	\N
+2567	167	Whitacre: Lux Aurumque	\N	undefined	04:16	[]	\N	2024-06-07 12:00:29.942-04	2024-06-07 12:00:29.942-04	\N
+2568	167	Whitacre: Sleep	\N	undefined	05:34	[]	\N	2024-06-07 12:00:29.956-04	2024-06-07 12:00:29.956-04	\N
+2569	167	The Seal Lullaby (Arr. Parkin)	\N	undefined	03:39	[]	\N	2024-06-07 12:00:29.97-04	2024-06-07 12:00:29.97-04	\N
+2570	167	Sleep (orch. Jim Clements)	\N	undefined	05:58	[]	\N	2024-06-07 12:00:29.982-04	2024-06-07 12:00:29.982-04	\N
+2571	167	The Sacred Veil: XII. Child of Wonder	\N	undefined	04:42	[]	\N	2024-06-07 12:00:29.995-04	2024-06-07 12:00:29.995-04	\N
+2572	167	October	\N	undefined	07:33	[]	\N	2024-06-07 12:00:30.006-04	2024-06-07 12:00:30.006-04	\N
+2573	167	Sing Gently	\N	undefined	03:44	[]	\N	2024-06-07 12:00:30.018-04	2024-06-07 12:00:30.018-04	\N
+2574	167	Whitacre: Five Hebrew Love Songs: Temuná (A Picture)	\N	undefined	01:46	[]	\N	2024-06-07 12:00:30.03-04	2024-06-07 12:00:30.03-04	\N
+2575	167	Goodnight Moon	\N	undefined	05:14	[]	\N	2024-06-07 12:00:30.04-04	2024-06-07 12:00:30.04-04	\N
+2576	167	Whitacre: A Boy And A Girl	\N	undefined	04:35	[]	\N	2024-06-07 12:00:30.06-04	2024-06-07 12:00:30.06-04	\N
+2577	167	Fly to Paradise - Main Mix	\N	undefined	05:12	[]	\N	2024-06-07 12:00:30.074-04	2024-06-07 12:00:30.074-04	\N
+2578	167	Alleluia	\N	undefined	09:24	[]	\N	2024-06-07 12:00:30.083-04	2024-06-07 12:00:30.083-04	\N
+2579	167	Whitacre: Water Night	\N	undefined	05:27	[]	\N	2024-06-07 12:00:30.09-04	2024-06-07 12:00:30.09-04	\N
+2580	167	All Seems Beautiful to Me	\N	undefined	04:53	[]	\N	2024-06-07 12:00:30.097-04	2024-06-07 12:00:30.097-04	\N
+2581	167	Hurt	\N	undefined	07:08	[]	\N	2024-06-07 12:00:30.107-04	2024-06-07 12:00:30.107-04	\N
+2582	167	Glow - From "World of Color Winter Dreams"	\N	undefined	03:08	[]	\N	2024-06-07 12:00:30.115-04	2024-06-07 12:00:30.115-04	\N
+2583	167	The Seal Lullaby	\N	undefined	04:35	[]	\N	2024-06-07 12:00:30.123-04	2024-06-07 12:00:30.123-04	\N
+2584	167	Whitacre: Five Hebrew Love Songs: Lárov (Mostly)	\N	undefined	00:58	[]	\N	2024-06-07 12:00:30.129-04	2024-06-07 12:00:30.129-04	\N
+2585	167	Equus	\N	undefined	09:02	[]	\N	2024-06-07 12:00:30.135-04	2024-06-07 12:00:30.135-04	\N
+2586	167	Whitacre: Nox Aurumque	\N	undefined	06:20	[]	\N	2024-06-07 12:00:30.146-04	2024-06-07 12:00:30.146-04	\N
+2587	167	i carry your heart	\N	undefined	04:32	[]	\N	2024-06-07 12:00:30.161-04	2024-06-07 12:00:30.161-04	\N
+2588	167	Whitacre: Five Hebrew Love Songs: Kalá Kallá (Light Bride)	\N	undefined	03:08	[]	\N	2024-06-07 12:00:30.169-04	2024-06-07 12:00:30.169-04	\N
+2589	167	Whitacre: Leonardo Dreams Of His Flying Machine	\N	undefined	08:40	[]	\N	2024-06-07 12:00:30.175-04	2024-06-07 12:00:30.175-04	\N
+2590	167	Fly to Paradise	\N	undefined	05:14	[]	\N	2024-06-07 12:00:30.184-04	2024-06-07 12:00:30.184-04	\N
+2591	167	A Boy and a Girl	\N	undefined	04:53	[]	\N	2024-06-07 12:00:30.191-04	2024-06-07 12:00:30.191-04	\N
+2592	167	October (Eric Whitacre Conducts)	\N	undefined	06:59	[]	\N	2024-06-07 12:00:30.202-04	2024-06-07 12:00:30.202-04	\N
+2593	167	Whitacre: Five Hebrew Love Songs: Éyze Shéleg! (What Snow!)	\N	undefined	02:06	[]	\N	2024-06-07 12:00:30.209-04	2024-06-07 12:00:30.209-04	\N
+2594	167	Deep Field: Earth Choir	\N	undefined	04:54	[]	\N	2024-06-07 12:00:30.218-04	2024-06-07 12:00:30.218-04	\N
+2595	167	Whitacre: Five Hebrew Love Songs: Rakút (Tenderness)	\N	undefined	02:22	[]	\N	2024-06-07 12:00:30.235-04	2024-06-07 12:00:30.235-04	\N
+2596	167	Go, Lovely Rose	\N	undefined	04:33	[]	\N	2024-06-07 12:00:30.24-04	2024-06-07 12:00:30.24-04	\N
+2597	167	Glow	\N	undefined	03:12	[]	\N	2024-06-07 12:00:30.249-04	2024-06-07 12:00:30.249-04	\N
+2598	167	Sleep	\N	undefined	05:16	[]	\N	2024-06-07 12:00:30.254-04	2024-06-07 12:00:30.254-04	\N
+2599	167	The Sacred Veil: III. Home	\N	undefined	03:56	[]	\N	2024-06-07 12:00:30.264-04	2024-06-07 12:00:30.264-04	\N
+2600	167	The Seal Lullaby (version for wind ensemble)	\N	undefined	04:22	[]	\N	2024-06-07 12:00:30.269-04	2024-06-07 12:00:30.269-04	\N
+2601	167	When David Heard	\N	undefined	17:39	[]	\N	2024-06-07 12:00:30.273-04	2024-06-07 12:00:30.273-04	\N
+2602	167	Sleep - Arr. for Marimba Quartet	\N	undefined	05:56	[]	\N	2024-06-07 12:00:30.279-04	2024-06-07 12:00:30.279-04	\N
+2603	167	Godzilla Eats Las Vegas: Gawdsilla Eats Las Vegas!	\N	undefined	12:37	[]	\N	2024-06-07 12:00:30.284-04	2024-06-07 12:00:30.284-04	\N
+2604	167	Cloudburst	\N	undefined	08:26	[]	\N	2024-06-07 12:00:30.288-04	2024-06-07 12:00:30.288-04	\N
+2605	167	The Sacred Veil: V. Whenever There is Birth	\N	undefined	03:36	[]	\N	2024-06-07 12:00:30.295-04	2024-06-07 12:00:30.295-04	\N
+2606	167	The Sacred Veil: II. In a Dark and Distant Year	\N	undefined	02:07	[]	\N	2024-06-07 12:00:30.301-04	2024-06-07 12:00:30.301-04	\N
+2607	168	Wallfisch: Lamorma	\N	undefined	03:06	[]	\N	2024-06-07 12:00:50.817-04	2024-06-07 12:00:50.817-04	\N
+2608	168	Wallfisch: Gilbert''s Theme	\N	undefined	01:27	[]	\N	2024-06-07 12:00:50.833-04	2024-06-07 12:00:50.833-04	\N
+2609	168	Wallfisch: Wedding	\N	undefined	01:19	[]	\N	2024-06-07 12:00:50.844-04	2024-06-07 12:00:50.844-04	\N
+2610	168	Wallfisch: The Races	\N	undefined	01:34	[]	\N	2024-06-07 12:00:50.856-04	2024-06-07 12:00:50.856-04	\N
+2611	168	Wallfisch: Siren''s Lullaby	\N	undefined	02:50	[]	\N	2024-06-07 12:00:50.868-04	2024-06-07 12:00:50.868-04	\N
+2612	168	Wallfisch: The Storm	\N	undefined	03:15	[]	\N	2024-06-07 12:00:50.877-04	2024-06-07 12:00:50.877-04	\N
+2613	168	Wallfisch: Final Kiss	\N	undefined	04:59	[]	\N	2024-06-07 12:00:50.886-04	2024-06-07 12:00:50.886-04	\N
+2614	168	Wallfisch: Painting	\N	undefined	04:51	[]	\N	2024-06-07 12:00:50.898-04	2024-06-07 12:00:50.898-04	\N
+2615	168	Wallfisch: Art And Life	\N	undefined	02:18	[]	\N	2024-06-07 12:00:50.906-04	2024-06-07 12:00:50.906-04	\N
+2616	168	Wallfisch: Mirror	\N	undefined	02:18	[]	\N	2024-06-07 12:00:50.913-04	2024-06-07 12:00:50.913-04	\N
+2617	168	Wallfisch: Unaccountable	\N	undefined	02:14	[]	\N	2024-06-07 12:00:50.921-04	2024-06-07 12:00:50.921-04	\N
+2618	168	Wallfisch: Aftermath	\N	undefined	01:56	[]	\N	2024-06-07 12:00:50.927-04	2024-06-07 12:00:50.927-04	\N
+2619	168	Wallfisch: Epilogue: Morning Ride	\N	undefined	04:03	[]	\N	2024-06-07 12:00:50.934-04	2024-06-07 12:00:50.934-04	\N
+2620	168	Wallfisch: Florence''s Hut	\N	undefined	01:56	[]	\N	2024-06-07 12:00:50.945-04	2024-06-07 12:00:50.945-04	\N
+2621	168	Wallfisch: AJ''s Request	\N	undefined	01:06	[]	\N	2024-06-07 12:00:50.953-04	2024-06-07 12:00:50.953-04	\N
+2622	168	Wallfisch: Proposal	\N	undefined	01:30	[]	\N	2024-06-07 12:00:50.959-04	2024-06-07 12:00:50.959-04	\N
+2623	168	Wallfisch: Florence''s Theme	\N	undefined	02:36	[]	\N	2024-06-07 12:00:50.965-04	2024-06-07 12:00:50.965-04	\N
+2624	168	Variations On A Theme By Paganini, Op. 35: Variation XII	\N	undefined	01:14	[]	\N	2024-06-07 12:00:50.975-04	2024-06-07 12:00:50.975-04	\N
+2625	168	Orfeo ed Euridice, Wq. 30: Melodie dell''Orfeo (Arr. by Sgambati)	\N	undefined	02:59	[]	\N	2024-06-07 12:00:50.983-04	2024-06-07 12:00:50.983-04	\N
+2626	168	Wallfisch: Cyanide	\N	undefined	03:20	[]	\N	2024-06-07 12:00:50.989-04	2024-06-07 12:00:50.989-04	\N
+2627	168	Waltz No .7 in C-Sharp Minor, Op. 64 No. 2: Tempo giusto	\N	undefined	03:46	[]	\N	2024-06-07 12:00:50.994-04	2024-06-07 12:00:50.994-04	\N
+2628	168	24 Preludes for piano, Op. 11: No. 11 In B Major	\N	undefined	01:32	[]	\N	2024-06-07 12:00:50.998-04	2024-06-07 12:00:50.998-04	\N
+2629	168	Wallfisch: Gilbert Returns	\N	undefined	03:49	[]	\N	2024-06-07 12:00:51.001-04	2024-06-07 12:00:51.001-04	\N
+2630	168	Gluck: Orfeo ed Euridice, Wq. 30 (Arranged by Sgambati): Melodie dell''Orfeo	\N	undefined	03:02	[]	\N	2024-06-07 12:00:51.005-04	2024-06-07 12:00:51.005-04	\N
+2631	168	24 Preludes for Piano, Op. 11: No. 11 in B	\N	undefined	01:32	[]	\N	2024-06-07 12:00:51.009-04	2024-06-07 12:00:51.009-04	\N
+2632	168	Variations on a Theme by Paganini, Op.35 / Book 1: Variation XII	\N	undefined	01:14	[]	\N	2024-06-07 12:00:51.013-04	2024-06-07 12:00:51.013-04	\N
+2633	169	Vocalise I	\N	undefined	03:06	[]	\N	2024-06-07 12:01:42.664-04	2024-06-07 12:01:42.664-04	\N
+2634	169	Vocalise II	\N	undefined	01:33	[]	\N	2024-06-07 12:01:42.681-04	2024-06-07 12:01:42.681-04	\N
+2635	169	Mambo - En Vivo	\N	undefined	07:24	[]	\N	2024-06-07 12:01:42.694-04	2024-06-07 12:01:42.694-04	\N
+2636	169	La caída de la República	\N	undefined	03:12	[]	\N	2024-06-07 12:01:42.707-04	2024-06-07 12:01:42.707-04	\N
+
+
+
+
+
+
+
+
+
+2637	169	Esto no es una frontera, esto es un río	\N	undefined	04:01	[]	\N	2024-06-07 12:01:42.721-04	2024-06-07 12:01:42.721-04	\N
+2638	169	María Teresa	\N	undefined	06:43	[]	\N	2024-06-07 12:01:42.733-04	2024-06-07 12:01:42.733-04	\N
+2639	169	¿Quien puede detener la lluvia?	\N	undefined	03:52	[]	\N	2024-06-07 12:01:42.747-04	2024-06-07 12:01:42.747-04	\N
+2640	169	El 25 de septiembre de 1828	\N	undefined	04:41	[]	\N	2024-06-07 12:01:42.759-04	2024-06-07 12:01:42.759-04	\N
+2641	169	Fanny du Villars	\N	undefined	01:17	[]	\N	2024-06-07 12:01:42.77-04	2024-06-07 12:01:42.77-04	\N
+2642	169	París	\N	undefined	01:22	[]	\N	2024-06-07 12:01:42.782-04	2024-06-07 12:01:42.782-04	\N
+2643	169	Manuela	\N	undefined	01:54	[]	\N	2024-06-07 12:01:42.792-04	2024-06-07 12:01:42.792-04	\N
+2644	169	Boyacá	\N	undefined	02:43	[]	\N	2024-06-07 12:01:42.803-04	2024-06-07 12:01:42.803-04	\N
+2645	169	Ellos están con nosotros	\N	undefined	03:29	[]	\N	2024-06-07 12:01:42.809-04	2024-06-07 12:01:42.809-04	\N
+2646	169	Regreso a Venezuela	\N	undefined	03:51	[]	\N	2024-06-07 12:01:42.816-04	2024-06-07 12:01:42.816-04	\N
+2647	169	Angostura	\N	undefined	01:59	[]	\N	2024-06-07 12:01:42.821-04	2024-06-07 12:01:42.821-04	\N
+2648	169	El paso de Los Andes	\N	undefined	04:04	[]	\N	2024-06-07 12:01:42.833-04	2024-06-07 12:01:42.833-04	\N
+2649	169	Destierro a Cartagena	\N	undefined	03:25	[]	\N	2024-06-07 12:01:42.841-04	2024-06-07 12:01:42.841-04	\N
+2650	169	El ultimo viaje	\N	undefined	03:39	[]	\N	2024-06-07 12:01:42.847-04	2024-06-07 12:01:42.847-04	\N
+2651	169	Muere el Mariscal	\N	undefined	01:30	[]	\N	2024-06-07 12:01:42.852-04	2024-06-07 12:01:42.852-04	\N
+2652	169	Jamaica	\N	undefined	02:26	[]	\N	2024-06-07 12:01:42.857-04	2024-06-07 12:01:42.857-04	\N
+2653	170	Bathroom Dance	\N	undefined	02:08	[]	\N	2024-06-07 12:02:02.549-04	2024-06-07 12:02:02.549-04	\N
+2654	170	Defeated Clown	\N	undefined	02:39	[]	\N	2024-06-07 12:02:02.566-04	2024-06-07 12:02:02.566-04	\N
+2655	170	Call Me Joker	\N	undefined	04:49	[]	\N	2024-06-07 12:02:02.58-04	2024-06-07 12:02:02.58-04	\N
+2656	170	Erupting Light	\N	undefined	02:22	[]	\N	2024-06-07 12:02:02.591-04	2024-06-07 12:02:02.591-04	\N
+2657	170	Bær	\N	undefined	03:18	[]	\N	2024-06-07 12:02:02.599-04	2024-06-07 12:02:02.599-04	\N
+2658	170	12 Hours Before	\N	undefined	02:32	[]	\N	2024-06-07 12:02:02.607-04	2024-06-07 12:02:02.607-04	\N
+2659	170	Hoyt''s Office	\N	undefined	01:25	[]	\N	2024-06-07 12:02:02.616-04	2024-06-07 12:02:02.616-04	\N
+2660	170	Meeting Bruce Wayne	\N	undefined	04:36	[]	\N	2024-06-07 12:02:02.625-04	2024-06-07 12:02:02.625-04	\N
+2661	170	Penny Taken to the Hospital	\N	undefined	01:49	[]	\N	2024-06-07 12:02:02.636-04	2024-06-07 12:02:02.636-04	\N
+2662	170	Bridge of Death	\N	undefined	04:44	[]	\N	2024-06-07 12:02:02.646-04	2024-06-07 12:02:02.646-04	\N
+2663	170	Torrek	\N	undefined	02:20	[]	\N	2024-06-07 12:02:02.654-04	2024-06-07 12:02:02.654-04	\N
+2664	170	A Bad Comedian	\N	undefined	01:28	[]	\N	2024-06-07 12:02:02.663-04	2024-06-07 12:02:02.663-04	\N
+2665	170	The Mustard Seed	\N	undefined	02:11	[]	\N	2024-06-07 12:02:02.671-04	2024-06-07 12:02:02.671-04	\N
+2666	170	The Door	\N	undefined	02:43	[]	\N	2024-06-07 12:02:02.68-04	2024-06-07 12:02:02.68-04	\N
+2667	170	Young Penny	\N	undefined	02:02	[]	\N	2024-06-07 12:02:02.688-04	2024-06-07 12:02:02.688-04	\N
+2668	170	Following Sophie	\N	undefined	01:33	[]	\N	2024-06-07 12:02:02.695-04	2024-06-07 12:02:02.695-04	\N
+2669	170	Escape from the Train	\N	undefined	02:31	[]	\N	2024-06-07 12:02:02.7-04	2024-06-07 12:02:02.7-04	\N
+2670	170	Battlefield 2042	\N	undefined	02:32	[]	\N	2024-06-07 12:02:02.707-04	2024-06-07 12:02:02.707-04	\N
+2671	170	Penny in the Hospital	\N	undefined	01:18	[]	\N	2024-06-07 12:02:02.717-04	2024-06-07 12:02:02.717-04	\N
+2672	170	Arthur Comes to Sophie	\N	undefined	01:39	[]	\N	2024-06-07 12:02:02.727-04	2024-06-07 12:02:02.727-04	\N
+2673	170	Learning How to Act Normal	\N	undefined	01:18	[]	\N	2024-06-07 12:02:02.735-04	2024-06-07 12:02:02.735-04	\N
+2674	170	Líður - Chernobyl Version	\N	undefined	02:48	[]	\N	2024-06-07 12:02:02.742-04	2024-06-07 12:02:02.742-04	\N
+2675	170	Subway	\N	undefined	03:34	[]	\N	2024-06-07 12:02:02.75-04	2024-06-07 12:02:02.75-04	\N
+2676	170	Hiding in the Fridge	\N	undefined	01:23	[]	\N	2024-06-07 12:02:02.761-04	2024-06-07 12:02:02.761-04	\N
+2677	170	Looking for Answers	\N	undefined	00:51	[]	\N	2024-06-07 12:02:02.767-04	2024-06-07 12:02:02.767-04	\N
+2678	170	Evacuation	\N	undefined	04:44	[]	\N	2024-06-07 12:02:02.773-04	2024-06-07 12:02:02.773-04	\N
+2679	170	Strokur	\N	undefined	07:30	[]	\N	2024-06-07 12:02:02.779-04	2024-06-07 12:02:02.779-04	\N
+2680	170	Confession	\N	undefined	01:29	[]	\N	2024-06-07 12:02:02.786-04	2024-06-07 12:02:02.786-04	\N
+2681	170	Gallery	\N	undefined	02:24	[]	\N	2024-06-07 12:02:02.791-04	2024-06-07 12:02:02.791-04	\N
+2682	170	Dealing With Destruction	\N	undefined	01:55	[]	\N	2024-06-07 12:02:02.797-04	2024-06-07 12:02:02.797-04	\N
+2683	170	Opaque	\N	undefined	03:51	[]	\N	2024-06-07 12:02:02.803-04	2024-06-07 12:02:02.803-04	\N
+2684	170	The Bomber	\N	undefined	01:35	[]	\N	2024-06-07 12:02:02.809-04	2024-06-07 12:02:02.809-04	\N
+2685	170	Til baka	\N	undefined	02:17	[]	\N	2024-06-07 12:02:02.815-04	2024-06-07 12:02:02.815-04	\N
+2686	170	Fólk fær andlit	\N	undefined	05:13	[]	\N	2024-06-07 12:02:02.822-04	2024-06-07 12:02:02.822-04	\N
+2687	170	Turbine Hall	\N	undefined	02:37	[]	\N	2024-06-07 12:02:02.828-04	2024-06-07 12:02:02.828-04	\N
+2688	170	Pump Room	\N	undefined	03:44	[]	\N	2024-06-07 12:02:02.835-04	2024-06-07 12:02:02.835-04	\N
+2689	170	Elevation	\N	undefined	05:58	[]	\N	2024-06-07 12:02:02.84-04	2024-06-07 12:02:02.84-04	\N
+2690	170	Overcast	\N	undefined	03:18	[]	\N	2024-06-07 12:02:02.851-04	2024-06-07 12:02:02.851-04	\N
+2691	170	Clean Up	\N	undefined	01:41	[]	\N	2024-06-07 12:02:02.864-04	2024-06-07 12:02:02.864-04	\N
+2692	170	Guðnadóttir: Minor C Variation	\N	undefined	03:08	[]	\N	2024-06-07 12:02:02.871-04	2024-06-07 12:02:02.871-04	\N
+2693	170	Heyr Himnasmiður	\N	undefined	03:09	[]	\N	2024-06-07 12:02:02.879-04	2024-06-07 12:02:02.879-04	\N
+2694	170	Cana	\N	undefined	01:40	[]	\N	2024-06-07 12:02:02.888-04	2024-06-07 12:02:02.888-04	\N
+2695	170	Corridors	\N	undefined	03:13	[]	\N	2024-06-07 12:02:02.897-04	2024-06-07 12:02:02.897-04	\N
+2696	170	Waiting for the Engineer	\N	undefined	01:32	[]	\N	2024-06-07 12:02:02.904-04	2024-06-07 12:02:02.904-04	\N
+2697	170	Moving Isabelle	\N	undefined	01:09	[]	\N	2024-06-07 12:02:02.91-04	2024-06-07 12:02:02.91-04	\N
+2698	170	Frá	\N	undefined	01:23	[]	\N	2024-06-07 12:02:02.915-04	2024-06-07 12:02:02.915-04	\N
+2699	170	Líður	\N	undefined	02:46	[]	\N	2024-06-07 12:02:02.921-04	2024-06-07 12:02:02.921-04	\N
+2700	170	Not All Men - From "Women Talking" Soundtrack	\N	undefined	03:30	[]	\N	2024-06-07 12:02:02.928-04	2024-06-07 12:02:02.928-04	\N
+2701	170	Maundy	\N	undefined	02:26	[]	\N	2024-06-07 12:02:02.936-04	2024-06-07 12:02:02.936-04	\N
+2702	171	Revelry: II. War	\N	undefined	03:09	[]	\N	2024-06-07 12:03:28.181-04	2024-06-07 12:03:28.181-04	\N
+2703	171	Umoja: Anthem of Unity	\N	undefined	13:28	[]	\N	2024-06-07 12:03:28.198-04	2024-06-07 12:03:28.198-04	\N
+2704	171	Revelry: I. Mysterio	\N	undefined	07:07	[]	\N	2024-06-07 12:03:28.208-04	2024-06-07 12:03:28.208-04	\N
+2705	171	Roma	\N	undefined	11:31	[]	\N	2024-06-07 12:03:28.221-04	2024-06-07 12:03:28.221-04	\N
+2706	171	Valerie Coleman: Tzigane	\N	undefined	10:14	[]	\N	2024-06-07 12:03:28.234-04	2024-06-07 12:03:28.234-04	\N
+2707	171	Valerie Coleman: Red Clay & Mississippi Delta	\N	undefined	05:24	[]	\N	2024-06-07 12:03:28.244-04	2024-06-07 12:03:28.244-04	\N
+2708	171	Umoja: The First Day of Kwanza 1997	\N	undefined	02:32	[]	\N	2024-06-07 12:03:28.252-04	2024-06-07 12:03:28.252-04	\N
+2709	171	Tracing Visions for String Orchestra: II. Amandla!	\N	undefined	05:15	[]	\N	2024-06-07 12:03:28.271-04	2024-06-07 12:03:28.271-04	\N
+2710	171	Tracing Visions for String Orchestra: I. Till.	\N	undefined	05:52	[]	\N	2024-06-07 12:03:28.278-04	2024-06-07 12:03:28.278-04	\N
+2711	171	Danza de la mariposa	\N	undefined	07:23	[]	\N	2024-06-07 12:03:28.285-04	2024-06-07 12:03:28.285-04	\N
+2712	171	Shotgun Houses: II. Grand Ave.	\N	undefined	05:43	[]	\N	2024-06-07 12:03:28.293-04	2024-06-07 12:03:28.293-04	\N
+2713	171	Legends: III. Gaia	\N	undefined	02:58	[]	\N	2024-06-07 12:03:28.299-04	2024-06-07 12:03:28.299-04	\N
+2714	171	Fanmi imèn	\N	undefined	07:47	[]	\N	2024-06-07 12:03:28.305-04	2024-06-07 12:03:28.305-04	\N
+2715	171	Requiem Milonga	\N	undefined	06:41	[]	\N	2024-06-07 12:03:28.311-04	2024-06-07 12:03:28.311-04	\N
+2716	171	Sonatina, for Clarinet and Piano	\N	undefined	08:10	[]	\N	2024-06-07 12:03:28.318-04	2024-06-07 12:03:28.318-04	\N
+2717	171	Shotgun Houses: I. Shotgun Houses	\N	undefined	05:24	[]	\N	2024-06-07 12:03:28.323-04	2024-06-07 12:03:28.323-04	\N
+2718	171	Umoja	\N	undefined	03:12	[]	\N	2024-06-07 12:03:28.328-04	2024-06-07 12:03:28.328-04	\N
+2719	171	Wish: Sonatine for Flute & Piano - Live	\N	undefined	11:47	[]	\N	2024-06-07 12:03:28.333-04	2024-06-07 12:03:28.333-04	\N
+2720	171	Legends: IV. El encierro	\N	undefined	01:37	[]	\N	2024-06-07 12:03:28.338-04	2024-06-07 12:03:28.338-04	\N
+2721	171	Shotgun Houses: III. Rome 1960	\N	undefined	06:35	[]	\N	2024-06-07 12:03:28.343-04	2024-06-07 12:03:28.343-04	\N
+2722	171	Wish Sonatine	\N	undefined	13:29	[]	\N	2024-06-07 12:03:28.35-04	2024-06-07 12:03:28.35-04	\N
+2723	171	Legends: I. Lin-fa	\N	undefined	03:12	[]	\N	2024-06-07 12:03:28.356-04	2024-06-07 12:03:28.356-04	\N
+2724	171	Legends: II. Dagda''s Harp	\N	undefined	01:06	[]	\N	2024-06-07 12:03:28.361-04	2024-06-07 12:03:28.361-04	\N
+2725	171	Four Legends: II. Dagda''s Harp	\N	undefined	01:15	[]	\N	2024-06-07 12:03:28.37-04	2024-06-07 12:03:28.37-04	\N
+2726	171	Elegy for Flute Ensemble	\N	undefined	08:37	[]	\N	2024-06-07 12:03:28.376-04	2024-06-07 12:03:28.376-04	\N
+2727	171	Portraits of Langston: Introduction No. 6 "Summer Night"	\N	undefined	00:56	[]	\N	2024-06-07 12:03:28.383-04	2024-06-07 12:03:28.383-04	\N
+2728	171	Hair, Cloth, and Thread: I. Mom''s Wisdom	\N	undefined	04:27	[]	\N	2024-06-07 12:03:28.394-04	2024-06-07 12:03:28.394-04	\N
+2729	171	American Vein: V. Barn Raising, Bourbon and Bluegrass (BB&B)	\N	undefined	05:03	[]	\N	2024-06-07 12:03:28.399-04	2024-06-07 12:03:28.399-04	\N
+2730	171	American Vein: II. On Route 66	\N	undefined	03:37	[]	\N	2024-06-07 12:03:28.406-04	2024-06-07 12:03:28.406-04	\N
+2731	171	American Vein: IV. The Melting Pot	\N	undefined	04:49	[]	\N	2024-06-07 12:03:28.413-04	2024-06-07 12:03:28.413-04	\N
+2732	171	Portraits of Langston: Introduction No. 4 "In Time of Silver Rain"	\N	undefined	00:55	[]	\N	2024-06-07 12:03:28.421-04	2024-06-07 12:03:28.421-04	\N
+2733	171	Roma (Live)	\N	undefined	10:45	[]	\N	2024-06-07 12:03:28.428-04	2024-06-07 12:03:28.428-04	\N
+2734	171	Portraits of Langston: I. Prelude. Helen Keller	\N	undefined	01:21	[]	\N	2024-06-07 12:03:28.435-04	2024-06-07 12:03:28.435-04	\N
+2735	171	Portraits of Langston: Introduction No. 5 "Jazz Band in a Parisian Cabaret"	\N	undefined	00:42	[]	\N	2024-06-07 12:03:28.452-04	2024-06-07 12:03:28.452-04	\N
+2736	171	Roma: Roma (Live)	\N	undefined	11:31	[]	\N	2024-06-07 12:03:28.46-04	2024-06-07 12:03:28.46-04	\N
+2737	171	Portraits of Langston: Introduction No. 1 "Hellen Keller"	\N	undefined	00:24	[]	\N	2024-06-07 12:03:28.475-04	2024-06-07 12:03:28.475-04	\N
+2738	171	Hair, Cloth, and Thread: II. AR/JW	\N	undefined	02:35	[]	\N	2024-06-07 12:03:28.483-04	2024-06-07 12:03:28.483-04	\N
+2739	171	Danza de la Mariposa - (Arr. for Violin by Lara St. John)	\N	undefined	05:59	[]	\N	2024-06-07 12:03:28.49-04	2024-06-07 12:03:28.49-04	\N
+2740	171	Four Legends: III. Gaia	\N	undefined	02:50	[]	\N	2024-06-07 12:03:28.5-04	2024-06-07 12:03:28.5-04	\N
+2741	171	Wish: Sonatine for Flute and Piano	\N	undefined	12:14	[]	\N	2024-06-07 12:03:28.509-04	2024-06-07 12:03:28.509-04	\N
+2742	171	Hair, Cloth, and Thread: V. Iterations	\N	undefined	04:12	[]	\N	2024-06-07 12:03:28.523-04	2024-06-07 12:03:28.523-04	\N
+2743	171	Fanmi Imèn	\N	undefined	07:43	[]	\N	2024-06-07 12:03:28.528-04	2024-06-07 12:03:28.528-04	\N
+2744	171	Portraits of Langston: V. Jazz Band in a Parisian Cabaret	\N	undefined	03:56	[]	\N	2024-06-07 12:03:28.533-04	2024-06-07 12:03:28.533-04	\N
+2745	171	Tzigane	\N	undefined	10:07	[]	\N	2024-06-07 12:03:28.539-04	2024-06-07 12:03:28.539-04	\N
+2746	172	One Day	\N	undefined	03:21	[]	\N	2024-06-07 12:03:42.387-04	2024-06-07 12:03:42.387-04	\N
+2747	172	Day By Day	\N	undefined	03:12	[]	\N	2024-06-07 12:03:42.406-04	2024-06-07 12:03:42.406-04	\N
+2748	172	All Day	\N	undefined	03:37	[]	\N	2024-06-07 12:03:42.418-04	2024-06-07 12:03:42.418-04	\N
+2749	172	Most Days	\N	undefined	03:57	[]	\N	2024-06-07 12:03:42.428-04	2024-06-07 12:03:42.428-04	\N
+2750	172	Days in the Sun	\N	undefined	01:49	[]	\N	2024-06-07 12:03:42.439-04	2024-06-07 12:03:42.439-04	\N
+2751	172	Days Of Elijah	\N	undefined	06:31	[]	\N	2024-06-07 12:03:42.45-04	2024-06-07 12:03:42.45-04	\N
+2752	172	Dance of the Dragonfly	\N	undefined	03:58	[]	\N	2024-06-07 12:03:42.459-04	2024-06-07 12:03:42.459-04	\N
+2753	172	Return to Love	\N	undefined	04:24	[]	\N	2024-06-07 12:03:42.467-04	2024-06-07 12:03:42.467-04	\N
+2754	172	From This Day Forward	\N	undefined	04:50	[]	\N	2024-06-07 12:03:42.474-04	2024-06-07 12:03:42.474-04	\N
+2755	172	Twilight''s Embrace	\N	undefined	06:60	[]	\N	2024-06-07 12:03:42.48-04	2024-06-07 12:03:42.48-04	\N
+2756	172	The Dance That Never Was	\N	undefined	07:19	[]	\N	2024-06-07 12:03:42.487-04	2024-06-07 12:03:42.487-04	\N
+2757	172	Day by day	\N	undefined	03:35	[]	\N	2024-06-07 12:03:42.502-04	2024-06-07 12:03:42.502-04	\N
+2758	172	Le Jardin	\N	undefined	04:52	[]	\N	2024-06-07 12:03:42.509-04	2024-06-07 12:03:42.509-04	\N
+2759	172	Pastel Reflections	\N	undefined	04:31	[]	\N	2024-06-07 12:03:42.516-04	2024-06-07 12:03:42.516-04	\N
+2760	172	Absolute Cunt of a Day - Live	\N	undefined	03:44	[]	\N	2024-06-07 12:03:42.522-04	2024-06-07 12:03:42.522-04	\N
+2761	172	Movement Three: Day	\N	undefined	13:35	[]	\N	2024-06-07 12:03:42.534-04	2024-06-07 12:03:42.534-04	\N
+2762	172	Day by Day (Live)	\N	undefined	04:57	[]	\N	2024-06-07 12:03:42.54-04	2024-06-07 12:03:42.54-04	\N
+2763	172	Dancing Fire	\N	undefined	03:49	[]	\N	2024-06-07 12:03:42.547-04	2024-06-07 12:03:42.547-04	\N
+2764	172	Rocketship! - Live	\N	undefined	04:41	[]	\N	2024-06-07 12:03:42.555-04	2024-06-07 12:03:42.555-04	\N
+2765	172	Busy	\N	undefined	04:45	[]	\N	2024-06-07 12:03:42.56-04	2024-06-07 12:03:42.56-04	\N
+2766	172	Day of Chaos	\N	undefined	04:10	[]	\N	2024-06-07 12:03:42.567-04	2024-06-07 12:03:42.567-04	\N
+2767	172	Now the Day Is Over	\N	undefined	02:47	[]	\N	2024-06-07 12:03:42.576-04	2024-06-07 12:03:42.576-04	\N
+2768	172	Water Tapestry	\N	undefined	02:56	[]	\N	2024-06-07 12:03:42.583-04	2024-06-07 12:03:42.583-04	\N
+2769	172	Once in the Long Ago	\N	undefined	05:26	[]	\N	2024-06-07 12:03:42.589-04	2024-06-07 12:03:42.589-04	\N
+2770	172	Great is the Day	\N	undefined	06:21	[]	\N	2024-06-07 12:03:42.594-04	2024-06-07 12:03:42.594-04	\N
+2771	172	Day by Day	\N	undefined	05:31	[]	\N	2024-06-07 12:03:42.598-04	2024-06-07 12:03:42.598-04	\N
+2772	172	Just For The Day	\N	undefined	03:13	[]	\N	2024-06-07 12:03:42.601-04	2024-06-07 12:03:42.601-04	\N
+2773	172	Day One (feat. Michael Wavves)	\N	undefined	03:12	[]	\N	2024-06-07 12:03:42.609-04	2024-06-07 12:03:42.609-04	\N
+2774	172	Such A Good Feeling - Earth n Days Remix	\N	undefined	02:31	[]	\N	2024-06-07 12:03:42.615-04	2024-06-07 12:03:42.615-04	\N
+2775	172	All Day Long	\N	undefined	05:30	[]	\N	2024-06-07 12:03:42.619-04	2024-06-07 12:03:42.619-04	\N
+2776	172	Concerto for Wind Ensemble: I. Flow	\N	undefined	04:07	[]	\N	2024-06-07 12:03:42.623-04	2024-06-07 12:03:42.623-04	\N
+2777	172	Concerto for Wind Ensemble: II. Riff	\N	undefined	03:33	[]	\N	2024-06-07 12:03:42.627-04	2024-06-07 12:03:42.627-04	\N
+2778	172	Summer Daydreams	\N	undefined	05:19	[]	\N	2024-06-07 12:03:42.631-04	2024-06-07 12:03:42.631-04	\N
+2779	172	A New Day, A New Blessing	\N	undefined	07:53	[]	\N	2024-06-07 12:03:42.634-04	2024-06-07 12:03:42.634-04	\N
+2780	172	Concerto for Wind Ensemble: V. Jam	\N	undefined	04:19	[]	\N	2024-06-07 12:03:42.638-04	2024-06-07 12:03:42.638-04	\N
+2781	172	Concerto for Wind Ensemble: III. Vibe	\N	undefined	04:06	[]	\N	2024-06-07 12:03:42.642-04	2024-06-07 12:03:42.642-04	\N
+2782	172	Concerto for Wind Ensemble: IV. Soul	\N	undefined	05:24	[]	\N	2024-06-07 12:03:42.647-04	2024-06-07 12:03:42.647-04	\N
+2783	172	Daydrunk	\N	undefined	02:47	[]	\N	2024-06-07 12:03:42.651-04	2024-06-07 12:03:42.651-04	\N
+2784	172	Daybreak	\N	undefined	03:21	[]	\N	2024-06-07 12:03:42.655-04	2024-06-07 12:03:42.655-04	\N
+2785	172	Dancing Fire (Live)	\N	undefined	04:24	[]	\N	2024-06-07 12:03:42.659-04	2024-06-07 12:03:42.659-04	\N
+2786	172	Whisperings	\N	undefined	05:07	[]	\N	2024-06-07 12:03:42.663-04	2024-06-07 12:03:42.663-04	\N
+2787	172	Pan''s Return	\N	undefined	04:37	[]	\N	2024-06-07 12:03:42.667-04	2024-06-07 12:03:42.667-04	\N
+2788	172	You Are the Daybreak	\N	undefined	02:34	[]	\N	2024-06-07 12:03:42.672-04	2024-06-07 12:03:42.672-04	\N
+2789	172	Friendly Day	\N	undefined	01:10	[]	\N	2024-06-07 12:03:42.677-04	2024-06-07 12:03:42.677-04	\N
+2790	172	Oilfield Tan	\N	undefined	03:50	[]	\N	2024-06-07 12:03:42.681-04	2024-06-07 12:03:42.681-04	\N
+2791	172	Real Good Day	\N	undefined	03:07	[]	\N	2024-06-07 12:03:42.685-04	2024-06-07 12:03:42.685-04	\N
+2792	173	Halcyon Sun	\N	undefined	17:25	[]	\N	2024-06-07 12:03:57.698-04	2024-06-07 12:03:57.698-04	\N
+2793	173	Rebounds	\N	undefined	04:28	[]	\N	2024-06-07 12:03:57.712-04	2024-06-07 12:03:57.712-04	\N
+2794	173	Motor City Dance Mix (Live)	\N	undefined	08:19	[]	\N	2024-06-07 12:03:57.725-04	2024-06-07 12:03:57.725-04	\N
+2795	173	Sonata Variation	\N	undefined	05:41	[]	\N	2024-06-07 12:03:57.747-04	2024-06-07 12:03:57.747-04	\N
+2796	173	The Intimacy of Harmony (2013)	\N	undefined	07:52	[]	\N	2024-06-07 12:03:57.761-04	2024-06-07 12:03:57.761-04	\N
+2797	173	Two-Part Inventions	\N	undefined	05:55	[]	\N	2024-06-07 12:03:57.777-04	2024-06-07 12:03:57.777-04	\N
+2798	173	The Flamboyant Frenchman	\N	undefined	02:14	[]	\N	2024-06-07 12:03:57.783-04	2024-06-07 12:03:57.783-04	\N
+2799	174	The Spark Catchers (Live)	\N	undefined	09:44	[]	\N	2024-06-07 12:05:06.835-04	2024-06-07 12:05:06.835-04	\N
+2800	174	alabaster/the great i am	\N	undefined	04:19	[]	\N	2024-06-07 12:05:06.849-04	2024-06-07 12:05:06.849-04	\N
+2801	174	you''re my one thing	\N	undefined	06:01	[]	\N	2024-06-07 12:05:06.863-04	2024-06-07 12:05:06.863-04	\N
+2802	174	A Winged Spirit	\N	undefined	01:46	[]	\N	2024-06-07 12:05:06.876-04	2024-06-07 12:05:06.876-04	\N
+2803	174	daughter	\N	undefined	01:33	[]	\N	2024-06-07 12:05:06.888-04	2024-06-07 12:05:06.888-04	\N
+2804	174	garden walk	\N	undefined	01:25	[]	\N	2024-06-07 12:05:06.9-04	2024-06-07 12:05:06.9-04	\N
+2805	174	this is but an oration of loss	\N	undefined	10:06	[]	\N	2024-06-07 12:05:06.91-04	2024-06-07 12:05:06.91-04	\N
+2806	174	only you.	\N	undefined	02:14	[]	\N	2024-06-07 12:05:06.921-04	2024-06-07 12:05:06.921-04	\N
+2807	174	On the Chequer’d Field Array’d: I. Mindplay	\N	undefined	02:38	[]	\N	2024-06-07 12:05:06.932-04	2024-06-07 12:05:06.932-04	\N
+2808	174	gentle & lowly	\N	undefined	04:44	[]	\N	2024-06-07 12:05:06.941-04	2024-06-07 12:05:06.941-04	\N
+2809	174	psalm 34	\N	undefined	03:08	[]	\N	2024-06-07 12:05:06.95-04	2024-06-07 12:05:06.95-04	\N
+2810	174	On the Chequer''d Field Array''d: I. Mindplay	\N	undefined	03:05	[]	\N	2024-06-07 12:05:06.961-04	2024-06-07 12:05:06.961-04	\N
+2811	174	Regina Caeli	\N	undefined	04:05	[]	\N	2024-06-07 12:05:06.971-04	2024-06-07 12:05:06.971-04	\N
+2812	174	Rosalind: III. …no explanation is needed	\N	undefined	02:15	[]	\N	2024-06-07 12:05:06.981-04	2024-06-07 12:05:06.981-04	\N
+2813	174	On the Chequer’d Field Array’d: III. Coda	\N	undefined	02:44	[]	\N	2024-06-07 12:05:06.989-04	2024-06-07 12:05:06.989-04	\N
+2814	174	On the Chequer’d Field Array’d: II. Middlegame	\N	undefined	05:21	[]	\N	2024-06-07 12:05:06.998-04	2024-06-07 12:05:06.998-04	\N
+2815	174	Rosalind: IV. Take my fear take my feeling	\N	undefined	04:03	[]	\N	2024-06-07 12:05:07.005-04	2024-06-07 12:05:07.005-04	\N
+2816	174	Weroon Weroon	\N	undefined	07:12	[]	\N	2024-06-07 12:05:07.012-04	2024-06-07 12:05:07.012-04	\N
+2817	174	On the Chequer''d Field Array''d: III. Coda	\N	undefined	02:49	[]	\N	2024-06-07 12:05:07.019-04	2024-06-07 12:05:07.019-04	\N
+2818	174	Rosalind: I. Here is a space	\N	undefined	03:32	[]	\N	2024-06-07 12:05:07.026-04	2024-06-07 12:05:07.026-04	\N
+2819	174	Joe	\N	undefined	03:11	[]	\N	2024-06-07 12:05:07.033-04	2024-06-07 12:05:07.033-04	\N
+2820	174	Rosalind: V. You do not get to dress me anymore	\N	undefined	01:36	[]	\N	2024-06-07 12:05:07.042-04	2024-06-07 12:05:07.042-04	\N
+2821	174	Nativity	\N	undefined	04:28	[]	\N	2024-06-07 12:05:07.051-04	2024-06-07 12:05:07.051-04	\N
+2822	174	On the Chequer''d Field Array''d: II. Middlegame	\N	undefined	05:48	[]	\N	2024-06-07 12:05:07.066-04	2024-06-07 12:05:07.066-04	\N
+2823	174	Rosalind: II. All love is a lunacy	\N	undefined	03:02	[]	\N	2024-06-07 12:05:07.075-04	2024-06-07 12:05:07.075-04	\N
+2853	176	much loved	\N	undefined	04:22	[]	\N	2024-06-07 12:05:53.073-04	2024-06-07 12:05:53.073-04	\N
+2854	176	Main Title	\N	undefined	03:07	[]	\N	2024-06-07 12:05:53.089-04	2024-06-07 12:05:53.089-04	\N
+2855	176	Theme - From "Emma"	\N	undefined	02:59	[]	\N	2024-06-07 12:05:53.1-04	2024-06-07 12:05:53.1-04	\N
+2856	176	Main Titles	\N	undefined	02:10	[]	\N	2024-06-07 12:05:53.111-04	2024-06-07 12:05:53.111-04	\N
+2857	176	We Had Today	\N	undefined	03:43	[]	\N	2024-06-07 12:05:53.121-04	2024-06-07 12:05:53.121-04	\N
+2858	176	End Titles	\N	undefined	02:08	[]	\N	2024-06-07 12:05:53.133-04	2024-06-07 12:05:53.133-04	\N
+2859	176	leaves and trees	\N	undefined	05:58	[]	\N	2024-06-07 12:05:53.145-04	2024-06-07 12:05:53.145-04	\N
+2860	176	Bailey	\N	undefined	02:17	[]	\N	2024-06-07 12:05:53.155-04	2024-06-07 12:05:53.155-04	\N
+2861	176	The Last Dinner	\N	undefined	01:51	[]	\N	2024-06-07 12:05:53.168-04	2024-06-07 12:05:53.168-04	\N
+2862	176	Three Women - Instrumental	\N	undefined	01:02	[]	\N	2024-06-07 12:05:53.177-04	2024-06-07 12:05:53.177-04	\N
+2863	176	a gift	\N	undefined	02:59	[]	\N	2024-06-07 12:05:53.184-04	2024-06-07 12:05:53.184-04	\N
+2864	176	The Duchess	\N	undefined	01:41	[]	\N	2024-06-07 12:05:53.191-04	2024-06-07 12:05:53.191-04	\N
+2865	176	End Credits - Instrumental	\N	undefined	04:36	[]	\N	2024-06-07 12:05:53.198-04	2024-06-07 12:05:53.198-04	\N
+2866	176	Vianne Sets Up Shop	\N	undefined	01:58	[]	\N	2024-06-07 12:05:53.204-04	2024-06-07 12:05:53.204-04	\N
+2867	176	Minor Swing	\N	undefined	02:14	[]	\N	2024-06-07 12:05:53.211-04	2024-06-07 12:05:53.211-04	\N
+2868	176	We Were the Lucky Ones Theme - From "We Were the Lucky Ones"	\N	undefined	02:46	[]	\N	2024-06-07 12:05:53.217-04	2024-06-07 12:05:53.217-04	\N
+2869	176	Good Night You Kings (from "The Cider House Rules", Arr. for Piano) - a calm version	\N	undefined	01:03	[]	\N	2024-06-07 12:05:53.223-04	2024-06-07 12:05:53.223-04	\N
+2870	176	Frozen Lake (from "The Human Stain", Arr. for Piano & Cello)	\N	undefined	03:26	[]	\N	2024-06-07 12:05:53.231-04	2024-06-07 12:05:53.231-04	\N
+2871	176	End Titles (We Were the Lucky Ones)	\N	undefined	01:06	[]	\N	2024-06-07 12:05:53.24-04	2024-06-07 12:05:53.24-04	\N
+2872	176	One Day: Piano Suite	\N	undefined	03:54	[]	\N	2024-06-07 12:05:53.25-04	2024-06-07 12:05:53.25-04	\N
+2873	176	Vianne Gazes at the River - Instrumental	\N	undefined	01:06	[]	\N	2024-06-07 12:05:53.261-04	2024-06-07 12:05:53.261-04	\N
+2874	176	The Cider House Rules: Piano Suite	\N	undefined	02:16	[]	\N	2024-06-07 12:05:53.268-04	2024-06-07 12:05:53.268-04	\N
+2875	176	Goodnight You Kings of New England - Instrumental	\N	undefined	01:06	[]	\N	2024-06-07 12:05:53.274-04	2024-06-07 12:05:53.274-04	\N
+2876	176	Flight	\N	undefined	04:29	[]	\N	2024-06-07 12:05:53.281-04	2024-06-07 12:05:53.281-04	\N
+2877	176	Caravan - Instrumental	\N	undefined	03:44	[]	\N	2024-06-07 12:05:53.287-04	2024-06-07 12:05:53.287-04	\N
+2878	176	Party Preparations - Instrumental	\N	undefined	01:28	[]	\N	2024-06-07 12:05:53.292-04	2024-06-07 12:05:53.292-04	\N
+2879	176	Sisterhood	\N	undefined	03:29	[]	\N	2024-06-07 12:05:53.298-04	2024-06-07 12:05:53.298-04	\N
+2880	176	One Day Main Titles	\N	undefined	01:54	[]	\N	2024-06-07 12:05:53.304-04	2024-06-07 12:05:53.304-04	\N
+2881	176	We All Complete	\N	undefined	05:07	[]	\N	2024-06-07 12:05:53.31-04	2024-06-07 12:05:53.31-04	\N
+2882	176	Burying Fuzzy - Instrumental	\N	undefined	01:35	[]	\N	2024-06-07 12:05:53.317-04	2024-06-07 12:05:53.317-04	\N
+2883	176	Themes from "Chocolat"	\N	undefined	04:24	[]	\N	2024-06-07 12:05:53.323-04	2024-06-07 12:05:53.323-04	\N
+2884	176	You Would Be My Wife	\N	undefined	02:20	[]	\N	2024-06-07 12:05:53.33-04	2024-06-07 12:05:53.33-04	\N
+2885	176	Wedding - Walking Through Snow	\N	undefined	02:21	[]	\N	2024-06-07 12:05:53.336-04	2024-06-07 12:05:53.336-04	\N
+2886	176	The Cider House - Instrumental	\N	undefined	04:13	[]	\N	2024-06-07 12:05:53.341-04	2024-06-07 12:05:53.341-04	\N
+2887	176	The Story of Grandmere - Instrumental	\N	undefined	04:09	[]	\N	2024-06-07 12:05:53.35-04	2024-06-07 12:05:53.35-04	\N
+2888	176	With Love	\N	undefined	06:10	[]	\N	2024-06-07 12:05:53.358-04	2024-06-07 12:05:53.358-04	\N
+2889	176	We Were the Lucky Ones Theme	\N	undefined	02:46	[]	\N	2024-06-07 12:05:53.366-04	2024-06-07 12:05:53.366-04	\N
+2890	176	Homer''s Lessons - Instrumental	\N	undefined	03:43	[]	\N	2024-06-07 12:05:53.374-04	2024-06-07 12:05:53.374-04	\N
+2891	176	A Dog''s Purpose	\N	undefined	01:53	[]	\N	2024-06-07 12:05:53.383-04	2024-06-07 12:05:53.383-04	\N
+2892	176	Passage of Time	\N	undefined	02:32	[]	\N	2024-06-07 12:05:53.391-04	2024-06-07 12:05:53.391-04	\N
+2893	176	Never Let Me Go	\N	undefined	02:44	[]	\N	2024-06-07 12:05:53.399-04	2024-06-07 12:05:53.399-04	\N
+2894	176	The Pier	\N	undefined	02:04	[]	\N	2024-06-07 12:05:53.407-04	2024-06-07 12:05:53.407-04	\N
+2895	176	Dr. Larch Dies - Instrumental	\N	undefined	01:37	[]	\N	2024-06-07 12:05:53.416-04	2024-06-07 12:05:53.416-04	\N
+2896	176	Ashes to the Wind / Roux Returns - Instrumental	\N	undefined	02:19	[]	\N	2024-06-07 12:05:53.424-04	2024-06-07 12:05:53.424-04	\N
+2897	176	Vianne Confronts the Comte - Instrumental	\N	undefined	01:22	[]	\N	2024-06-07 12:05:53.433-04	2024-06-07 12:05:53.433-04	\N
+2898	176	Guillaume''s Confession - Instrumental	\N	undefined	01:29	[]	\N	2024-06-07 12:05:53.441-04	2024-06-07 12:05:53.441-04	\N
+2899	176	Other Possibilities - Instrumental	\N	undefined	01:35	[]	\N	2024-06-07 12:05:53.451-04	2024-06-07 12:05:53.451-04	\N
+2900	176	Homer Leaves Orphanage - Instrumental	\N	undefined	04:37	[]	\N	2024-06-07 12:05:53.459-04	2024-06-07 12:05:53.459-04	\N
+2901	177	St Anne’s Mass: III. Sanctus	\N	undefined	01:44	[]	\N	2024-06-07 12:06:06.793-04	2024-06-07 12:06:06.793-04	\N
+2902	177	St Anne’s Mass: IV. Agnus Dei	\N	undefined	01:25	[]	\N	2024-06-07 12:06:06.808-04	2024-06-07 12:06:06.808-04	\N
+2903	177	Dominus dabit benignitatem	\N	undefined	04:29	[]	\N	2024-06-07 12:06:06.82-04	2024-06-07 12:06:06.82-04	\N
+2904	177	Stabat mater: Sancta mater, istud agas	\N	undefined	11:28	[]	\N	2024-06-07 12:06:06.833-04	2024-06-07 12:06:06.833-04	\N
+2905	177	O Radiant Dawn	\N	undefined	04:09	[]	\N	2024-06-07 12:06:06.847-04	2024-06-07 12:06:06.847-04	\N
+2906	177	The Lord’s Prayer	\N	undefined	01:58	[]	\N	2024-06-07 12:06:06.874-04	2024-06-07 12:06:06.874-04	\N
+2907	177	St Anne’s Mass: II. Gloria	\N	undefined	02:30	[]	\N	2024-06-07 12:06:06.884-04	2024-06-07 12:06:06.884-04	\N
+2908	177	Miserere	\N	undefined	12:34	[]	\N	2024-06-07 12:06:06.892-04	2024-06-07 12:06:06.892-04	\N
+2909	177	The Gallant Weaver	\N	undefined	05:49	[]	\N	2024-06-07 12:06:06.902-04	2024-06-07 12:06:06.902-04	\N
+2910	177	St Anne’s Mass: I. Kyrie	\N	undefined	00:52	[]	\N	2024-06-07 12:06:06.911-04	2024-06-07 12:06:06.911-04	\N
+2911	177	Data est mihi	\N	undefined	03:55	[]	\N	2024-06-07 12:06:06.928-04	2024-06-07 12:06:06.928-04	\N
+2912	177	Os Mutorum	\N	undefined	04:14	[]	\N	2024-06-07 12:06:06.939-04	2024-06-07 12:06:06.939-04	\N
+2913	177	Ave Maria	\N	undefined	04:30	[]	\N	2024-06-07 12:06:06.961-04	2024-06-07 12:06:06.961-04	\N
+2914	177	A New Song	\N	undefined	05:49	[]	\N	2024-06-07 12:06:06.969-04	2024-06-07 12:06:06.969-04	\N
+2915	177	A Child''s Prayer	\N	undefined	04:12	[]	\N	2024-06-07 12:06:06.973-04	2024-06-07 12:06:06.973-04	\N
+2916	177	MacMillan: Who Shall Separate Us?	\N	undefined	03:09	[]	\N	2024-06-07 12:06:06.978-04	2024-06-07 12:06:06.978-04	\N
+2917	177	Strathclyde Motets: Mitte manum tuam	\N	undefined	03:06	[]	\N	2024-06-07 12:06:06.983-04	2024-06-07 12:06:06.983-04	\N
+2918	177	Behold, You Are Beautiful, My Love	\N	undefined	05:05	[]	\N	2024-06-07 12:06:06.987-04	2024-06-07 12:06:06.987-04	\N
+2919	177	Ave Maris Stella (b)	\N	undefined	04:27	[]	\N	2024-06-07 12:06:06.992-04	2024-06-07 12:06:06.992-04	\N
+2920	177	The Culham Motets: II. I Saw Water Flowing	\N	undefined	08:49	[]	\N	2024-06-07 12:06:06.998-04	2024-06-07 12:06:06.998-04	\N
+2921	177	Strathclyde Motets: In splendoribus sanctorum	\N	undefined	11:10	[]	\N	2024-06-07 12:06:07.004-04	2024-06-07 12:06:07.004-04	\N
+2922	177	The Culham Motets: V. Your Light Will Come, Jerusalem	\N	undefined	04:15	[]	\N	2024-06-07 12:06:07.009-04	2024-06-07 12:06:07.009-04	\N
+2923	177	Tenebrae Responsories: III. Jesum tradidit impius	\N	undefined	08:08	[]	\N	2024-06-07 12:06:07.014-04	2024-06-07 12:06:07.014-04	\N
+2924	177	Sing Joyfully to the Lord	\N	undefined	06:21	[]	\N	2024-06-07 12:06:07.018-04	2024-06-07 12:06:07.018-04	\N
+2925	177	Strathclyde Motets: Lux aeterna	\N	undefined	03:47	[]	\N	2024-06-07 12:06:07.022-04	2024-06-07 12:06:07.022-04	\N
+2926	177	Tenebrae Responsories: I. Tenebrae factae sunt	\N	undefined	06:07	[]	\N	2024-06-07 12:06:07.027-04	2024-06-07 12:06:07.027-04	\N
+2927	177	Wedding Song	\N	undefined	04:17	[]	\N	2024-06-07 12:06:07.032-04	2024-06-07 12:06:07.032-04	\N
+2928	177	A Special Appeal	\N	undefined	07:02	[]	\N	2024-06-07 12:06:07.036-04	2024-06-07 12:06:07.036-04	\N
+2929	177	Kenga e Krushqve	\N	undefined	04:36	[]	\N	2024-06-07 12:06:07.04-04	2024-06-07 12:06:07.04-04	\N
+2930	177	Lux aeterna	\N	undefined	03:11	[]	\N	2024-06-07 12:06:07.044-04	2024-06-07 12:06:07.044-04	\N
+2931	177	Strathclyde Motets: Data est mihi omnis potestas	\N	undefined	03:48	[]	\N	2024-06-07 12:06:07.048-04	2024-06-07 12:06:07.048-04	\N
+2932	177	Beatus Andreas	\N	undefined	05:36	[]	\N	2024-06-07 12:06:07.052-04	2024-06-07 12:06:07.052-04	\N
+2933	177	Strathclyde Motets: O Radiant Dawn	\N	undefined	03:23	[]	\N	2024-06-07 12:06:07.057-04	2024-06-07 12:06:07.057-04	\N
+2934	177	Strathclyde Motets: Dominus dabit benignitatem	\N	undefined	04:34	[]	\N	2024-06-07 12:06:07.062-04	2024-06-07 12:06:07.062-04	\N
+2935	177	Strathclyde Motets: Factus est repente	\N	undefined	02:37	[]	\N	2024-06-07 12:06:07.067-04	2024-06-07 12:06:07.067-04	\N
+2936	177	The Culham Motets: I. Lift High the Ancient Portals	\N	undefined	05:21	[]	\N	2024-06-07 12:06:07.072-04	2024-06-07 12:06:07.072-04	\N
+2937	177	O Bone Jesu	\N	undefined	10:15	[]	\N	2024-06-07 12:06:07.076-04	2024-06-07 12:06:07.076-04	\N
+2938	177	Tenebrae Responsories: II. Tradiderunt me	\N	undefined	05:36	[]	\N	2024-06-07 12:06:07.081-04	2024-06-07 12:06:07.081-04	\N
+2939	177	Ave maris stella	\N	undefined	04:49	[]	\N	2024-06-07 12:06:07.085-04	2024-06-07 12:06:07.085-04	\N
+2940	177	Strathclyde Motets: Benedicimus Deum caeli	\N	undefined	02:29	[]	\N	2024-06-07 12:06:07.09-04	2024-06-07 12:06:07.09-04	\N
+2941	177	Strathclyde Motets: Videns Dominus	\N	undefined	05:09	[]	\N	2024-06-07 12:06:07.094-04	2024-06-07 12:06:07.094-04	\N
+2942	177	The Culham Motets: IV. From the Hand of the Angel	\N	undefined	04:32	[]	\N	2024-06-07 12:06:07.098-04	2024-06-07 12:06:07.098-04	\N
+2943	177	The Culham Motets: III. See the Place Where God Lives	\N	undefined	10:09	[]	\N	2024-06-07 12:06:07.103-04	2024-06-07 12:06:07.103-04	\N
+2944	177	Domine non secundum peccata nostra	\N	undefined	10:01	[]	\N	2024-06-07 12:06:07.108-04	2024-06-07 12:06:07.108-04	\N
+2945	177	Until the Day Breathes	\N	undefined	03:05	[]	\N	2024-06-07 12:06:07.114-04	2024-06-07 12:06:07.114-04	\N
+2946	177	St John Passion: Part II, IX. The Death of Jesus	\N	undefined	03:04	[]	\N	2024-06-07 12:06:07.12-04	2024-06-07 12:06:07.12-04	\N
+2947	177	Stabat Mater (Plainsong)	\N	undefined	04:56	[]	\N	2024-06-07 12:06:07.125-04	2024-06-07 12:06:07.125-04	\N
+2948	178	Adams: Hallelujah Junction: 1st Movement	\N	undefined	07:10	[]	\N	2024-06-07 12:09:52.632-04	2024-06-07 12:09:52.632-04	\N
+2949	178	You’re Beautiful - Acoustic	\N	undefined	03:25	[]	\N	2024-06-07 12:09:52.649-04	2024-06-07 12:09:52.649-04	\N
+2950	178	If I Ain''t Got You - Acoustic	\N	undefined	02:57	[]	\N	2024-06-07 12:09:52.66-04	2024-06-07 12:09:52.66-04	\N
+2951	178	Have I Told You Lately That I Love You - Acoustic	\N	undefined	03:22	[]	\N	2024-06-07 12:09:52.67-04	2024-06-07 12:09:52.67-04	\N
+2952	178	Bohemian Rhapsody - Acoustic	\N	undefined	02:53	[]	\N	2024-06-07 12:09:52.682-04	2024-06-07 12:09:52.682-04	\N
+2953	178	Eddie	\N	undefined	02:47	[]	\N	2024-06-07 12:09:52.692-04	2024-06-07 12:09:52.692-04	\N
+2954	178	Believe - Acoustic	\N	undefined	02:60	[]	\N	2024-06-07 12:09:52.707-04	2024-06-07 12:09:52.707-04	\N
+2955	178	Dancing In the Dark - Acoustic	\N	undefined	02:39	[]	\N	2024-06-07 12:09:52.716-04	2024-06-07 12:09:52.716-04	\N
+2956	178	A Million Dreams - Acoustic	\N	undefined	03:23	[]	\N	2024-06-07 12:09:52.724-04	2024-06-07 12:09:52.724-04	\N
+2957	178	What’s Up - Acoustic	\N	undefined	03:07	[]	\N	2024-06-07 12:09:52.732-04	2024-06-07 12:09:52.732-04	\N
+2958	178	Lover - Acoustic	\N	undefined	03:12	[]	\N	2024-06-07 12:09:52.738-04	2024-06-07 12:09:52.738-04	\N
+2959	178	Georgia Morning Dew	\N	undefined	03:17	[]	\N	2024-06-07 12:09:52.744-04	2024-06-07 12:09:52.744-04	\N
+2960	178	Amen	\N	undefined	03:12	[]	\N	2024-06-07 12:09:52.751-04	2024-06-07 12:09:52.751-04	\N
+2961	178	Purple Rain - Acoustic	\N	undefined	02:50	[]	\N	2024-06-07 12:09:52.757-04	2024-06-07 12:09:52.757-04	\N
+2962	178	Fix You - Acoustic	\N	undefined	02:43	[]	\N	2024-06-07 12:09:52.764-04	2024-06-07 12:09:52.764-04	\N
+2963	178	I Will Always Love You - Acoustic	\N	undefined	02:60	[]	\N	2024-06-07 12:09:52.772-04	2024-06-07 12:09:52.772-04	\N
+2964	178	ocean eyes - Acoustic	\N	undefined	02:50	[]	\N	2024-06-07 12:09:52.786-04	2024-06-07 12:09:52.786-04	\N
+2965	178	For Me, For Her, For You	\N	undefined	04:04	[]	\N	2024-06-07 12:09:52.795-04	2024-06-07 12:09:52.795-04	\N
+2966	178	China Gates	\N	undefined	04:39	[]	\N	2024-06-07 12:09:52.805-04	2024-06-07 12:09:52.805-04	\N
+2967	178	This Time I''m Gone For Good	\N	undefined	04:40	[]	\N	2024-06-07 12:09:52.814-04	2024-06-07 12:09:52.814-04	\N
+2968	178	Adams: The Death of Klinghoffer, Prologue: Chorus of Exiled Palestinians	\N	undefined	08:40	[]	\N	2024-06-07 12:09:52.823-04	2024-06-07 12:09:52.823-04	\N
+2969	178	2 Become 1 - Acoustic	\N	undefined	03:07	[]	\N	2024-06-07 12:09:52.842-04	2024-06-07 12:09:52.842-04	\N
+2970	178	In a Moment of Weakness	\N	undefined	02:37	[]	\N	2024-06-07 12:09:52.855-04	2024-06-07 12:09:52.855-04	\N
+2971	178	I Want To Know What Love Is - Acoustic	\N	undefined	02:54	[]	\N	2024-06-07 12:09:52.866-04	2024-06-07 12:09:52.866-04	\N
+2972	178	Short Ride in a Fast Machine	\N	undefined	04:14	[]	\N	2024-06-07 12:09:52.879-04	2024-06-07 12:09:52.879-04	\N
+2973	178	I''m Like A Bird	\N	undefined	03:40	[]	\N	2024-06-07 12:09:52.889-04	2024-06-07 12:09:52.889-04	\N
+2974	178	Lay With Me	\N	undefined	02:51	[]	\N	2024-06-07 12:09:52.898-04	2024-06-07 12:09:52.898-04	\N
+2975	178	Hallelujah Junction	\N	undefined	02:10	[]	\N	2024-06-07 12:09:52.905-04	2024-06-07 12:09:52.905-04	\N
+2976	178	All My Life - Acoustic	\N	undefined	03:04	[]	\N	2024-06-07 12:09:52.91-04	2024-06-07 12:09:52.91-04	\N
+2977	178	Sugar - Acoustic	\N	undefined	03:17	[]	\N	2024-06-07 12:09:52.915-04	2024-06-07 12:09:52.915-04	\N
+2978	178	Reconsider Me	\N	undefined	03:55	[]	\N	2024-06-07 12:09:52.92-04	2024-06-07 12:09:52.92-04	\N
+2979	178	The One - Acoustic Piano	\N	undefined	03:44	[]	\N	2024-06-07 12:09:52.924-04	2024-06-07 12:09:52.924-04	\N
+2980	178	Adams: The Chairman Dances (Foxtrot for Orchestra)	\N	undefined	12:26	[]	\N	2024-06-07 12:09:52.928-04	2024-06-07 12:09:52.928-04	\N
+2981	178	Adams: Nixon in China: Act III - (Beginning)	\N	undefined	01:11	[]	\N	2024-06-07 12:09:52.932-04	2024-06-07 12:09:52.932-04	\N
+2982	178	It''s Been So Long - Remastered	\N	undefined	04:05	[]	\N	2024-06-07 12:09:52.939-04	2024-06-07 12:09:52.939-04	\N
+2983	178	Adams: Hallelujah Junction: 2nd Movement	\N	undefined	02:36	[]	\N	2024-06-07 12:09:52.945-04	2024-06-07 12:09:52.945-04	\N
+2984	178	Become Ocean	\N	undefined	42:14	[]	\N	2024-06-07 12:09:52.949-04	2024-06-07 12:09:52.949-04	\N
+2985	178	Simply the Best - Acoustic	\N	undefined	02:57	[]	\N	2024-06-07 12:09:52.954-04	2024-06-07 12:09:52.954-04	\N
+2986	178	I’d Do Anything for Love (But I Won’t Do That) - Acoustic	\N	undefined	03:13	[]	\N	2024-06-07 12:09:52.958-04	2024-06-07 12:09:52.958-04	\N
+2987	178	Shaker Loops (version for string orchestra): A Final Shaking	\N	undefined	04:09	[]	\N	2024-06-07 12:09:52.962-04	2024-06-07 12:09:52.962-04	\N
+2988	178	Century Rolls: I. First Movement - excerpt	\N	undefined	04:16	[]	\N	2024-06-07 12:09:52.967-04	2024-06-07 12:09:52.967-04	\N
+2989	178	Adams: China Gates	\N	undefined	04:34	[]	\N	2024-06-07 12:09:52.971-04	2024-06-07 12:09:52.971-04	\N
+2990	178	Nothing Compares 2 U - Acoustic	\N	undefined	03:43	[]	\N	2024-06-07 12:09:52.977-04	2024-06-07 12:09:52.977-04	\N
+2991	178	Living on Your Love	\N	undefined	01:39	[]	\N	2024-06-07 12:09:52.987-04	2024-06-07 12:09:52.987-04	\N
+2992	178	The Way You Make Me Feel - Acoustic	\N	undefined	02:37	[]	\N	2024-06-07 12:09:52.993-04	2024-06-07 12:09:52.993-04	\N
+2993	178	I Won''t Cry	\N	undefined	02:20	[]	\N	2024-06-07 12:09:52.998-04	2024-06-07 12:09:52.998-04	\N
+2994	179	Colette	\N	undefined	04:10	[]	\N	2024-06-07 12:10:09.636-04	2024-06-07 12:10:09.636-04	\N
+2995	179	Arcadiana, Op. 12: VI. O Albion	\N	undefined	03:16	[]	\N	2024-06-07 12:10:09.651-04	2024-06-07 12:10:09.651-04	\N
+2996	179	Arcadiana: VI. O Albion	\N	undefined	03:27	[]	\N	2024-06-07 12:10:09.674-04	2024-06-07 12:10:09.674-04	\N
+2997	179	Arcadiana, Op. 12: 6. O Albion (Arr. Clements)	\N	undefined	02:47	[]	\N	2024-06-07 12:10:09.686-04	2024-06-07 12:10:09.686-04	\N
+2998	179	Adès: Traced Overhead, Op. 15: I. Sursum	\N	undefined	00:46	[]	\N	2024-06-07 12:10:09.699-04	2024-06-07 12:10:09.699-04	\N
+2999	179	Adès: Les baricades mistérieuses	\N	undefined	02:43	[]	\N	2024-06-07 12:10:09.711-04	2024-06-07 12:10:09.711-04	\N
+3000	179	Snow Globe	\N	undefined	02:58	[]	\N	2024-06-07 12:10:09.725-04	2024-06-07 12:10:09.725-04	\N
+3001	179	Märchentänze (Orchestral Version): III. A Skylark for Jane	\N	undefined	02:07	[]	\N	2024-06-07 12:10:09.738-04	2024-06-07 12:10:09.738-04	\N
+3002	179	Colette’s Journey	\N	undefined	01:57	[]	\N	2024-06-07 12:10:09.75-04	2024-06-07 12:10:09.75-04	\N
+3003	179	The Branch - Grand Piano	\N	undefined	01:22	[]	\N	2024-06-07 12:10:09.762-04	2024-06-07 12:10:09.762-04	\N
+3004	179	Arabesque (Debussy)	\N	undefined	02:22	[]	\N	2024-06-07 12:10:09.774-04	2024-06-07 12:10:09.774-04	\N
+3005	179	The Branch - Upright Piano	\N	undefined	01:19	[]	\N	2024-06-07 12:10:09.793-04	2024-06-07 12:10:09.793-04	\N
+3006	179	Adès: Dante, Pt. I "Inferno": I. Abandon Hope—	\N	undefined	00:56	[]	\N	2024-06-07 12:10:09.804-04	2024-06-07 12:10:09.804-04	\N
+3007	179	Gnossienne No 1 Lent (Satie)	\N	undefined	00:48	[]	\N	2024-06-07 12:10:09.812-04	2024-06-07 12:10:09.812-04	\N
+3008	179	Adès: Dante, Pt. I "Inferno": III. The Ferryman	\N	undefined	04:19	[]	\N	2024-06-07 12:10:09.818-04	2024-06-07 12:10:09.818-04	\N
+3009	179	Adès: Dante, Pt. I "Inferno": IV. Pavan of the Souls in Limbo—	\N	undefined	02:04	[]	\N	2024-06-07 12:10:09.825-04	2024-06-07 12:10:09.825-04	\N
+3010	179	Adès: Dante, Pt. I "Inferno": VI. The Gluttons—in slime	\N	undefined	05:15	[]	\N	2024-06-07 12:10:09.831-04	2024-06-07 12:10:09.831-04	\N
+3011	179	Adès: Dante, Pt. I "Inferno": II. The Selfish—stung by wasps	\N	undefined	01:58	[]	\N	2024-06-07 12:10:09.837-04	2024-06-07 12:10:09.837-04	\N
+3012	179	Adès: Dante, Pt. I "Inferno": V. Paolo and Francesca—the endless whirlwind	\N	undefined	02:57	[]	\N	2024-06-07 12:10:09.844-04	2024-06-07 12:10:09.844-04	\N
+3013	179	Asyla, Op. 17: III. Ecstasio	\N	undefined	06:35	[]	\N	2024-06-07 12:10:09.85-04	2024-06-07 12:10:09.85-04	\N
+3014	179	Willy’s Arrival	\N	undefined	01:12	[]	\N	2024-06-07 12:10:09.855-04	2024-06-07 12:10:09.855-04	\N
+3015	179	Adès: Dante, Pt. II "Purgatorio": II. Mount Purgatory—	\N	undefined	02:30	[]	\N	2024-06-07 12:10:09.86-04	2024-06-07 12:10:09.86-04	\N
+3016	179	Adès: Dante, Pt. II "Purgatorio": VII. The Ascent	\N	undefined	02:38	[]	\N	2024-06-07 12:10:09.865-04	2024-06-07 12:10:09.865-04	\N
+3017	179	Adès: Dante, Pt. II "Purgatorio": I. Dawn on the Sea of Purgatory—	\N	undefined	04:37	[]	\N	2024-06-07 12:10:09.871-04	2024-06-07 12:10:09.871-04	\N
+3018	179	Adès: Dante, Pt. I "Inferno": XIII. Satan—in the lake of ice	\N	undefined	02:28	[]	\N	2024-06-07 12:10:09.879-04	2024-06-07 12:10:09.879-04	\N
+3019	179	Adès: Dante, Pt. II "Purgatorio": IV. The Healing Fire—	\N	undefined	02:48	[]	\N	2024-06-07 12:10:09.888-04	2024-06-07 12:10:09.888-04	\N
+3020	179	Adès: Dante, Pt. II "Purgatorio": V. The Earthly Paradise—	\N	undefined	02:40	[]	\N	2024-06-07 12:10:09.895-04	2024-06-07 12:10:09.895-04	\N
+3021	179	Adès: Dante, Pt. II "Purgatorio": III. The Valley of Flowers—	\N	undefined	03:32	[]	\N	2024-06-07 12:10:09.903-04	2024-06-07 12:10:09.903-04	\N
+3022	179	Adès: Dante, Pt. I "Inferno": XI. The Hypocrites—in coats of lead	\N	undefined	05:24	[]	\N	2024-06-07 12:10:09.913-04	2024-06-07 12:10:09.913-04	\N
+3023	179	Adès: Dante, Pt. I "Inferno": X. The Popes’ Adagio—heads first—	\N	undefined	01:45	[]	\N	2024-06-07 12:10:09.923-04	2024-06-07 12:10:09.923-04	\N
+3024	179	Adès: Dante, Pt. II "Purgatorio": VI. The Heavenly Procession—	\N	undefined	03:17	[]	\N	2024-06-07 12:10:09.931-04	2024-06-07 12:10:09.931-04	\N
+3025	179	Adès: Dante, Pt. I "Inferno": VII. The Suicides—the bleeding trees—	\N	undefined	05:30	[]	\N	2024-06-07 12:10:09.942-04	2024-06-07 12:10:09.942-04	\N
+3026	179	Adès: Dante, Pt. I "Inferno": VIII. The Deviants—on burning sand—	\N	undefined	03:53	[]	\N	2024-06-07 12:10:09.951-04	2024-06-07 12:10:09.951-04	\N
+3027	179	Adès: Dante, Pt. I "Inferno": XII. The Thieves—devoured by reptiles	\N	undefined	03:03	[]	\N	2024-06-07 12:10:09.962-04	2024-06-07 12:10:09.962-04	\N
+3028	179	Adès: Dante, Pt. I "Inferno": IX. The Fortune-tellers—facing both ways	\N	undefined	03:38	[]	\N	2024-06-07 12:10:09.973-04	2024-06-07 12:10:09.973-04	\N
+3029	179	Adès: Dante, Pt. III "Paradiso": Awakening—Moon—Mercury—Venus—Sun—Mars—Jupiter (The Eagle)—Saturn (The Golden Ladder)—Fixed Stars—Empyrean	\N	undefined	26:34	[]	\N	2024-06-07 12:10:09.983-04	2024-06-07 12:10:09.983-04	\N
+3030	179	Arcadiana, Op. 12: I. Venezia notturna	\N	undefined	02:34	[]	\N	2024-06-07 12:10:09.992-04	2024-06-07 12:10:09.992-04	\N
+3031	179	Polaris "Voyage for Orchestra"	\N	undefined	13:30	[]	\N	2024-06-07 12:10:10.002-04	2024-06-07 12:10:10.002-04	\N
+3032	179	Flesh	\N	undefined	01:08	[]	\N	2024-06-07 12:10:10.013-04	2024-06-07 12:10:10.013-04	\N
+3033	179	These are the Copses	\N	undefined	01:30	[]	\N	2024-06-07 12:10:10.022-04	2024-06-07 12:10:10.022-04	\N
+3034	179	La Vagabonde	\N	undefined	01:08	[]	\N	2024-06-07 12:10:10.032-04	2024-06-07 12:10:10.032-04	\N
+3035	179	Etching Montage	\N	undefined	01:23	[]	\N	2024-06-07 12:10:10.04-04	2024-06-07 12:10:10.04-04	\N
+3036	179	Colette Is Free	\N	undefined	01:25	[]	\N	2024-06-07 12:10:10.048-04	2024-06-07 12:10:10.048-04	\N
+3037	179	Valse Du Salon	\N	undefined	03:36	[]	\N	2024-06-07 12:10:10.062-04	2024-06-07 12:10:10.062-04	\N
+3038	179	Adès: Asyla, Op. 17: I. —	\N	undefined	05:33	[]	\N	2024-06-07 12:10:10.071-04	2024-06-07 12:10:10.071-04	\N
+3039	179	Adès: Asyla, Op. 17: II. —	\N	undefined	06:00	[]	\N	2024-06-07 12:10:10.077-04	2024-06-07 12:10:10.077-04	\N
+3040	179	Adès: Asyla, Op. 17: IV. —	\N	undefined	04:39	[]	\N	2024-06-07 12:10:10.082-04	2024-06-07 12:10:10.082-04	\N
+3041	179	Adès: Darknesse Visible	\N	undefined	07:14	[]	\N	2024-06-07 12:10:10.087-04	2024-06-07 12:10:10.087-04	\N
+3042	179	Adès: Asyla, Op. 17: III. Ecstasio	\N	undefined	06:21	[]	\N	2024-06-07 12:10:10.092-04	2024-06-07 12:10:10.092-04	\N
+3043	180	Mothership	\N	undefined	09:22	[]	\N	2024-06-07 12:16:23.892-04	2024-06-07 12:16:23.892-04	\N
+3044	180	Bates: The B-Sides: V. Warehouse Medicine	\N	undefined	04:45	[]	\N	2024-06-07 12:16:23.905-04	2024-06-07 12:16:23.905-04	\N
+3045	180	Anthology of Fantastic Zoology: Nymphs	\N	undefined	02:48	[]	\N	2024-06-07 12:16:23.916-04	2024-06-07 12:16:23.916-04	\N
+3046	180	Philharmonia Fantastique - The Making of the Orchestra: The Strings	\N	undefined	03:04	[]	\N	2024-06-07 12:16:23.928-04	2024-06-07 12:16:23.928-04	\N
+3047	180	Philharmonia Fantastique - The Making of the Orchestra: Birth of Sprite	\N	undefined	04:36	[]	\N	2024-06-07 12:16:23.939-04	2024-06-07 12:16:23.939-04	\N
+3048	180	Bates: The B-Sides: I. Broom of the System	\N	undefined	04:11	[]	\N	2024-06-07 12:16:23.951-04	2024-06-07 12:16:23.951-04	\N
+3049	180	Bates: Alternative Energy: I. Ford''s Farm, 1896	\N	undefined	07:08	[]	\N	2024-06-07 12:16:23.963-04	2024-06-07 12:16:23.963-04	\N
+3050	180	Bates: "Stelle, vostra mercè l´eccelse sfere"	\N	undefined	02:20	[]	\N	2024-06-07 12:16:23.974-04	2024-06-07 12:16:23.974-04	\N
+3051	180	Mothership (version for wind ensemble)	\N	undefined	09:12	[]	\N	2024-06-07 12:16:23.989-04	2024-06-07 12:16:23.989-04	\N
+3052	180	Ford’s Farm	\N	undefined	03:19	[]	\N	2024-06-07 12:16:24.001-04	2024-06-07 12:16:24.001-04	\N
+3053	180	Philharmonia Fantastique - The Making of the Orchestra: The Woodwinds	\N	undefined	02:48	[]	\N	2024-06-07 12:16:24.013-04	2024-06-07 12:16:24.013-04	\N
+3054	180	Sirens: II. Die Lorelei	\N	undefined	05:33	[]	\N	2024-06-07 12:16:24.022-04	2024-06-07 12:16:24.022-04	\N
+3055	180	Philharmonia Fantastique - The Making of the Orchestra: Primordial Orchestra	\N	undefined	00:42	[]	\N	2024-06-07 12:16:24.034-04	2024-06-07 12:16:24.034-04	\N
+3056	180	Philharmonia Fantastique - The Making of the Orchestra: The Brass	\N	undefined	02:17	[]	\N	2024-06-07 12:16:24.045-04	2024-06-07 12:16:24.045-04	\N
+3057	180	Philharmonia Fantastique - The Making of the Orchestra: Finale & Rebirth of Sprite	\N	undefined	04:34	[]	\N	2024-06-07 12:16:24.059-04	2024-06-07 12:16:24.059-04	\N
+3058	180	Philharmonia Fantastique - The Making of the Orchestra: Rivalry & Death of Sprite	\N	undefined	03:42	[]	\N	2024-06-07 12:16:24.067-04	2024-06-07 12:16:24.067-04	\N
+3059	180	Philharmonia Fantastique - The Making of the Orchestra: The Percussion	\N	undefined	01:16	[]	\N	2024-06-07 12:16:24.074-04	2024-06-07 12:16:24.074-04	\N
+3060	180	Bates: Liquid Interface: II. Scherzo Liquido	\N	undefined	03:54	[]	\N	2024-06-07 12:16:24.081-04	2024-06-07 12:16:24.081-04	\N
+3061	180	Bates: The B-Sides: IV. Temescal Noir	\N	undefined	03:14	[]	\N	2024-06-07 12:16:24.089-04	2024-06-07 12:16:24.089-04	\N
+3062	180	Bates: Liquid Interface: III. Crescent City	\N	undefined	08:25	[]	\N	2024-06-07 12:16:24.098-04	2024-06-07 12:16:24.098-04	\N
+3063	180	Bates: Liquid Interface: IV. On the Wannsee	\N	undefined	04:29	[]	\N	2024-06-07 12:16:24.107-04	2024-06-07 12:16:24.107-04	\N
+3064	180	Bates: Liquid Interface: I. Glaciers Calving	\N	undefined	06:47	[]	\N	2024-06-07 12:16:24.115-04	2024-06-07 12:16:24.115-04	\N
+3065	180	Bates: Alternative Energy: II. Chicago, 2012	\N	undefined	05:53	[]	\N	2024-06-07 12:16:24.123-04	2024-06-07 12:16:24.123-04	\N
+3066	180	Bates: The B-Sides: III. Gemini in the Solar Wind	\N	undefined	05:33	[]	\N	2024-06-07 12:16:24.133-04	2024-06-07 12:16:24.133-04	\N
+3067	180	Bates: Alternative Energy: IV. Reykjavik, 2222	\N	undefined	04:51	[]	\N	2024-06-07 12:16:24.141-04	2024-06-07 12:16:24.141-04	\N
+3068	180	Bates: Alternative Energy: III. Xinjiang Province, 2112	\N	undefined	08:07	[]	\N	2024-06-07 12:16:24.149-04	2024-06-07 12:16:24.149-04	\N
+3069	180	Bates: The B-Sides: II. Aerosol Melody (Hanalei)	\N	undefined	04:02	[]	\N	2024-06-07 12:16:24.158-04	2024-06-07 12:16:24.158-04	\N
+3070	180	Sea-Blue Circuitry	\N	undefined	12:29	[]	\N	2024-06-07 12:16:24.167-04	2024-06-07 12:16:24.167-04	\N
+3071	180	Rusty Air in Carolina	\N	undefined	13:37	[]	\N	2024-06-07 12:16:24.178-04	2024-06-07 12:16:24.178-04	\N
+3072	180	Desert Transport	\N	undefined	14:13	[]	\N	2024-06-07 12:16:24.187-04	2024-06-07 12:16:24.187-04	\N
+3073	180	Attack Decay Sustain Release	\N	undefined	04:39	[]	\N	2024-06-07 12:16:24.199-04	2024-06-07 12:16:24.199-04	\N
+3074	180	String Band	\N	undefined	12:30	[]	\N	2024-06-07 12:16:24.209-04	2024-06-07 12:16:24.209-04	\N
+3075	180	Difficult Bamboo	\N	undefined	22:55	[]	\N	2024-06-07 12:16:24.219-04	2024-06-07 12:16:24.219-04	\N
+3076	180	Terrycloth Troposphere	\N	undefined	05:15	[]	\N	2024-06-07 12:16:24.229-04	2024-06-07 12:16:24.229-04	\N
+3077	180	Observer in the Megellanic Cloud	\N	undefined	06:25	[]	\N	2024-06-07 12:16:24.24-04	2024-06-07 12:16:24.24-04	\N
+3078	180	Stereo Is King	\N	undefined	12:34	[]	\N	2024-06-07 12:16:24.25-04	2024-06-07 12:16:24.25-04	\N
+3079	180	White Lies for Lomax	\N	undefined	06:37	[]	\N	2024-06-07 12:16:24.26-04	2024-06-07 12:16:24.26-04	\N
+3080	180	Terrycloth Troposphere (after T. Riley''s, In C) (Masonic, Mason Bates Remix)	\N	undefined	05:14	[]	\N	2024-06-07 12:16:24.27-04	2024-06-07 12:16:24.27-04	\N
+3081	180	Alternative Energy: Ford''s Farm, 1896—	\N	undefined	07:31	[]	\N	2024-06-07 12:16:24.281-04	2024-06-07 12:16:24.281-04	\N
+3082	180	Alternative Energy: Reykjavik, 2222	\N	undefined	04:59	[]	\N	2024-06-07 12:16:24.291-04	2024-06-07 12:16:24.291-04	\N
+3083	180	Alternative Energy: Chicago, 2012	\N	undefined	05:38	[]	\N	2024-06-07 12:16:24.299-04	2024-06-07 12:16:24.299-04	\N
+3084	180	Alternative Energy: Xianjiang Province, 2112—	\N	undefined	08:03	[]	\N	2024-06-07 12:16:24.308-04	2024-06-07 12:16:24.308-04	\N
+3085	180	The (R)evolution of Steve Jobs: Meditative Interlude	\N	undefined	01:33	[]	\N	2024-06-07 12:16:24.317-04	2024-06-07 12:16:24.317-04	\N
+3086	180	The (R)evolution of Steve Jobs, Overture	\N	undefined	01:19	[]	\N	2024-06-07 12:16:24.324-04	2024-06-07 12:16:24.324-04	\N
+3087	180	The (R)evolution of Steve Jobs: Scene 1, Thanks for Coming	\N	undefined	07:41	[]	\N	2024-06-07 12:16:24.333-04	2024-06-07 12:16:24.333-04	\N
+3088	180	The (R)evolution of Steve Jobs: Overture	\N	undefined	01:19	[]	\N	2024-06-07 12:16:24.342-04	2024-06-07 12:16:24.342-04	\N
+3089	180	The (R)evolution of Steve Jobs: Scene 2, Hey, Stranger	\N	undefined	03:10	[]	\N	2024-06-07 12:16:24.349-04	2024-06-07 12:16:24.349-04	\N
+3090	180	The (R)evolution of Steve Jobs, Scene 1: Thanks for coming	\N	undefined	07:41	[]	\N	2024-06-07 12:16:24.355-04	2024-06-07 12:16:24.355-04	\N
+3091	180	The (R)evolution of Steve Jobs, Prologue: Thought it was high-time	\N	undefined	03:16	[]	\N	2024-06-07 12:16:24.361-04	2024-06-07 12:16:24.361-04	\N
+3092	180	The (R)evolution of Steve Jobs: Prologue. Thought It Was High-time	\N	undefined	03:16	[]	\N	2024-06-07 12:16:24.367-04	2024-06-07 12:16:24.367-04	\N
+3093	181	Rocaná	\N	undefined	17:58	[]	\N	2024-06-07 12:17:12.071-04	2024-06-07 12:17:12.071-04	\N
+3094	181	Violin Concerto No. 1: III.	\N	undefined	03:15	[]	\N	2024-06-07 12:17:12.085-04	2024-06-07 12:17:12.085-04	\N
+3095	181	Violin Concerto No. 1: I.	\N	undefined	08:52	[]	\N	2024-06-07 12:17:12.096-04	2024-06-07 12:17:12.096-04	\N
+3096	181	Violin Concerto No. 1: II.	\N	undefined	06:35	[]	\N	2024-06-07 12:17:12.108-04	2024-06-07 12:17:12.108-04	\N
+3097	181	Le silence des Sirènes	\N	undefined	16:25	[]	\N	2024-06-07 12:17:12.119-04	2024-06-07 12:17:12.119-04	\N
+3098	181	Cello Concerto: I. Aniri	\N	undefined	09:42	[]	\N	2024-06-07 12:17:12.143-04	2024-06-07 12:17:12.143-04	\N
+3099	181	Cello Concerto: IV.	\N	undefined	06:35	[]	\N	2024-06-07 12:17:12.152-04	2024-06-07 12:17:12.152-04	\N
+3100	181	Violin Concerto No. 1: IV.	\N	undefined	05:53	[]	\N	2024-06-07 12:17:12.169-04	2024-06-07 12:17:12.169-04	\N
+3101	181	Cello Concerto: III.	\N	undefined	07:26	[]	\N	2024-06-07 12:17:12.181-04	2024-06-07 12:17:12.181-04	\N
+3102	181	Cello Concerto: II.	\N	undefined	02:54	[]	\N	2024-06-07 12:17:12.19-04	2024-06-07 12:17:12.19-04	\N
+3103	181	Piano Concerto: III.	\N	undefined	04:29	[]	\N	2024-06-07 12:17:12.202-04	2024-06-07 12:17:12.202-04	\N
+3104	181	Piano Concerto: II.	\N	undefined	08:29	[]	\N	2024-06-07 12:17:12.213-04	2024-06-07 12:17:12.213-04	\N
+3105	181	Piano Concerto: I.	\N	undefined	04:10	[]	\N	2024-06-07 12:17:12.224-04	2024-06-07 12:17:12.224-04	\N
+3106	181	Piano Concerto: IV.	\N	undefined	04:27	[]	\N	2024-06-07 12:17:12.237-04	2024-06-07 12:17:12.237-04	\N
+3107	181	Cello Concerto: Movement II	\N	undefined	02:57	[]	\N	2024-06-07 12:17:12.251-04	2024-06-07 12:17:12.251-04	\N
+3108	181	Cello Concerto: Movement IV	\N	undefined	07:16	[]	\N	2024-06-07 12:17:12.264-04	2024-06-07 12:17:12.264-04	\N
+3109	181	Piano Concerto: Movement III	\N	undefined	04:53	[]	\N	2024-06-07 12:17:12.274-04	2024-06-07 12:17:12.274-04	\N
+3110	181	Šu for sheng and orchestra	\N	undefined	21:20	[]	\N	2024-06-07 12:17:12.286-04	2024-06-07 12:17:12.286-04	\N
+3111	181	Cello Concerto: Movement I, "Aniri"	\N	undefined	09:48	[]	\N	2024-06-07 12:17:12.3-04	2024-06-07 12:17:12.3-04	\N
+3112	181	Piano Concerto: Movement II	\N	undefined	09:05	[]	\N	2024-06-07 12:17:12.311-04	2024-06-07 12:17:12.311-04	\N
+3113	181	Piano Concerto: Movement I	\N	undefined	04:08	[]	\N	2024-06-07 12:17:12.32-04	2024-06-07 12:17:12.32-04	\N
+3114	181	Cello Concerto: Movement III	\N	undefined	08:06	[]	\N	2024-06-07 12:17:12.33-04	2024-06-07 12:17:12.33-04	\N
+3115	181	Piano Concerto: Movement IV	\N	undefined	04:37	[]	\N	2024-06-07 12:17:12.34-04	2024-06-07 12:17:12.34-04	\N
+3116	181	Violin Concerto, Mouvement lll	\N	undefined	03:27	[]	\N	2024-06-07 12:17:12.363-04	2024-06-07 12:17:12.363-04	\N
+3117	181	Rocaná (Room Of Light)	\N	undefined	21:04	[]	\N	2024-06-07 12:17:12.372-04	2024-06-07 12:17:12.372-04	\N
+3118	181	Violin Concerto, Mouvement I	\N	undefined	10:14	[]	\N	2024-06-07 12:17:12.382-04	2024-06-07 12:17:12.382-04	\N
+3119	181	Violin Concerto, Mouvement II	\N	undefined	07:14	[]	\N	2024-06-07 12:17:12.39-04	2024-06-07 12:17:12.39-04	\N
+3120	181	Violin Concerto, Mouvement IV	\N	undefined	06:08	[]	\N	2024-06-07 12:17:12.4-04	2024-06-07 12:17:12.4-04	\N
+3121	181	Parametastrings for String Quartet and Tape: I. Allegro	\N	undefined	04:55	[]	\N	2024-06-07 12:17:12.409-04	2024-06-07 12:17:12.409-04	\N
+3122	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 7. Aus der alten Zeit	\N	undefined	03:22	[]	\N	2024-06-07 12:17:12.419-04	2024-06-07 12:17:12.419-04	\N
+3123	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 2. Das Rätsel von den drei magsichen Toren	\N	undefined	01:34	[]	\N	2024-06-07 12:17:12.429-04	2024-06-07 12:17:12.429-04	\N
+3124	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 1. Versteckspiel	\N	undefined	03:19	[]	\N	2024-06-07 12:17:12.44-04	2024-06-07 12:17:12.44-04	\N
+3125	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 4. Vier Jahreszeiten in fünf Strophen	\N	undefined	01:52	[]	\N	2024-06-07 12:17:12.45-04	2024-06-07 12:17:12.45-04	\N
+3126	181	Double Concerto, for Piano, Percussion and Ensemble	\N	undefined	20:39	[]	\N	2024-06-07 12:17:12.461-04	2024-06-07 12:17:12.461-04	\N
+3127	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 3. Die Spielregel - sträwkcür tieZ	\N	undefined	01:38	[]	\N	2024-06-07 12:17:12.472-04	2024-06-07 12:17:12.472-04	\N
+3128	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 6. Das Beliebigkeitsspiel	\N	undefined	01:25	[]	\N	2024-06-07 12:17:12.482-04	2024-06-07 12:17:12.482-04	\N
+3129	181	Akrostichon-Wortspiel. Seven Scenes from Fairy-Tales: 5. Domifare S	\N	undefined	02:38	[]	\N	2024-06-07 12:17:12.494-04	2024-06-07 12:17:12.494-04	\N
+3130	181	Xi, for Ensemble and Electronic	\N	undefined	22:48	[]	\N	2024-06-07 12:17:12.504-04	2024-06-07 12:17:12.504-04	\N
+3131	181	Fantaisie mécanique	\N	undefined	12:37	[]	\N	2024-06-07 12:17:12.514-04	2024-06-07 12:17:12.514-04	\N
+3132	181	Piano Etudes: No. 6, Grains	\N	undefined	04:14	[]	\N	2024-06-07 12:17:12.523-04	2024-06-07 12:17:12.523-04	\N
+3133	181	Piano Etudes: No. 1, In C	\N	undefined	03:23	[]	\N	2024-06-07 12:17:12.533-04	2024-06-07 12:17:12.533-04	\N
+3134	181	Piano Etudes: No. 4, Scalen	\N	undefined	02:51	[]	\N	2024-06-07 12:17:12.541-04	2024-06-07 12:17:12.541-04	\N
+3135	181	Piano Etudes: No. 2, Sequenzen	\N	undefined	02:45	[]	\N	2024-06-07 12:17:12.551-04	2024-06-07 12:17:12.551-04	\N
+3136	181	Piano Etudes: No. 3, Scherzo ad libitum	\N	undefined	03:13	[]	\N	2024-06-07 12:17:12.562-04	2024-06-07 12:17:12.562-04	\N
+3137	181	Piano Etudes: No. 5, Toccata	\N	undefined	02:48	[]	\N	2024-06-07 12:17:12.57-04	2024-06-07 12:17:12.57-04	\N
+3138	181	Graffiti: I. Palimpsest	\N	undefined	09:51	[]	\N	2024-06-07 12:17:12.581-04	2024-06-07 12:17:12.581-04	\N
+3139	181	Gougalon - Scenes from a Street Theater: I. Prologue - Dramatic Opening of the Curtain	\N	undefined	03:51	[]	\N	2024-06-07 12:17:12.591-04	2024-06-07 12:17:12.591-04	\N
+3140	182	DANCE: I. when you''re broken open	\N	undefined	04:45	[]	\N	2024-06-07 12:18:09.954-04	2024-06-07 12:18:09.954-04	\N
+3141	182	DANCE: IV. in your blood	\N	undefined	05:32	[]	\N	2024-06-07 12:18:09.974-04	2024-06-07 12:18:09.974-04	\N
+3142	182	DANCE: III. in the middle of the fighting	\N	undefined	04:21	[]	\N	2024-06-07 12:18:09.986-04	2024-06-07 12:18:09.986-04	\N
+3143	182	DANCE: II. if you’ve torn the bandage off	\N	undefined	04:10	[]	\N	2024-06-07 12:18:09.997-04	2024-06-07 12:18:09.997-04	\N
+3144	182	DANCE: V. when you’re perfectly free	\N	undefined	06:20	[]	\N	2024-06-07 12:18:10.007-04	2024-06-07 12:18:10.007-04	\N
+3145	182	This Midnight Hour	\N	undefined	12:42	[]	\N	2024-06-07 12:18:10.017-04	2024-06-07 12:18:10.017-04	\N
+3146	182	Masquerade	\N	undefined	04:57	[]	\N	2024-06-07 12:18:10.026-04	2024-06-07 12:18:10.026-04	\N
+3147	182	Night Ferry	\N	undefined	22:25	[]	\N	2024-06-07 12:18:10.035-04	2024-06-07 12:18:10.035-04	\N
+3148	182	Lavender Rain	\N	undefined	04:29	[]	\N	2024-06-07 12:18:10.045-04	2024-06-07 12:18:10.045-04	\N
+3149	182	The Seamstress	\N	undefined	21:24	[]	\N	2024-06-07 12:18:10.061-04	2024-06-07 12:18:10.061-04	\N
+3150	182	<<rewind<<	\N	undefined	07:58	[]	\N	2024-06-07 12:18:10.07-04	2024-06-07 12:18:10.07-04	\N
+3151	182	Restless Oceans	\N	undefined	04:09	[]	\N	2024-06-07 12:18:10.078-04	2024-06-07 12:18:10.078-04	\N
+3152	182	Beauty	\N	undefined	05:14	[]	\N	2024-06-07 12:18:10.086-04	2024-06-07 12:18:10.086-04	\N
+3153	182	Perched	\N	undefined	04:03	[]	\N	2024-06-07 12:18:10.092-04	2024-06-07 12:18:10.092-04	\N
+3154	182	A Wonderful Day	\N	undefined	05:02	[]	\N	2024-06-07 12:18:10.099-04	2024-06-07 12:18:10.099-04	\N
+3155	182	Blue Hour	\N	undefined	08:05	[]	\N	2024-06-07 12:18:10.109-04	2024-06-07 12:18:10.109-04	\N
+3156	182	Ship of Stars	\N	undefined	06:10	[]	\N	2024-06-07 12:18:10.117-04	2024-06-07 12:18:10.117-04	\N
+3157	182	1987	\N	undefined	08:03	[]	\N	2024-06-07 12:18:10.123-04	2024-06-07 12:18:10.123-04	\N
+3158	182	Prince of Clouds	\N	undefined	13:35	[]	\N	2024-06-07 12:18:10.128-04	2024-06-07 12:18:10.128-04	\N
+3159	182	Rest These Hands	\N	undefined	09:11	[]	\N	2024-06-07 12:18:10.133-04	2024-06-07 12:18:10.133-04	\N
+3160	182	Tea Leaves	\N	undefined	06:27	[]	\N	2024-06-07 12:18:10.138-04	2024-06-07 12:18:10.138-04	\N
+3161	182	Choke	\N	undefined	08:39	[]	\N	2024-06-07 12:18:10.144-04	2024-06-07 12:18:10.144-04	\N
+3162	182	Rapture	\N	undefined	07:13	[]	\N	2024-06-07 12:18:10.149-04	2024-06-07 12:18:10.149-04	\N
+3163	182	Paint box	\N	undefined	06:57	[]	\N	2024-06-07 12:18:10.154-04	2024-06-07 12:18:10.154-04	\N
+3164	182	Roulette	\N	undefined	10:16	[]	\N	2024-06-07 12:18:10.16-04	2024-06-07 12:18:10.16-04	\N
+3165	182	Resting in the Green	\N	undefined	05:42	[]	\N	2024-06-07 12:18:10.165-04	2024-06-07 12:18:10.165-04	\N
+3166	182	Steelworks	\N	undefined	14:27	[]	\N	2024-06-07 12:18:10.17-04	2024-06-07 12:18:10.17-04	\N
+3167	182	October Rose	\N	undefined	03:45	[]	\N	2024-06-07 12:18:10.175-04	2024-06-07 12:18:10.175-04	\N
+3168	182	Fits + Starts	\N	undefined	06:16	[]	\N	2024-06-07 12:18:10.185-04	2024-06-07 12:18:10.185-04	\N
+3169	182	Shorthand	\N	undefined	11:06	[]	\N	2024-06-07 12:18:10.189-04	2024-06-07 12:18:10.189-04	\N
+3170	182	Mercy (Gospel Vocals)	\N	undefined	05:26	[]	\N	2024-06-07 12:18:10.195-04	2024-06-07 12:18:10.195-04	\N
+3171	182	Prelude	\N	undefined	03:41	[]	\N	2024-06-07 12:18:10.199-04	2024-06-07 12:18:10.199-04	\N
+3172	182	Choke - For Baritone Sax and Tape	\N	undefined	09:00	[]	\N	2024-06-07 12:18:10.207-04	2024-06-07 12:18:10.207-04	\N
+3173	182	Tender Hooks	\N	undefined	09:36	[]	\N	2024-06-07 12:18:10.211-04	2024-06-07 12:18:10.211-04	\N
+3174	182	Red Nines	\N	undefined	11:58	[]	\N	2024-06-07 12:18:10.215-04	2024-06-07 12:18:10.215-04	\N
+3175	182	PIVOT	\N	undefined	05:50	[]	\N	2024-06-07 12:18:10.233-04	2024-06-07 12:18:10.233-04	\N
+3176	182	TENDER HOOKS: TENDER HOOKS	\N	undefined	09:38	[]	\N	2024-06-07 12:18:10.247-04	2024-06-07 12:18:10.247-04	\N
+3177	182	On Track	\N	undefined	07:23	[]	\N	2024-06-07 12:18:10.256-04	2024-06-07 12:18:10.256-04	\N
+3178	182	Restling in the Green	\N	undefined	05:42	[]	\N	2024-06-07 12:18:10.263-04	2024-06-07 12:18:10.263-04	\N
+3179	183	Mercury	\N	undefined	05:12	[]	\N	2024-06-07 14:46:20.128-04	2024-06-07 14:46:20.128-04	\N
+3180	183	Halley''s Comet	\N	undefined	00:30	[]	\N	2024-06-07 14:46:20.145-04	2024-06-07 14:46:20.145-04	\N
+3181	183	Song for Ainola	\N	undefined	01:17	[]	\N	2024-06-07 14:46:20.154-04	2024-06-07 14:46:20.154-04	\N
+3182	183	Dessner: Song for Octave	\N	undefined	03:17	[]	\N	2024-06-07 14:46:20.162-04	2024-06-07 14:46:20.162-04	\N
+3183	183	Neptune	\N	undefined	03:05	[]	\N	2024-06-07 14:46:20.174-04	2024-06-07 14:46:20.174-04	\N
+3184	183	Jupiter	\N	undefined	07:10	[]	\N	2024-06-07 14:46:20.186-04	2024-06-07 14:46:20.186-04	\N
+3185	183	Imagining Buffalo	\N	undefined	02:40	[]	\N	2024-06-07 14:46:20.198-04	2024-06-07 14:46:20.198-04	\N
+3186	183	Lullaby for Jacques et Brune	\N	undefined	02:27	[]	\N	2024-06-07 14:46:20.209-04	2024-06-07 14:46:20.209-04	\N
+3187	183	Who''s Taking Care of Jesse?	\N	undefined	02:05	[]	\N	2024-06-07 14:46:20.221-04	2024-06-07 14:46:20.221-04	\N
+3188	183	Tides	\N	undefined	00:58	[]	\N	2024-06-07 14:46:20.232-04	2024-06-07 14:46:20.232-04	\N
+3189	183	Pluto	\N	undefined	04:24	[]	\N	2024-06-07 14:46:20.241-04	2024-06-07 14:46:20.241-04	\N
+3190	183	Venus	\N	undefined	04:42	[]	\N	2024-06-07 14:46:20.25-04	2024-06-07 14:46:20.25-04	\N
+3191	183	The Kiss	\N	undefined	01:38	[]	\N	2024-06-07 14:46:20.262-04	2024-06-07 14:46:20.262-04	\N
+3192	183	Saturn	\N	undefined	03:51	[]	\N	2024-06-07 14:46:20.272-04	2024-06-07 14:46:20.272-04	\N
+3193	183	Opening	\N	undefined	01:59	[]	\N	2024-06-07 14:46:20.281-04	2024-06-07 14:46:20.281-04	\N
+3194	183	Uranus	\N	undefined	06:52	[]	\N	2024-06-07 14:46:20.291-04	2024-06-07 14:46:20.291-04	\N
+3195	183	I Love You	\N	undefined	03:24	[]	\N	2024-06-07 14:46:20.302-04	2024-06-07 14:46:20.302-04	\N
+3196	183	Moon	\N	undefined	03:42	[]	\N	2024-06-07 14:46:20.309-04	2024-06-07 14:46:20.309-04	\N
+3197	183	Wherever I Fall - Pt. 2	\N	undefined	06:01	[]	\N	2024-06-07 14:46:20.318-04	2024-06-07 14:46:20.318-04	\N
+3198	183	Dessner: Julian and Tereza	\N	undefined	01:05	[]	\N	2024-06-07 14:46:20.327-04	2024-06-07 14:46:20.327-04	\N
+3199	183	Siete de Abril	\N	undefined	01:30	[]	\N	2024-06-07 14:46:20.335-04	2024-06-07 14:46:20.335-04	\N
+3200	183	Looking For Glass	\N	undefined	02:51	[]	\N	2024-06-07 14:46:20.347-04	2024-06-07 14:46:20.347-04	\N
+3201	183	Happy Sad Empty Full	\N	undefined	02:25	[]	\N	2024-06-07 14:46:20.356-04	2024-06-07 14:46:20.356-04	\N
+3202	183	Walls 2	\N	undefined	01:21	[]	\N	2024-06-07 14:46:20.365-04	2024-06-07 14:46:20.365-04	\N
+3203	183	Ten Men Fight	\N	undefined	01:45	[]	\N	2024-06-07 14:46:20.372-04	2024-06-07 14:46:20.372-04	\N
+3204	183	Dying	\N	undefined	01:09	[]	\N	2024-06-07 14:46:20.379-04	2024-06-07 14:46:20.379-04	\N
+3205	183	In The Beginning	\N	undefined	01:17	[]	\N	2024-06-07 14:46:20.384-04	2024-06-07 14:46:20.384-04	\N
+3206	183	Mars	\N	undefined	07:09	[]	\N	2024-06-07 14:46:20.389-04	2024-06-07 14:46:20.389-04	\N
+3207	183	Intro	\N	undefined	00:37	[]	\N	2024-06-07 14:46:20.395-04	2024-06-07 14:46:20.395-04	\N
+3208	183	I Won''t Remember?	\N	undefined	02:41	[]	\N	2024-06-07 14:46:20.4-04	2024-06-07 14:46:20.4-04	\N
+3209	183	Garcia Counterpoint	\N	undefined	07:12	[]	\N	2024-06-07 14:46:20.406-04	2024-06-07 14:46:20.406-04	\N
+3210	183	Garrison Arrival	\N	undefined	01:07	[]	\N	2024-06-07 14:46:20.413-04	2024-06-07 14:46:20.413-04	\N
+3211	183	Not A Toy	\N	undefined	01:57	[]	\N	2024-06-07 14:46:20.422-04	2024-06-07 14:46:20.422-04	\N
+3212	183	Be Funny When You Can	\N	undefined	03:27	[]	\N	2024-06-07 14:46:20.427-04	2024-06-07 14:46:20.427-04	\N
+3213	183	Soupe populaire	\N	undefined	02:27	[]	\N	2024-06-07 14:46:20.433-04	2024-06-07 14:46:20.433-04	\N
+3214	183	I''m Not Fine And That''s A Totally Reasonable Response	\N	undefined	02:21	[]	\N	2024-06-07 14:46:20.439-04	2024-06-07 14:46:20.439-04	\N
+3215	183	Sun	\N	undefined	03:60	[]	\N	2024-06-07 14:46:20.447-04	2024-06-07 14:46:20.447-04	\N
+3216	183	Earth	\N	undefined	15:10	[]	\N	2024-06-07 14:46:20.455-04	2024-06-07 14:46:20.455-04	\N
+3217	183	Marry Christian	\N	undefined	02:46	[]	\N	2024-06-07 14:46:20.463-04	2024-06-07 14:46:20.463-04	\N
+3218	183	Saying Goodbye	\N	undefined	01:45	[]	\N	2024-06-07 14:46:20.471-04	2024-06-07 14:46:20.471-04	\N
+3219	183	Saying Goodbye - Piano Solo	\N	undefined	01:26	[]	\N	2024-06-07 14:46:20.481-04	2024-06-07 14:46:20.481-04	\N
+3220	183	The Orphan	\N	undefined	02:31	[]	\N	2024-06-07 14:46:20.49-04	2024-06-07 14:46:20.49-04	\N
+3221	183	Black Energy	\N	undefined	05:26	[]	\N	2024-06-07 14:46:20.498-04	2024-06-07 14:46:20.498-04	\N
+3222	183	The Orphan Returns	\N	undefined	01:23	[]	\N	2024-06-07 14:46:20.507-04	2024-06-07 14:46:20.507-04	\N
+3223	183	Booth Suits Up	\N	undefined	02:02	[]	\N	2024-06-07 14:46:20.517-04	2024-06-07 14:46:20.517-04	\N
+3224	183	Guilty	\N	undefined	02:15	[]	\N	2024-06-07 14:46:20.526-04	2024-06-07 14:46:20.526-04	\N
+3225	183	Black Hole	\N	undefined	00:34	[]	\N	2024-06-07 14:46:20.535-04	2024-06-07 14:46:20.535-04	\N
+3226	183	Kuiper Belt	\N	undefined	02:04	[]	\N	2024-06-07 14:46:20.545-04	2024-06-07 14:46:20.545-04	\N
+3227	183	He Will Be Here	\N	undefined	03:39	[]	\N	2024-06-07 14:46:20.554-04	2024-06-07 14:46:20.554-04	\N
+3228	184	Eight Memories in Watercolour, Op. 1: 6. Floating Clouds - Live	\N	undefined	01:43	[]	\N	2024-06-07 14:50:01.983-04	2024-06-07 14:50:01.983-04	\N
+3229	184	For the World	\N	undefined	04:20	[]	\N	2024-06-07 14:50:01.997-04	2024-06-07 14:50:01.997-04	\N
+3230	184	Farewell	\N	undefined	02:25	[]	\N	2024-06-07 14:50:02.007-04	2024-06-07 14:50:02.007-04	\N
+3231	184	The Eternal Vow	\N	undefined	02:58	[]	\N	2024-06-07 14:50:02.017-04	2024-06-07 14:50:02.017-04	\N
+3232	184	Crouching Tiger, Hidden Dragon	\N	undefined	03:24	[]	\N	2024-06-07 14:50:02.025-04	2024-06-07 14:50:02.025-04	\N
+3233	184	Yearning of the Sword	\N	undefined	03:29	[]	\N	2024-06-07 14:50:02.034-04	2024-06-07 14:50:02.034-04	\N
+3234	184	Silk Road	\N	undefined	03:06	[]	\N	2024-06-07 14:50:02.056-04	2024-06-07 14:50:02.056-04	\N
+3235	184	Night Fight	\N	undefined	03:06	[]	\N	2024-06-07 14:50:02.067-04	2024-06-07 14:50:02.067-04	\N
+3236	184	To the South	\N	undefined	02:20	[]	\N	2024-06-07 14:50:02.086-04	2024-06-07 14:50:02.086-04	\N
+3237	184	Longing	\N	undefined	04:20	[]	\N	2024-06-07 14:50:02.094-04	2024-06-07 14:50:02.094-04	\N
+3238	184	Gone with Leaves	\N	undefined	03:28	[]	\N	2024-06-07 14:50:02.103-04	2024-06-07 14:50:02.103-04	\N
+3239	184	Love in Distance	\N	undefined	04:55	[]	\N	2024-06-07 14:50:02.115-04	2024-06-07 14:50:02.115-04	\N
+3240	184	Overture	\N	undefined	04:22	[]	\N	2024-06-07 14:50:02.124-04	2024-06-07 14:50:02.124-04	\N
+3241	184	Through the Bamboo Forest	\N	undefined	04:20	[]	\N	2024-06-07 14:50:02.133-04	2024-06-07 14:50:02.133-04	\N
+3242	184	A Wedding Interrupted	\N	undefined	02:13	[]	\N	2024-06-07 14:50:02.148-04	2024-06-07 14:50:02.148-04	\N
+3243	184	Desert Capriccio	\N	undefined	04:30	[]	\N	2024-06-07 14:50:02.157-04	2024-06-07 14:50:02.157-04	\N
+3244	184	In the Chess Court	\N	undefined	04:03	[]	\N	2024-06-07 14:50:02.167-04	2024-06-07 14:50:02.167-04	\N
+3245	184	No Cap (feat. Dantè, Dontaÿ, Dunteá)	\N	undefined	03:16	[]	\N	2024-06-07 14:50:02.186-04	2024-06-07 14:50:02.186-04	\N
+3246	184	The Encounter	\N	undefined	02:36	[]	\N	2024-06-07 14:50:02.204-04	2024-06-07 14:50:02.204-04	\N
+3247	184	Be Africa	\N	undefined	04:16	[]	\N	2024-06-07 14:50:02.212-04	2024-06-07 14:50:02.212-04	\N
+3248	184	Spirit Fight	\N	undefined	04:33	[]	\N	2024-06-07 14:50:02.221-04	2024-06-07 14:50:02.221-04	\N
+3249	184	In the Old Temple	\N	undefined	03:42	[]	\N	2024-06-07 14:50:02.23-04	2024-06-07 14:50:02.23-04	\N
+3250	184	Warriors	\N	undefined	03:44	[]	\N	2024-06-07 14:50:02.239-04	2024-06-07 14:50:02.239-04	\N
+3251	184	Home	\N	undefined	01:16	[]	\N	2024-06-07 14:50:02.246-04	2024-06-07 14:50:02.246-04	\N
+3252	184	The Banquet: 2. Waiting	\N	undefined	02:05	[]	\N	2024-06-07 14:50:02.256-04	2024-06-07 14:50:02.256-04	\N
+3253	184	Above Water	\N	undefined	01:45	[]	\N	2024-06-07 14:50:02.262-04	2024-06-07 14:50:02.262-04	\N
+3254	184	Farewell, Hero	\N	undefined	03:00	[]	\N	2024-06-07 14:50:02.266-04	2024-06-07 14:50:02.266-04	\N
+3255	184	Swift Sword	\N	undefined	03:37	[]	\N	2024-06-07 14:50:02.27-04	2024-06-07 14:50:02.27-04	\N
+3256	184	Sorrow	\N	undefined	03:60	[]	\N	2024-06-07 14:50:02.274-04	2024-06-07 14:50:02.274-04	\N
+3257	184	Yearning for the Peace	\N	undefined	03:29	[]	\N	2024-06-07 14:50:02.278-04	2024-06-07 14:50:02.278-04	\N
+3258	184	Eight Memories in Watercolour, Op. 1: 4. Blue Nun - Live	\N	undefined	01:07	[]	\N	2024-06-07 14:50:02.287-04	2024-06-07 14:50:02.287-04	\N
+3259	184	The Banquet: 1. Only For Love (Theme Song)	\N	undefined	05:21	[]	\N	2024-06-07 14:50:02.292-04	2024-06-07 14:50:02.292-04	\N
+3260	184	At Emperor''s Palace	\N	undefined	03:58	[]	\N	2024-06-07 14:50:02.297-04	2024-06-07 14:50:02.297-04	\N
+3261	184	Sorrow in Desert	\N	undefined	02:33	[]	\N	2024-06-07 14:50:02.302-04	2024-06-07 14:50:02.302-04	\N
+3262	184	Snow	\N	undefined	01:07	[]	\N	2024-06-07 14:50:02.307-04	2024-06-07 14:50:02.307-04	\N
+3263	184	8 Memories in Watercolor: No. 2, Staccato Beans (2002 Revised Version)	\N	undefined	01:30	[]	\N	2024-06-07 14:50:02.317-04	2024-06-07 14:50:02.317-04	\N
+3264	184	戀人絮語	\N	undefined	03:40	[]	\N	2024-06-07 14:50:02.321-04	2024-06-07 14:50:02.321-04	\N
+3265	184	Dün Gün Batarken - Akustik	\N	undefined	02:39	[]	\N	2024-06-07 14:50:02.325-04	2024-06-07 14:50:02.325-04	\N
+3266	184	The Eternal Vow (From "Crouching Tiger, Hidden Dragon")	\N	undefined	02:17	[]	\N	2024-06-07 14:50:02.33-04	2024-06-07 14:50:02.33-04	\N
+3267	184	Desert Capriccio (Music from the film Crouching Tiger, Hidden Dragon)	\N	undefined	01:35	[]	\N	2024-06-07 14:50:02.334-04	2024-06-07 14:50:02.334-04	\N
+3268	184	Đừng Chờ Anh Nữa	\N	undefined	03:45	[]	\N	2024-06-07 14:50:02.34-04	2024-06-07 14:50:02.34-04	\N
+3269	184	Señorita	\N	undefined	04:27	[]	\N	2024-06-07 14:50:02.345-04	2024-06-07 14:50:02.345-04	\N
+3270	185	Leyendas: An Andean Walkabout: VI. Coquetos	\N	undefined	03:24	[]	\N	2024-06-07 14:52:32.68-04	2024-06-07 14:52:32.68-04	\N
+3271	185	Hilos: I. Danza del Altiplano	\N	undefined	02:32	[]	\N	2024-06-07 14:52:32.698-04	2024-06-07 14:52:32.698-04	\N
+3272	185	Sonata Andina: IV. Finale Saqsampillo	\N	undefined	06:56	[]	\N	2024-06-07 14:52:32.71-04	2024-06-07 14:52:32.71-04	\N
+3273	185	Sonata Andina: I. Alegro Aymara	\N	undefined	06:11	[]	\N	2024-06-07 14:52:32.724-04	2024-06-07 14:52:32.724-04	\N
+3274	185	Tarqueada	\N	undefined	03:21	[]	\N	2024-06-07 14:52:32.732-04	2024-06-07 14:52:32.732-04	\N
+3275	185	Five Andean Improvisations for Flute and Piano: I. Quena	\N	undefined	03:19	[]	\N	2024-06-07 14:52:32.74-04	2024-06-07 14:52:32.74-04	\N
+3276	185	Mujeres Cantando	\N	undefined	01:57	[]	\N	2024-06-07 14:52:32.747-04	2024-06-07 14:52:32.747-04	\N
+3277	185	Coqueteos	\N	undefined	03:30	[]	\N	2024-06-07 14:52:32.756-04	2024-06-07 14:52:32.756-04	\N
+3278	185	Leyendas: An Andean Walkabout: II. Tarqueda	\N	undefined	03:10	[]	\N	2024-06-07 14:52:32.764-04	2024-06-07 14:52:32.764-04	\N
+3279	185	Leyendas, "An Andean Walkabout" (version for string quartet): I. Toyos	\N	undefined	01:35	[]	\N	2024-06-07 14:52:32.773-04	2024-06-07 14:52:32.773-04	\N
+3280	185	Adios a Churín	\N	undefined	03:28	[]	\N	2024-06-07 14:52:32.782-04	2024-06-07 14:52:32.782-04	\N
+3281	185	Zampoñas Rotas	\N	undefined	04:11	[]	\N	2024-06-07 14:52:32.791-04	2024-06-07 14:52:32.791-04	\N
+3282	185	Mestizo Waltz	\N	undefined	03:11	[]	\N	2024-06-07 14:52:32.8-04	2024-06-07 14:52:32.8-04	\N
+3283	185	Chasqui	\N	undefined	03:34	[]	\N	2024-06-07 14:52:32.81-04	2024-06-07 14:52:32.81-04	\N
+3284	185	Toyos	\N	undefined	01:49	[]	\N	2024-06-07 14:52:32.819-04	2024-06-07 14:52:32.819-04	\N
+3285	185	Tingo María	\N	undefined	02:16	[]	\N	2024-06-07 14:52:32.827-04	2024-06-07 14:52:32.827-04	\N
+3286	185	Capilla del Camino	\N	undefined	02:39	[]	\N	2024-06-07 14:52:32.836-04	2024-06-07 14:52:32.836-04	\N
+3287	185	Ritmos Anchinos: Ritmos Anchinos: I. Harawi para Colquipocro	\N	undefined	03:45	[]	\N	2024-06-07 14:52:32.844-04	2024-06-07 14:52:32.844-04	\N
+3288	185	Ritmos Anchinos: Ritmos Anchinos: II. Charangos de Chincha	\N	undefined	05:19	[]	\N	2024-06-07 14:52:32.851-04	2024-06-07 14:52:32.851-04	\N
+3289	185	Three Pieces from Suite Mestiza: V. Tarqueada	\N	undefined	02:30	[]	\N	2024-06-07 14:52:32.862-04	2024-06-07 14:52:32.862-04	\N
+3290	185	Ritmos Anchinos: Ritmos Anchinos: III. Kachampa	\N	undefined	05:10	[]	\N	2024-06-07 14:52:32.871-04	2024-06-07 14:52:32.871-04	\N
+3291	185	Danza de los Muñecos	\N	undefined	03:34	[]	\N	2024-06-07 14:52:32.879-04	2024-06-07 14:52:32.879-04	\N
+3292	185	Hilos: Hilos: I. Danza del Altiplano	\N	undefined	02:32	[]	\N	2024-06-07 14:52:32.888-04	2024-06-07 14:52:32.888-04	\N
+3293	185	Leyendas: An Andean Walkabout: III. Himo de Zamponas	\N	undefined	03:06	[]	\N	2024-06-07 14:52:32.898-04	2024-06-07 14:52:32.898-04	\N
+3294	185	Sombras de Amantaní	\N	undefined	02:37	[]	\N	2024-06-07 14:52:32.907-04	2024-06-07 14:52:32.907-04	\N
+3295	185	Hilos: IV. Danza de los Diablos	\N	undefined	03:38	[]	\N	2024-06-07 14:52:32.916-04	2024-06-07 14:52:32.916-04	\N
+3296	185	Quijotadas: III. Moto Perpetuo: La Locura de Quijote	\N	undefined	03:46	[]	\N	2024-06-07 14:52:32.927-04	2024-06-07 14:52:32.927-04	\N
+3297	185	Hilos: VII. Yaravillosa	\N	undefined	03:33	[]	\N	2024-06-07 14:52:32.937-04	2024-06-07 14:52:32.937-04	\N
+3298	185	Quijotadas: V. La Danza de los Arrieros	\N	undefined	06:20	[]	\N	2024-06-07 14:52:32.956-04	2024-06-07 14:52:32.956-04	\N
+3299	185	Danza de los Saqsampillos (Version for 2 marimbas)	\N	undefined	06:48	[]	\N	2024-06-07 14:52:32.967-04	2024-06-07 14:52:32.967-04	\N
+3300	185	Hilos: VI. Juegos	\N	undefined	02:06	[]	\N	2024-06-07 14:52:32.978-04	2024-06-07 14:52:32.978-04	\N
+3301	185	Adoracion para Angelitos	\N	undefined	02:57	[]	\N	2024-06-07 14:52:32.996-04	2024-06-07 14:52:32.996-04	\N
+3302	185	Hilos: III. Charanguista Viejo	\N	undefined	03:44	[]	\N	2024-06-07 14:52:33.016-04	2024-06-07 14:52:33.016-04	\N
+3303	185	The Armadillo''s Charango	\N	undefined	02:38	[]	\N	2024-06-07 14:52:33.022-04	2024-06-07 14:52:33.022-04	\N
+3304	185	Hilos: VIII. Bombines	\N	undefined	05:49	[]	\N	2024-06-07 14:52:33.027-04	2024-06-07 14:52:33.027-04	\N
+3305	185	Hilos: V. Zumbayllu	\N	undefined	02:40	[]	\N	2024-06-07 14:52:33.031-04	2024-06-07 14:52:33.031-04	\N
+3306	185	Quijotadas: II. Seguidilla para la Mancha	\N	undefined	04:15	[]	\N	2024-06-07 14:52:33.041-04	2024-06-07 14:52:33.041-04	\N
+3307	185	Quijotadas: IV. Asturianada: La Cueva	\N	undefined	07:00	[]	\N	2024-06-07 14:52:33.047-04	2024-06-07 14:52:33.047-04	\N
+3308	185	Adagio para Amantaní: Adagio para Amantani	\N	undefined	09:31	[]	\N	2024-06-07 14:52:33.059-04	2024-06-07 14:52:33.059-04	\N
+3309	185	Quijotadas: I. Alborada	\N	undefined	01:11	[]	\N	2024-06-07 14:52:33.063-04	2024-06-07 14:52:33.063-04	\N
+3310	185	Danza de los Saqsampillos (version for 2 marimbas)	\N	undefined	06:48	[]	\N	2024-06-07 14:52:33.072-04	2024-06-07 14:52:33.072-04	\N
+3311	186	Omaramor For Solo Cello	\N	undefined	08:15	[]	\N	2024-06-07 14:52:46.642-04	2024-06-07 14:52:46.642-04	\N
+3312	186	Farewell	\N	undefined	03:04	[]	\N	2024-06-07 14:52:46.657-04	2024-06-07 14:52:46.657-04	\N
+3313	186	Ainadamar: Water and Horse Prelude	\N	undefined	02:42	[]	\N	2024-06-07 14:52:46.673-04	2024-06-07 14:52:46.673-04	\N
+3314	186	Golijov: Azul: I. Paz Sulfúrica	\N	undefined	06:33	[]	\N	2024-06-07 14:52:46.685-04	2024-06-07 14:52:46.685-04	\N
+3315	186	Air to Air: Air to Air: III. K''in Sventa Ch''ul Me''tik Kwadalupe (Ritual for the Holy Mother of Guadalupe)	\N	undefined	05:57	[]	\N	2024-06-07 14:52:46.695-04	2024-06-07 14:52:46.695-04	\N
+3316	186	Tenebrae (version for string quartet)	\N	undefined	12:44	[]	\N	2024-06-07 14:52:46.702-04	2024-06-07 14:52:46.702-04	\N
+3317	186	Tenebrae: 2.	\N	undefined	06:46	[]	\N	2024-06-07 14:52:46.709-04	2024-06-07 14:52:46.709-04	\N
+3318	186	Levante: Levante	\N	undefined	04:05	[]	\N	2024-06-07 14:52:46.717-04	2024-06-07 14:52:46.717-04	\N
+3319	186	Golijov: Azul: II. Silencio	\N	undefined	06:50	[]	\N	2024-06-07 14:52:46.724-04	2024-06-07 14:52:46.724-04	\N
+3320	186	Golijov: Azul: III. Transit	\N	undefined	06:41	[]	\N	2024-06-07 14:52:46.731-04	2024-06-07 14:52:46.731-04	\N
+3321	186	Golijov: Azul: IV. Yrushalem	\N	undefined	08:14	[]	\N	2024-06-07 14:52:46.738-04	2024-06-07 14:52:46.738-04	\N
+3322	186	Ainadamar / Act 1: Mariana: 2. Mariana, tus ojos	\N	undefined	08:17	[]	\N	2024-06-07 14:52:46.748-04	2024-06-07 14:52:46.748-04	\N
+3323	186	Ainadamar / Act 1: Mariana: 1. Balada	\N	undefined	04:47	[]	\N	2024-06-07 14:52:46.755-04	2024-06-07 14:52:46.755-04	\N
+3324	186	Oceana: 1. Call	\N	undefined	03:30	[]	\N	2024-06-07 14:52:46.762-04	2024-06-07 14:52:46.762-04	\N
+3325	186	Oceana: 4. Second Call	\N	undefined	02:10	[]	\N	2024-06-07 14:52:46.768-04	2024-06-07 14:52:46.768-04	\N
+3326	186	Oceana: 2. First Wave and Rain Train Interlude	\N	undefined	01:39	[]	\N	2024-06-07 14:52:46.778-04	2024-06-07 14:52:46.778-04	\N
+3327	186	Oceana: 3. Second Wave	\N	undefined	02:40	[]	\N	2024-06-07 14:52:46.786-04	2024-06-07 14:52:46.786-04	\N
+3328	186	Tenebrae: 1.	\N	undefined	06:10	[]	\N	2024-06-07 14:52:46.793-04	2024-06-07 14:52:46.793-04	\N
+3329	186	La Pasión según San Marcos: 24. Escarnio y Negación	\N	undefined	01:38	[]	\N	2024-06-07 14:52:46.8-04	2024-06-07 14:52:46.8-04	\N
+3330	186	La Pasión según San Marcos: 26. Lúa descolorida (Aria de las lágrimas de Pedro)	\N	undefined	05:44	[]	\N	2024-06-07 14:52:46.81-04	2024-06-07 14:52:46.81-04	\N
+3331	186	The Dreams and Prayers of Isaac the Blind: Prelude: Calmo, Sospeso	\N	undefined	03:14	[]	\N	2024-06-07 14:52:46.818-04	2024-06-07 14:52:46.818-04	\N
+3332	186	The Dreams and Prayers of Isaac the Blind - I. Agitato-Con Fuoco-Maestoso-Senza Misura, Oscilante	\N	undefined	08:40	[]	\N	2024-06-07 14:52:46.827-04	2024-06-07 14:52:46.827-04	\N
+3333	186	Night Messengers	\N	undefined	08:00	[]	\N	2024-06-07 14:52:46.837-04	2024-06-07 14:52:46.837-04	\N
+3334	186	Close Your Eyes - Instrumental	\N	undefined	03:44	[]	\N	2024-06-07 14:52:46.85-04	2024-06-07 14:52:46.85-04	\N
+3335	186	Dr Rudolf''s Dream	\N	undefined	02:51	[]	\N	2024-06-07 14:52:46.857-04	2024-06-07 14:52:46.857-04	\N
+3336	186	Tetro: 2. Love, Angie	\N	undefined	03:54	[]	\N	2024-06-07 14:52:46.863-04	2024-06-07 14:52:46.863-04	\N
+3337	186	Heart Murmur	\N	undefined	06:12	[]	\N	2024-06-07 14:52:46.869-04	2024-06-07 14:52:46.869-04	\N
+3338	186	Golijov: Lua descolorida	\N	undefined	05:38	[]	\N	2024-06-07 14:52:46.877-04	2024-06-07 14:52:46.877-04	\N
+3339	186	Ainadamar / Act 2: Federico: 4. Quiero cantar entre las explosiones	\N	undefined	05:19	[]	\N	2024-06-07 14:52:46.883-04	2024-06-07 14:52:46.883-04	\N
+3340	186	Ainadamar / Act 1: Mariana: 4. Desde mi ventana (Aria a la estatua de Mariana)	\N	undefined	07:27	[]	\N	2024-06-07 14:52:46.888-04	2024-06-07 14:52:46.888-04	\N
+3341	186	Ainadamar / Act 2: Federico: 5. Arresto	\N	undefined	04:34	[]	\N	2024-06-07 14:52:46.893-04	2024-06-07 14:52:46.893-04	\N
+3342	186	Ainadamar / Act 1: Mariana: 3. Bar Albor de Madrid	\N	undefined	02:43	[]	\N	2024-06-07 14:52:46.898-04	2024-06-07 14:52:46.898-04	\N
+3343	186	Ainadamar / Act 2: Federico: 1. Balada	\N	undefined	01:43	[]	\N	2024-06-07 14:52:46.903-04	2024-06-07 14:52:46.903-04	\N
+3344	186	Ainadamar / Act 3: Margarita: 4. Crepúsculo delirante	\N	undefined	03:40	[]	\N	2024-06-07 14:52:46.909-04	2024-06-07 14:52:46.909-04	\N
+3345	186	Ainadamar / Act 3: Margarita: 1. Balada	\N	undefined	02:47	[]	\N	2024-06-07 14:52:46.915-04	2024-06-07 14:52:46.915-04	\N
+3346	186	Ainadamar / Act 3: Margarita: 2. De mi fuente tu emerges	\N	undefined	02:33	[]	\N	2024-06-07 14:52:46.925-04	2024-06-07 14:52:46.925-04	\N
+3347	186	Ainadamar / Act 1: Mariana: 5. Muerte a Caballo	\N	undefined	00:51	[]	\N	2024-06-07 14:52:46.934-04	2024-06-07 14:52:46.934-04	\N
+3348	186	Ainadamar / Act 2: Federico: 7. Confesión	\N	undefined	08:34	[]	\N	2024-06-07 14:52:46.94-04	2024-06-07 14:52:46.94-04	\N
+3349	186	Ainadamar / Act 2: Federico: 2. Quiero arrancarme los ojos	\N	undefined	03:55	[]	\N	2024-06-07 14:52:46.948-04	2024-06-07 14:52:46.948-04	\N
+3350	186	Ainadamar / Act 3: Margarita: 6. Yo soy la libertad	\N	undefined	07:38	[]	\N	2024-06-07 14:52:46.952-04	2024-06-07 14:52:46.952-04	\N
+3351	186	Ainadamar / Act 3: Margarita: 5. Doy mi sangre	\N	undefined	04:08	[]	\N	2024-06-07 14:52:46.959-04	2024-06-07 14:52:46.959-04	\N
+3352	186	Ainadamar / Act 2: Federico: 6. La Fuente de las Lágrimas	\N	undefined	02:07	[]	\N	2024-06-07 14:52:46.964-04	2024-06-07 14:52:46.964-04	\N
+3353	186	Ainadamar / Act 2: Federico: 3. A La Habana	\N	undefined	03:28	[]	\N	2024-06-07 14:52:46.969-04	2024-06-07 14:52:46.969-04	\N
+3354	186	Ainadamar / Act 3: Margarita: 3. Tome su mano	\N	undefined	01:43	[]	\N	2024-06-07 14:52:46.974-04	2024-06-07 14:52:46.974-04	\N
+3355	186	Ainadamar: Interludio de Balazos y Lamento por la Muerte de Federico	\N	undefined	01:20	[]	\N	2024-06-07 14:52:46.979-04	2024-06-07 14:52:46.979-04	\N
+3356	186	St. Mark Passion: XXV. Desgarro de la Tunica	\N	undefined	01:23	[]	\N	2024-06-07 14:52:46.985-04	2024-06-07 14:52:46.985-04	\N
+3357	186	St. Mark Passion: III. Primer Anuncio	\N	undefined	03:43	[]	\N	2024-06-07 14:52:46.991-04	2024-06-07 14:52:46.991-04	\N
+3358	186	St. Mark Passion: X. El Primer Dia	\N	undefined	01:34	[]	\N	2024-06-07 14:52:46.997-04	2024-06-07 14:52:46.997-04	\N
+3359	186	St. Mark Passion: XI. Judas. XII. El Cordero Pascual	\N	undefined	04:29	[]	\N	2024-06-07 14:52:47.003-04	2024-06-07 14:52:47.003-04	\N
+3360	186	St. Mark Passion: VII. Uncion en Betania	\N	undefined	01:30	[]	\N	2024-06-07 14:52:47.008-04	2024-06-07 14:52:47.008-04	\N
+3361	187	Concerto for Viola and Orchestra (1996)	\N	undefined	35:18	[]	\N	2024-06-07 14:53:04.51-04	2024-06-07 14:53:04.51-04	\N
+3362	187	Serenade	\N	undefined	02:51	[]	\N	2024-06-07 14:53:04.524-04	2024-06-07 14:53:04.524-04	\N
+3363	187	St. John Passion: I. Das Wort	\N	undefined	01:28	[]	\N	2024-06-07 14:53:04.539-04	2024-06-07 14:53:04.539-04	\N
+3364	187	String Quartet No. 2	\N	undefined	08:11	[]	\N	2024-06-07 14:53:04.55-04	2024-06-07 14:53:04.55-04	\N
+3365	187	Raduysya (Rejoice): IV. And he returned to his own abode [Nun ist er in sein Haus zurückgekehrt]	\N	undefined	06:21	[]	\N	2024-06-07 14:53:04.561-04	2024-06-07 14:53:04.561-04	\N
+3366	187	Gubaidulina: The Canticle of the Sun: II. —	\N	undefined	03:02	[]	\N	2024-06-07 14:53:04.571-04	2024-06-07 14:53:04.571-04	\N
+3367	187	Garten von Freuden und Traurigkeiten	\N	undefined	18:46	[]	\N	2024-06-07 14:53:04.579-04	2024-06-07 14:53:04.579-04	\N
+3368	187	Sieben Worte (1982): 2. Weib, siehe, das ist dein Sohn - Siehe, das ist deine Mutter	\N	undefined	03:51	[]	\N	2024-06-07 14:53:04.59-04	2024-06-07 14:53:04.59-04	\N
+3369	187	Ten Preludes for Cello Solo (1974): 3. Con Sordino - Senza Sordino	\N	undefined	03:02	[]	\N	2024-06-07 14:53:04.6-04	2024-06-07 14:53:04.6-04	\N
+3370	187	Ten Preludes for Cello Solo (1974): 5. Sul Ponticello - Ordinario - Sul Tasto	\N	undefined	03:48	[]	\N	2024-06-07 14:53:04.611-04	2024-06-07 14:53:04.611-04	\N
+3371	187	Sieben Worte (1982): 1. Vater, vergib ihnen, denn sie wissen nicht, was sie tun	\N	undefined	04:14	[]	\N	2024-06-07 14:53:04.62-04	2024-06-07 14:53:04.62-04	\N
+3372	187	De Profundis	\N	undefined	13:31	[]	\N	2024-06-07 14:53:04.629-04	2024-06-07 14:53:04.629-04	\N
+3373	187	Ten Preludes for Cello Solo (1974): 1. Staccato - Legato	\N	undefined	01:13	[]	\N	2024-06-07 14:53:04.64-04	2024-06-07 14:53:04.64-04	\N
+3374	187	Sieben Worte (1982): 3. Wahrlich, ich sage dir: Heute wirst du mit mir im Paradiese sein	\N	undefined	03:50	[]	\N	2024-06-07 14:53:04.648-04	2024-06-07 14:53:04.648-04	\N
+3375	187	Ten Preludes for Cello Solo (1974): 8. Arco - Pizzicato	\N	undefined	01:17	[]	\N	2024-06-07 14:53:04.655-04	2024-06-07 14:53:04.655-04	\N
+3376	187	Ten Preludes for Cello Solo (1974): 2. Legato - Staccato	\N	undefined	02:33	[]	\N	2024-06-07 14:53:04.662-04	2024-06-07 14:53:04.662-04	\N
+3377	187	Sieben Worte (1982): 4. Mein Gott, mein Gott, warum hast du mich verlassen?	\N	undefined	08:40	[]	\N	2024-06-07 14:53:04.674-04	2024-06-07 14:53:04.674-04	\N
+3378	187	Ten Preludes for Cello Solo (1974): 9. Pizzicato - Arco	\N	undefined	02:53	[]	\N	2024-06-07 14:53:04.682-04	2024-06-07 14:53:04.682-04	\N
+3379	187	Gubaidulina: The Canticle of the Sun: I. Altissimo omnipontente bon Signore	\N	undefined	04:39	[]	\N	2024-06-07 14:53:04.691-04	2024-06-07 14:53:04.691-04	\N
+3380	187	Pantomime for Double Bass and Piano	\N	undefined	09:53	[]	\N	2024-06-07 14:53:04.7-04	2024-06-07 14:53:04.7-04	\N
+3381	187	Preludes for Solo Double Bass: Sul ponticello - Ordinario - Sul tasto	\N	undefined	02:52	[]	\N	2024-06-07 14:53:04.709-04	2024-06-07 14:53:04.709-04	\N
+3382	187	Meditation on the Bach Chorale ''Vor deinen Thron tret ich hiermit''	\N	undefined	12:18	[]	\N	2024-06-07 14:53:04.719-04	2024-06-07 14:53:04.719-04	\N
+3383	187	Repentance	\N	undefined	22:12	[]	\N	2024-06-07 14:53:04.73-04	2024-06-07 14:53:04.73-04	\N
+3384	187	Offertorium - Concerto For Violin And Orchestra	\N	undefined	35:34	[]	\N	2024-06-07 14:53:04.741-04	2024-06-07 14:53:04.741-04	\N
+3385	187	St. John Passion: III. Das Gebot des Glaubens	\N	undefined	02:31	[]	\N	2024-06-07 14:53:04.758-04	2024-06-07 14:53:04.758-04	\N
+3386	187	St. John Passion: V. Hoffnung	\N	undefined	02:37	[]	\N	2024-06-07 14:53:04.768-04	2024-06-07 14:53:04.768-04	\N
+3387	187	St. John Passion: II. Fusswaschung	\N	undefined	13:08	[]	\N	2024-06-07 14:53:04.777-04	2024-06-07 14:53:04.777-04	\N
+3388	187	10 Preludes for Cello Solo: VII. Al taco – da punta darco	\N	undefined	02:47	[]	\N	2024-06-07 14:53:04.785-04	2024-06-07 14:53:04.785-04	\N
+3389	187	Toccata	\N	undefined	03:01	[]	\N	2024-06-07 14:53:04.806-04	2024-06-07 14:53:04.806-04	\N
+3390	187	Poema-skazka (Fairy-Tale Poem)	\N	undefined	12:12	[]	\N	2024-06-07 14:53:04.826-04	2024-06-07 14:53:04.826-04	\N
+3391	187	Quartetto No. 4 - Live	\N	undefined	12:12	[]	\N	2024-06-07 14:53:04.832-04	2024-06-07 14:53:04.832-04	\N
+3392	187	Chaconne	\N	undefined	08:34	[]	\N	2024-06-07 14:53:04.837-04	2024-06-07 14:53:04.837-04	\N
+3393	187	Silenzio, IV - Live	\N	undefined	02:29	[]	\N	2024-06-07 14:53:04.841-04	2024-06-07 14:53:04.841-04	\N
+3394	187	Silenzio, I - Live	\N	undefined	04:24	[]	\N	2024-06-07 14:53:04.845-04	2024-06-07 14:53:04.845-04	\N
+3395	187	Musical Toys: II. Magic Roundabout	\N	undefined	00:40	[]	\N	2024-06-07 14:53:04.85-04	2024-06-07 14:53:04.85-04	\N
+3396	187	Musical Toys: III. The Trumpeter in the Forest	\N	undefined	01:33	[]	\N	2024-06-07 14:53:04.856-04	2024-06-07 14:53:04.856-04	\N
+3397	187	Stimmen Verstummen, "Symphony in Twelve Movements": XII.	\N	undefined	06:20	[]	\N	2024-06-07 14:53:04.861-04	2024-06-07 14:53:04.861-04	\N
+3398	187	Stimmen Verstummen, "Symphony in Twelve Movements": IX.	\N	undefined	00:56	[]	\N	2024-06-07 14:53:04.865-04	2024-06-07 14:53:04.865-04	\N
+3399	187	Stimmen Verstummen, "Symphony in Twelve Movements": VI.	\N	undefined	04:25	[]	\N	2024-06-07 14:53:04.87-04	2024-06-07 14:53:04.87-04	\N
+3400	187	Stufen	\N	undefined	18:02	[]	\N	2024-06-07 14:53:04.876-04	2024-06-07 14:53:04.876-04	\N
+3401	187	Stimmen Verstummen, "Symphony in Twelve Movements": X.	\N	undefined	01:39	[]	\N	2024-06-07 14:53:04.881-04	2024-06-07 14:53:04.881-04	\N
+3402	187	Stimmen Verstummen, "Symphony in Twelve Movements": IV.	\N	undefined	02:01	[]	\N	2024-06-07 14:53:04.886-04	2024-06-07 14:53:04.886-04	\N
+3403	187	Stimmen Verstummen, "Symphony in Twelve Movements": I.	\N	undefined	01:38	[]	\N	2024-06-07 14:53:04.891-04	2024-06-07 14:53:04.891-04	\N
+3404	187	Stimmen Verstummen, "Symphony in Twelve Movements": V.	\N	undefined	00:39	[]	\N	2024-06-07 14:53:04.896-04	2024-06-07 14:53:04.896-04	\N
+3405	187	Stimmen Verstummen, "Symphony in Twelve Movements": II.	\N	undefined	02:06	[]	\N	2024-06-07 14:53:04.901-04	2024-06-07 14:53:04.901-04	\N
+3406	187	Stimmen Verstummen, "Symphony in Twelve Movements": XI.	\N	undefined	01:53	[]	\N	2024-06-07 14:53:04.908-04	2024-06-07 14:53:04.908-04	\N
+3407	188	String poetic: II. Nocturne	\N	undefined	04:46	[]	\N	2024-06-07 14:53:22.097-04	2024-06-07 14:53:22.097-04	\N
+3408	188	blue cathedral	\N	undefined	10:28	[]	\N	2024-06-07 14:53:22.11-04	2024-06-07 14:53:22.11-04	\N
+3409	188	Violin Concerto: 1726	\N	undefined	14:23	[]	\N	2024-06-07 14:53:22.134-04	2024-06-07 14:53:22.134-04	\N
+3410	188	Violin Concerto: Fly Forward	\N	undefined	05:09	[]	\N	2024-06-07 14:53:22.145-04	2024-06-07 14:53:22.145-04	\N
+3411	188	Concerto 4-3: I. The Shallows	\N	undefined	09:06	[]	\N	2024-06-07 14:53:22.157-04	2024-06-07 14:53:22.157-04	\N
+3412	188	Piano Trio: I. Pale Yellow	\N	undefined	07:54	[]	\N	2024-06-07 14:53:22.169-04	2024-06-07 14:53:22.169-04	\N
+3413	188	Violin Concerto: Chaconni	\N	undefined	12:18	[]	\N	2024-06-07 14:53:22.181-04	2024-06-07 14:53:22.181-04	\N
+3414	188	Rhythm Stand	\N	undefined	02:31	[]	\N	2024-06-07 14:53:22.193-04	2024-06-07 14:53:22.193-04	\N
+3415	188	Concerto 4-3: II. Little River	\N	undefined	08:06	[]	\N	2024-06-07 14:53:22.206-04	2024-06-07 14:53:22.206-04	\N
+3416	188	All Things Majestic: II. String Lake	\N	undefined	07:07	[]	\N	2024-06-07 14:53:22.217-04	2024-06-07 14:53:22.217-04	\N
+3417	188	Scenes from the Poet''s Dreams: No. 2, Summer Shimmers Across the Glass of Green Ponds	\N	undefined	07:02	[]	\N	2024-06-07 14:53:22.229-04	2024-06-07 14:53:22.229-04	\N
+3418	188	Echo Dash	\N	undefined	02:17	[]	\N	2024-06-07 14:53:22.242-04	2024-06-07 14:53:22.242-04	\N
+3419	188	Concerto 4-3: III. Roaring Smokies	\N	undefined	05:48	[]	\N	2024-06-07 14:53:22.253-04	2024-06-07 14:53:22.253-04	\N
+3420	188	Cold Mountain, Act I: Act I Scene 2: Aria: The metal age (Inman, Ada, Teague, Blind Man)	\N	undefined	06:10	[]	\N	2024-06-07 14:53:22.265-04	2024-06-07 14:53:22.265-04	\N
+3421	188	Cold Mountain, Act I: Act I Scene 6: Aria: My only teacher was hunger (Ruby, Ada, Inman)	\N	undefined	06:34	[]	\N	2024-06-07 14:53:22.277-04	2024-06-07 14:53:22.277-04	\N
+3422	188	Cold Mountain, Act I: Act I Scene 5: We once lived in a land of paradise (Veasey, Inman, Home Guard, Laura)	\N	undefined	06:45	[]	\N	2024-06-07 14:53:22.288-04	2024-06-07 14:53:22.288-04	\N
+3423	188	Cold Mountain, Act I: Act I Scene 9: Listen (Ruby, Ada, Stobrod, Teague)	\N	undefined	08:09	[]	\N	2024-06-07 14:53:22.297-04	2024-06-07 14:53:22.297-04	\N
+3424	188	Cold Mountain, Act I: Act I Scene 6: Sun''s up. You''ll eat later (Ruby, Ada)	\N	undefined	02:33	[]	\N	2024-06-07 14:53:22.308-04	2024-06-07 14:53:22.308-04	\N
+3425	188	Cold Mountain, Act I: Act I Scene 1: Peaches in the summertime (Teague, Owens, Chorus)	\N	undefined	04:33	[]	\N	2024-06-07 14:53:22.321-04	2024-06-07 14:53:22.321-04	\N
+3426	188	Cold Mountain, Act I: Act I Scene 9: Aria: A fence is a good thing (Teague, Ada, Ruby, Stobrod)	\N	undefined	03:38	[]	\N	2024-06-07 14:53:22.329-04	2024-06-07 14:53:22.329-04	\N
+3427	188	Cold Mountain, Act II: Act II Scene 9: Howdy, strangers …Keep playin … (Teague, Stobrod, Pangle, Reid, Ruby, Ada)	\N	undefined	04:52	[]	\N	2024-06-07 14:53:22.336-04	2024-06-07 14:53:22.336-04	\N
+3428	188	Cold Mountain, Act I: Act I Scene 2: What were their names? (Chorus, Inman, Blind Man)	\N	undefined	06:09	[]	\N	2024-06-07 14:53:22.344-04	2024-06-07 14:53:22.344-04	\N
+3429	188	Cold Mountain, Act II: Act II Scene 1: Duet: Is that all you got? (Lucinda, Inman)	\N	undefined	07:09	[]	\N	2024-06-07 14:53:22.35-04	2024-06-07 14:53:22.35-04	\N
+3430	188	Cold Mountain, Act I: Act I Scene 10: Duet: Come back to cold mountain (Ada, Inman)	\N	undefined	04:59	[]	\N	2024-06-07 14:53:22.355-04	2024-06-07 14:53:22.355-04	\N
+3431	188	Cold Mountain, Act I: Act I Scene 6: Duet: Why can''t we? (Ada, Inman)	\N	undefined	03:36	[]	\N	2024-06-07 14:53:22.364-04	2024-06-07 14:53:22.364-04	\N
+3432	188	Cold Mountain, Act I: Act I Scene 3: I don''t like that man (Monroe, Ada, Inman)	\N	undefined	04:31	[]	\N	2024-06-07 14:53:22.374-04	2024-06-07 14:53:22.374-04	\N
+3433	188	Cold Mountain, Act II: Act II Scene 8: I should be cryin'' but I just feel numb (Ada, Ruby, Inman, Quintet)	\N	undefined	02:42	[]	\N	2024-06-07 14:53:22.381-04	2024-06-07 14:53:22.381-04	\N
+3434	188	Cold Mountain, Act I: Act I Scene 4: Who ya'' talking to? (Ruby, Ada)	\N	undefined	04:02	[]	\N	2024-06-07 14:53:22.386-04	2024-06-07 14:53:22.386-04	\N
+3435	188	Cold Mountain, Act II: Act II Scene 4: Bless you, Ruby (Ruby, Stobrod, Pangle, Ada, Reid)	\N	undefined	06:12	[]	\N	2024-06-07 14:53:22.391-04	2024-06-07 14:53:22.391-04	\N
+3436	188	Cold Mountain, Act II: Act II Scene 10: Aria: I feel sorry for you (Ada, Ruby)	\N	undefined	04:41	[]	\N	2024-06-07 14:53:22.395-04	2024-06-07 14:53:22.395-04	\N
+3437	188	Cold Mountain, Act II: Act II Scene 3: Duet: Orion (Ada, Inman)	\N	undefined	02:49	[]	\N	2024-06-07 14:53:22.4-04	2024-06-07 14:53:22.4-04	\N
+3438	188	Cold Mountain, Act II: Act II Scene 10: Our beautiful country (Chorus of the Dead, Ruby, Ada)	\N	undefined	04:17	[]	\N	2024-06-07 14:53:22.405-04	2024-06-07 14:53:22.405-04	\N
+3439	188	A Gentle Notion	\N	undefined	02:25	[]	\N	2024-06-07 14:53:22.41-04	2024-06-07 14:53:22.41-04	\N
+3440	188	Amazing Grace (version for string quartet)	\N	undefined	04:38	[]	\N	2024-06-07 14:53:22.415-04	2024-06-07 14:53:22.415-04	\N
+3441	188	Sky Quartet: I. Sky Rising	\N	undefined	04:27	[]	\N	2024-06-07 14:53:22.419-04	2024-06-07 14:53:22.419-04	\N
+3442	188	Trumpet Songs: VI. Breaking	\N	undefined	01:15	[]	\N	2024-06-07 14:53:22.424-04	2024-06-07 14:53:22.424-04	\N
+3443	188	Trumpet Songs: I. Morning Opens	\N	undefined	01:47	[]	\N	2024-06-07 14:53:22.429-04	2024-06-07 14:53:22.429-04	\N
+3444	188	Trumpet Songs: II. To Home	\N	undefined	00:49	[]	\N	2024-06-07 14:53:22.433-04	2024-06-07 14:53:22.433-04	\N
+3445	188	Concerto for Orchestra: IV. Fourth movement	\N	undefined	05:24	[]	\N	2024-06-07 14:53:22.44-04	2024-06-07 14:53:22.44-04	\N
+3446	188	Trumpet Songs: III. In Our Quiet	\N	undefined	03:07	[]	\N	2024-06-07 14:53:22.444-04	2024-06-07 14:53:22.444-04	\N
+3447	188	Concerto for Orchestra: I. First movement	\N	undefined	07:41	[]	\N	2024-06-07 14:53:22.449-04	2024-06-07 14:53:22.449-04	\N
+3448	188	Concerto for Orchestra: III. Third movement	\N	undefined	09:13	[]	\N	2024-06-07 14:53:22.453-04	2024-06-07 14:53:22.453-04	\N
+3449	188	Concerto for Orchestra: II. Second movement	\N	undefined	04:11	[]	\N	2024-06-07 14:53:22.457-04	2024-06-07 14:53:22.457-04	\N
+3450	188	Concerto for Orchestra: V. Fifth movement	\N	undefined	06:37	[]	\N	2024-06-07 14:53:22.462-04	2024-06-07 14:53:22.462-04	\N
+3451	188	Trumpet Songs: V. Threaded	\N	undefined	01:15	[]	\N	2024-06-07 14:53:22.466-04	2024-06-07 14:53:22.466-04	\N
+3452	188	O magnum mysterium	\N	undefined	07:09	[]	\N	2024-06-07 14:53:22.471-04	2024-06-07 14:53:22.471-04	\N
+3453	188	Piano Trio: II. Fiery Red	\N	undefined	05:26	[]	\N	2024-06-07 14:53:22.475-04	2024-06-07 14:53:22.475-04	\N
+3454	188	Voices: III. Grace	\N	undefined	05:01	[]	\N	2024-06-07 14:53:22.48-04	2024-06-07 14:53:22.48-04	\N
+3455	188	Impressions: II. Quiet Art	\N	undefined	08:06	[]	\N	2024-06-07 14:53:22.485-04	2024-06-07 14:53:22.485-04	\N
+3456	189	Hymn of Echoes	\N	undefined	02:27	[]	\N	2024-06-07 14:53:37.623-04	2024-06-07 14:53:37.623-04	\N
+3457	189	11 Gates: No. 1, Drifting into D Major	\N	undefined	01:52	[]	\N	2024-06-07 14:53:37.639-04	2024-06-07 14:53:37.639-04	\N
+3458	189	Dreaming River	\N	undefined	20:28	[]	\N	2024-06-07 14:53:37.65-04	2024-06-07 14:53:37.65-04	\N
+3459	189	11 Gates: No. 10, Seafloor Meditation (Whispering Mirrors at the Seafloor)	\N	undefined	01:45	[]	\N	2024-06-07 14:53:37.661-04	2024-06-07 14:53:37.661-04	\N
+3460	189	11 Gates: No. 6, Into the Great Wide Open	\N	undefined	03:56	[]	\N	2024-06-07 14:53:37.673-04	2024-06-07 14:53:37.673-04	\N
+3461	189	11 Gates: No. 2, Suddenly in the Room with Chattering Mirrors	\N	undefined	02:09	[]	\N	2024-06-07 14:53:37.683-04	2024-06-07 14:53:37.683-04	\N
+3462	189	11 Gates: No. 11, Waves, Pulse and Elastic Seabirds	\N	undefined	03:21	[]	\N	2024-06-07 14:53:37.692-04	2024-06-07 14:53:37.692-04	\N
+3463	189	11 Gates: No. 4, Confused Dialogues with Woodpecker	\N	undefined	00:57	[]	\N	2024-06-07 14:53:37.701-04	2024-06-07 14:53:37.701-04	\N
+3464	189	11 Gates: No. 8, Toypianos on the Surface of the Sea	\N	undefined	00:50	[]	\N	2024-06-07 14:53:37.709-04	2024-06-07 14:53:37.709-04	\N
+3465	189	King Tide	\N	undefined	13:48	[]	\N	2024-06-07 14:53:37.715-04	2024-06-07 14:53:37.715-04	\N
+3466	189	11 Gates: No. 5, Suddenly in the Room with Floating Mirrors	\N	undefined	00:44	[]	\N	2024-06-07 14:53:37.721-04	2024-06-07 14:53:37.721-04	\N
+3467	189	11 Gates: No. 7, Meadow of Sadsongs	\N	undefined	02:46	[]	\N	2024-06-07 14:53:37.727-04	2024-06-07 14:53:37.727-04	\N
+3468	189	Exquisite Corpse	\N	undefined	13:41	[]	\N	2024-06-07 14:53:37.734-04	2024-06-07 14:53:37.734-04	\N
+3469	189	11 Gates: No. 9, String Quartet spiralling to the Seafloor	\N	undefined	00:45	[]	\N	2024-06-07 14:53:37.742-04	2024-06-07 14:53:37.742-04	\N
+3470	189	O dessa ögon	\N	undefined	04:48	[]	\N	2024-06-07 14:53:37.748-04	2024-06-07 14:53:37.748-04	\N
+3471	189	Liquid Marble	\N	undefined	10:32	[]	\N	2024-06-07 14:53:37.757-04	2024-06-07 14:53:37.757-04	\N
+3472	189	Clarinet Concerto "Peacock Tales" (Version for Clarinet & Orchestra)	\N	undefined	29:00	[]	\N	2024-06-07 14:53:37.766-04	2024-06-07 14:53:37.766-04	\N
+3473	189	Violin Concerto No. 1	\N	undefined	25:22	[]	\N	2024-06-07 14:53:37.773-04	2024-06-07 14:53:37.773-04	\N
+3474	189	Brass Quintet	\N	undefined	07:55	[]	\N	2024-06-07 14:53:37.78-04	2024-06-07 14:53:37.78-04	\N
+3475	189	The Strand Settings: 3. Dark Harbor XXXV	\N	undefined	05:26	[]	\N	2024-06-07 14:53:37.788-04	2024-06-07 14:53:37.788-04	\N
+3476	189	Mouyayoum	\N	undefined	13:17	[]	\N	2024-06-07 14:53:37.798-04	2024-06-07 14:53:37.798-04	\N
+3477	189	The Strand Settings: 1. Black Sea	\N	undefined	04:17	[]	\N	2024-06-07 14:53:37.804-04	2024-06-07 14:53:37.804-04	\N
+3478	189	The Strand Settings: 2. Dark Harbor XX	\N	undefined	05:09	[]	\N	2024-06-07 14:53:37.812-04	2024-06-07 14:53:37.812-04	\N
+3479	189	Pafagelsogonblick	\N	undefined	01:18	[]	\N	2024-06-07 14:53:37.82-04	2024-06-07 14:53:37.82-04	\N
+3480	189	The Strand Settings: 4. Dark Harbor XI	\N	undefined	05:41	[]	\N	2024-06-07 14:53:37.829-04	2024-06-07 14:53:37.829-04	\N
+3481	189	Primal Blues	\N	undefined	01:19	[]	\N	2024-06-07 14:53:37.843-04	2024-06-07 14:53:37.843-04	\N
+3482	189	Innan kärleken kom	\N	undefined	05:25	[]	\N	2024-06-07 14:53:37.851-04	2024-06-07 14:53:37.851-04	\N
+3483	189	En gul böjd banan	\N	undefined	05:43	[]	\N	2024-06-07 14:53:37.862-04	2024-06-07 14:53:37.862-04	\N
+3484	189	Lava	\N	undefined	01:12	[]	\N	2024-06-07 14:53:37.87-04	2024-06-07 14:53:37.87-04	\N
+3485	189	Hillborg Miniature	\N	undefined	02:10	[]	\N	2024-06-07 14:53:37.878-04	2024-06-07 14:53:37.878-04	\N
+3486	189	Hillborg: Kongsgaard Variations	\N	undefined	19:37	[]	\N	2024-06-07 14:53:37.886-04	2024-06-07 14:53:37.886-04	\N
+3487	189	11 Gates: No. 3, D Major Still Life	\N	undefined	00:24	[]	\N	2024-06-07 14:53:37.896-04	2024-06-07 14:53:37.896-04	\N
+3488	189	... lontana in sonno ...	\N	undefined	15:05	[]	\N	2024-06-07 14:53:37.904-04	2024-06-07 14:53:37.904-04	\N
+3489	189	Celestial Mechanics	\N	undefined	21:28	[]	\N	2024-06-07 14:53:37.915-04	2024-06-07 14:53:37.915-04	\N
+3490	189	Six Pieces for Wind Quintet: V. Very Calm	\N	undefined	02:13	[]	\N	2024-06-07 14:53:37.925-04	2024-06-07 14:53:37.925-04	\N
+3491	189	Six Pieces for Wind Quintet: IV. With Fury	\N	undefined	02:28	[]	\N	2024-06-07 14:53:37.933-04	2024-06-07 14:53:37.933-04	\N
+3492	189	Six Pieces for Wind Quintet: III. Idyll	\N	undefined	01:12	[]	\N	2024-06-07 14:53:37.945-04	2024-06-07 14:53:37.945-04	\N
+3493	189	Six Pieces for Wind Quintet: I. —	\N	undefined	01:34	[]	\N	2024-06-07 14:53:37.957-04	2024-06-07 14:53:37.957-04	\N
+3494	189	Six Pieces for Wind Quintet: II. —	\N	undefined	00:55	[]	\N	2024-06-07 14:53:37.967-04	2024-06-07 14:53:37.967-04	\N
+3495	189	Six Pieces for Wind Quintet: VI. —	\N	undefined	01:07	[]	\N	2024-06-07 14:53:37.975-04	2024-06-07 14:53:37.975-04	\N
+3496	189	Hudbasun	\N	undefined	03:33	[]	\N	2024-06-07 14:53:37.984-04	2024-06-07 14:53:37.984-04	\N
+3497	189	Lamento	\N	undefined	10:59	[]	\N	2024-06-07 14:53:37.998-04	2024-06-07 14:53:37.998-04	\N
+3498	189	Clang and Fury	\N	undefined	27:09	[]	\N	2024-06-07 14:53:38.015-04	2024-06-07 14:53:38.015-04	\N
+3499	190	Google Google	\N	undefined	06:09	[]	\N	2024-06-07 14:53:50.947-04	2024-06-07 14:53:50.947-04	\N
+3500	190	Ussumu Laresey	\N	undefined	04:47	[]	\N	2024-06-07 14:53:50.964-04	2024-06-07 14:53:50.964-04	\N
+3501	190	Compassion	\N	undefined	04:51	[]	\N	2024-06-07 14:53:50.98-04	2024-06-07 14:53:50.98-04	\N
+3502	190	Uchimandai	\N	undefined	04:12	[]	\N	2024-06-07 14:53:50.991-04	2024-06-07 14:53:50.991-04	\N
+3503	190	Arch	\N	undefined	06:14	[]	\N	2024-06-07 14:53:50.999-04	2024-06-07 14:53:50.999-04	\N
+3504	190	Overjoyed	\N	undefined	07:53	[]	\N	2024-06-07 14:53:51.007-04	2024-06-07 14:53:51.007-04	\N
+3505	190	Kan Irandil	\N	undefined	04:31	[]	\N	2024-06-07 14:53:51.018-04	2024-06-07 14:53:51.018-04	\N
+3506	190	Prelude: Orison	\N	undefined	03:44	[]	\N	2024-06-07 14:53:51.026-04	2024-06-07 14:53:51.026-04	\N
+3507	190	Maelstrom	\N	undefined	04:37	[]	\N	2024-06-07 14:53:51.034-04	2024-06-07 14:53:51.034-04	\N
+3508	190	Human Nature (Trio Extension)	\N	undefined	09:39	[]	\N	2024-06-07 14:53:51.044-04	2024-06-07 14:53:51.044-04	\N
+3509	190	Mystic Brew	\N	undefined	04:56	[]	\N	2024-06-07 14:53:51.053-04	2024-06-07 14:53:51.053-04	\N
+3510	190	Tempest	\N	undefined	06:24	[]	\N	2024-06-07 14:53:51.061-04	2024-06-07 14:53:51.061-04	\N
+3511	190	Azhagaai Pookkuthey	\N	undefined	04:57	[]	\N	2024-06-07 14:53:51.07-04	2024-06-07 14:53:51.07-04	\N
+3512	190	Playlist For An Extreme Occasion: Part Zero	\N	undefined	01:33	[]	\N	2024-06-07 14:53:51.08-04	2024-06-07 14:53:51.08-04	\N
+3513	190	Human Nature	\N	undefined	06:09	[]	\N	2024-06-07 14:53:51.09-04	2024-06-07 14:53:51.09-04	\N
+3514	190	It Goes	\N	undefined	03:10	[]	\N	2024-06-07 14:53:51.101-04	2024-06-07 14:53:51.101-04	\N
+3515	190	Panegyric	\N	undefined	06:31	[]	\N	2024-06-07 14:53:51.111-04	2024-06-07 14:53:51.111-04	\N
+3516	190	Nonaah	\N	undefined	02:32	[]	\N	2024-06-07 14:53:51.12-04	2024-06-07 14:53:51.12-04	\N
+3517	190	Ghostrumental	\N	undefined	06:38	[]	\N	2024-06-07 14:53:51.131-04	2024-06-07 14:53:51.131-04	\N
+3518	190	Where I Am	\N	undefined	05:45	[]	\N	2024-06-07 14:53:51.143-04	2024-06-07 14:53:51.143-04	\N
+3519	190	Combat Breathing	\N	undefined	07:51	[]	\N	2024-06-07 14:53:51.154-04	2024-06-07 14:53:51.154-04	\N
+3520	190	Free Spirits / Drummer''s Song	\N	undefined	07:15	[]	\N	2024-06-07 14:53:51.163-04	2024-06-07 14:53:51.163-04	\N
+3521	190	Children Of Flint	\N	undefined	06:26	[]	\N	2024-06-07 14:53:51.175-04	2024-06-07 14:53:51.175-04	\N
+3522	190	King Solomon''s Marbles	\N	undefined	04:35	[]	\N	2024-06-07 14:53:51.195-04	2024-06-07 14:53:51.195-04	\N
+3523	190	Entrustment	\N	undefined	05:06	[]	\N	2024-06-07 14:53:51.207-04	2024-06-07 14:53:51.207-04	\N
+3524	190	Aval Appadi Onrum	\N	undefined	04:18	[]	\N	2024-06-07 14:53:51.218-04	2024-06-07 14:53:51.218-04	\N
+3525	190	Kadhalikka	\N	undefined	04:37	[]	\N	2024-06-07 14:53:51.23-04	2024-06-07 14:53:51.23-04	\N
+3526	190	Work	\N	undefined	06:14	[]	\N	2024-06-07 14:53:51.243-04	2024-06-07 14:53:51.243-04	\N
+3527	190	Touba	\N	undefined	07:18	[]	\N	2024-06-07 14:53:51.256-04	2024-06-07 14:53:51.256-04	\N
+3528	190	Night And Day	\N	undefined	09:34	[]	\N	2024-06-07 14:53:51.268-04	2024-06-07 14:53:51.268-04	\N
+3529	190	Galang (Trio Riot Version)	\N	undefined	02:41	[]	\N	2024-06-07 14:53:51.279-04	2024-06-07 14:53:51.279-04	\N
+3530	190	Starlings	\N	undefined	03:52	[]	\N	2024-06-07 14:53:51.289-04	2024-06-07 14:53:51.289-04	\N
+3531	190	Augury	\N	undefined	03:29	[]	\N	2024-06-07 14:53:51.298-04	2024-06-07 14:53:51.298-04	\N
+3532	190	The Star of a Story	\N	undefined	05:46	[]	\N	2024-06-07 14:53:51.31-04	2024-06-07 14:53:51.31-04	\N
+3533	190	Drummer’s Song	\N	undefined	06:48	[]	\N	2024-06-07 14:53:51.349-04	2024-06-07 14:53:51.349-04	\N
+3534	190	Uneasy	\N	undefined	09:12	[]	\N	2024-06-07 14:53:51.36-04	2024-06-07 14:53:51.36-04	\N
+3535	190	Configurations	\N	undefined	09:28	[]	\N	2024-06-07 14:53:51.37-04	2024-06-07 14:53:51.37-04	\N
+3536	190	Playlist For An Extreme Occasion: Part Four	\N	undefined	02:30	[]	\N	2024-06-07 14:53:51.382-04	2024-06-07 14:53:51.382-04	\N
+3537	190	Chorale	\N	undefined	04:35	[]	\N	2024-06-07 14:53:51.391-04	2024-06-07 14:53:51.391-04	\N
+3538	190	Optimism	\N	undefined	07:23	[]	\N	2024-06-07 14:53:51.401-04	2024-06-07 14:53:51.401-04	\N
+3539	190	Hood	\N	undefined	06:10	[]	\N	2024-06-07 14:53:51.411-04	2024-06-07 14:53:51.411-04	\N
+3540	190	Uchimandai (From "Vettaikaaran")	\N	undefined	04:12	[]	\N	2024-06-07 14:53:51.42-04	2024-06-07 14:53:51.42-04	\N
+3541	190	Accelerando	\N	undefined	02:53	[]	\N	2024-06-07 14:53:51.44-04	2024-06-07 14:53:51.44-04	\N
+3542	190	Historicity	\N	undefined	07:50	[]	\N	2024-06-07 14:53:51.45-04	2024-06-07 14:53:51.45-04	\N
+3543	190	Little Pocket Size Demons	\N	undefined	07:14	[]	\N	2024-06-07 14:53:51.461-04	2024-06-07 14:53:51.461-04	\N
+3544	190	Playlist For An Extreme Occasion: Part One	\N	undefined	01:53	[]	\N	2024-06-07 14:53:51.472-04	2024-06-07 14:53:51.472-04	\N
+3545	191	Intermezzi for Piano: 2. Zart singend	\N	undefined	01:23	[]	\N	2024-06-07 14:54:03.691-04	2024-06-07 14:54:03.691-04	\N
+3546	191	25 Duos for Violin and Cello: XXI. Valse bavaroise	\N	undefined	01:55	[]	\N	2024-06-07 14:54:03.706-04	2024-06-07 14:54:03.706-04	\N
+3547	191	Widmann: Petite Suite	\N	undefined	06:11	[]	\N	2024-06-07 14:54:03.729-04	2024-06-07 14:54:03.729-04	\N
+3548	191	Viola Concerto: IV. Toccata, Presto	\N	undefined	01:59	[]	\N	2024-06-07 14:54:03.742-04	2024-06-07 14:54:03.742-04	\N
+3549	191	String Quartet No. 3 "Jagdquartett"	\N	undefined	10:15	[]	\N	2024-06-07 14:54:03.754-04	2024-06-07 14:54:03.754-04	\N
+3550	191	Viola Concerto: II. Sehr langsam - Calmo	\N	undefined	08:37	[]	\N	2024-06-07 14:54:03.766-04	2024-06-07 14:54:03.766-04	\N
+3551	191	24 Duets: No. 9. Calmo	\N	undefined	00:41	[]	\N	2024-06-07 14:54:03.778-04	2024-06-07 14:54:03.778-04	\N
+3552	191	Viola Concerto: I. Pizzicato, Molto rubato - Più mosso	\N	undefined	08:47	[]	\N	2024-06-07 14:54:03.79-04	2024-06-07 14:54:03.79-04	\N
+3553	191	24 Duets: No. 21. Valse bavaroise	\N	undefined	01:38	[]	\N	2024-06-07 14:54:03.8-04	2024-06-07 14:54:03.8-04	\N
+3554	191	Viola Concerto: V. Aria, Molto Adagio	\N	undefined	06:16	[]	\N	2024-06-07 14:54:03.813-04	2024-06-07 14:54:03.813-04	\N
+3555	191	Viola Concerto: III. Poco vivo subito	\N	undefined	02:25	[]	\N	2024-06-07 14:54:03.825-04	2024-06-07 14:54:03.825-04	\N
+3556	191	24 Duets: No. 16. Petit ballet mécanique (Pas de deux)	\N	undefined	00:58	[]	\N	2024-06-07 14:54:03.838-04	2024-06-07 14:54:03.838-04	\N
+3557	191	24 Duets: No. 5. Frage	\N	undefined	00:49	[]	\N	2024-06-07 14:54:03.85-04	2024-06-07 14:54:03.85-04	\N
+3558	191	2nd String Quartet	\N	undefined	13:45	[]	\N	2024-06-07 14:54:03.861-04	2024-06-07 14:54:03.861-04	\N
+3559	191	1st String Quartet	\N	undefined	13:10	[]	\N	2024-06-07 14:54:03.87-04	2024-06-07 14:54:03.87-04	\N
+3560	191	Octet in F Major: I. Intrada - Live	\N	undefined	05:55	[]	\N	2024-06-07 14:54:03.88-04	2024-06-07 14:54:03.88-04	\N
+3561	191	Octet in F Major: II. Menuetto - Live	\N	undefined	01:50	[]	\N	2024-06-07 14:54:03.89-04	2024-06-07 14:54:03.89-04	\N
+3562	191	Octet in F Major: III. Lied ohne Worte - Live	\N	undefined	09:34	[]	\N	2024-06-07 14:54:03.9-04	2024-06-07 14:54:03.9-04	\N
+3563	191	24 Duos, Vol. 1: No. 13, Vier Strophen vom Heimweh	\N	undefined	02:11	[]	\N	2024-06-07 14:54:03.91-04	2024-06-07 14:54:03.91-04	\N
+3564	191	Clarinet Quintet	\N	undefined	38:41	[]	\N	2024-06-07 14:54:03.92-04	2024-06-07 14:54:03.92-04	\N
+3565	191	Es war einmal… Fünf Stücke im Märchenton: No. 5, Und wenn sie nicht gestorben sind	\N	undefined	06:32	[]	\N	2024-06-07 14:54:03.931-04	2024-06-07 14:54:03.931-04	\N
+3566	191	Es war einmal… Fünf Stücke im Märchenton: No. 1, Es war einmal…	\N	undefined	05:38	[]	\N	2024-06-07 14:54:03.943-04	2024-06-07 14:54:03.943-04	\N
+3567	191	Fantasie	\N	undefined	07:52	[]	\N	2024-06-07 14:54:03.954-04	2024-06-07 14:54:03.954-04	\N
+3568	191	Fünf Bruchstücke: II. Presto possibile	\N	undefined	01:08	[]	\N	2024-06-07 14:54:03.964-04	2024-06-07 14:54:03.964-04	\N
+3569	191	Intermezzi for Piano: 4. Wiegenlied (Ruhig fließend)	\N	undefined	04:14	[]	\N	2024-06-07 14:54:03.976-04	2024-06-07 14:54:03.976-04	\N
+3570	191	Intermezzi for Piano: 3. Mit dunkler Glut (Agitato sempre)	\N	undefined	11:60	[]	\N	2024-06-07 14:54:03.987-04	2024-06-07 14:54:03.987-04	\N
+3571	191	Zirkustänze: No. 8, Karussell-Walzer	\N	undefined	01:48	[]	\N	2024-06-07 14:54:03.998-04	2024-06-07 14:54:03.998-04	\N
+3572	191	5 Albumblätter	\N	undefined	16:01	[]	\N	2024-06-07 14:54:04.01-04	2024-06-07 14:54:04.01-04	\N
+3573	191	Zirkustänze: No. 6, Valse sentimentale	\N	undefined	01:39	[]	\N	2024-06-07 14:54:04.021-04	2024-06-07 14:54:04.021-04	\N
+3574	191	Fünf Bruchstücke: IV. Energiegeladen, sehr schnell	\N	undefined	01:30	[]	\N	2024-06-07 14:54:04.032-04	2024-06-07 14:54:04.032-04	\N
+3575	191	Zirkustänze: No. 10, Venezianisches Gondellied	\N	undefined	03:36	[]	\N	2024-06-07 14:54:04.044-04	2024-06-07 14:54:04.044-04	\N
+3576	191	Zirkustänze: No. 4, Vier Strophen vom Heimweh	\N	undefined	02:04	[]	\N	2024-06-07 14:54:04.058-04	2024-06-07 14:54:04.058-04	\N
+3577	191	Zirkustänze: No. 5, Valse bavaroise	\N	undefined	01:22	[]	\N	2024-06-07 14:54:04.07-04	2024-06-07 14:54:04.07-04	\N
+3578	191	Con brio	\N	undefined	11:58	[]	\N	2024-06-07 14:54:04.082-04	2024-06-07 14:54:04.082-04	\N
+3579	191	Intermezzi for Piano: 1. I	\N	undefined	00:46	[]	\N	2024-06-07 14:54:04.095-04	2024-06-07 14:54:04.095-04	\N
+3580	191	Zirkustänze: No. 2, Boogie-Woogie	\N	undefined	00:56	[]	\N	2024-06-07 14:54:04.107-04	2024-06-07 14:54:04.107-04	\N
+3581	191	Lied ohne Worte	\N	undefined	03:46	[]	\N	2024-06-07 14:54:04.119-04	2024-06-07 14:54:04.119-04	\N
+3582	191	Zirkustänze: No. 9, Hebräische Melodie	\N	undefined	04:31	[]	\N	2024-06-07 14:54:04.131-04	2024-06-07 14:54:04.131-04	\N
+3583	191	Intermezzi for Piano: 5. Lento un poco andante	\N	undefined	01:41	[]	\N	2024-06-07 14:54:04.142-04	2024-06-07 14:54:04.142-04	\N
+3584	191	Zirkustänze: No. 7, Kinderreim	\N	undefined	00:48	[]	\N	2024-06-07 14:54:04.154-04	2024-06-07 14:54:04.154-04	\N
+3585	191	Zirkustänze: No. 11, Bayerisch-babylonischer Marsch	\N	undefined	04:16	[]	\N	2024-06-07 14:54:04.165-04	2024-06-07 14:54:04.165-04	\N
+3586	191	Zirkustänze: No. 3, Erster Walzer	\N	undefined	01:25	[]	\N	2024-06-07 14:54:04.179-04	2024-06-07 14:54:04.179-04	\N
+3587	191	24 Duos for Violin and Cello: XXIV. Toccatina all’inglese	\N	undefined	02:58	[]	\N	2024-06-07 14:54:04.191-04	2024-06-07 14:54:04.191-04	\N
+3588	191	Liebeslied nach Jörg Widmann	\N	undefined	10:07	[]	\N	2024-06-07 14:54:04.203-04	2024-06-07 14:54:04.203-04	\N
+3589	191	Lichtstudie III	\N	undefined	16:58	[]	\N	2024-06-07 14:54:04.215-04	2024-06-07 14:54:04.215-04	\N
+3590	191	Fleurs du mal	\N	undefined	19:13	[]	\N	2024-06-07 14:54:04.227-04	2024-06-07 14:54:04.227-04	\N
+3591	191	Elf Humoresken: IV. Waldszene	\N	undefined	01:04	[]	\N	2024-06-07 14:54:04.239-04	2024-06-07 14:54:04.239-04	\N
+3592	191	Toccata	\N	undefined	09:42	[]	\N	2024-06-07 14:54:04.262-04	2024-06-07 14:54:04.262-04	\N
+3593	192	Reflection In Your Eyes	\N	undefined	02:27	[]	\N	2024-06-07 14:54:20.728-04	2024-06-07 14:54:20.728-04	\N
+3594	192	Our Song	\N	undefined	02:35	[]	\N	2024-06-07 14:54:20.744-04	2024-06-07 14:54:20.744-04	\N
+3595	192	Lighted By Candles	\N	undefined	02:16	[]	\N	2024-06-07 14:54:20.756-04	2024-06-07 14:54:20.756-04	\N
+3596	192	Waking Up With You	\N	undefined	02:21	[]	\N	2024-06-07 14:54:20.765-04	2024-06-07 14:54:20.765-04	\N
+3597	192	Sharp Sting	\N	undefined	02:16	[]	\N	2024-06-07 14:54:20.778-04	2024-06-07 14:54:20.778-04	\N
+3598	192	The Great Escape	\N	undefined	02:21	[]	\N	2024-06-07 14:54:20.789-04	2024-06-07 14:54:20.789-04	\N
+3599	192	Adventurous	\N	undefined	02:29	[]	\N	2024-06-07 14:54:20.802-04	2024-06-07 14:54:20.802-04	\N
+3600	192	Horizon Sky	\N	undefined	02:19	[]	\N	2024-06-07 14:54:20.814-04	2024-06-07 14:54:20.814-04	\N
+3601	192	Clarinet Concerto	\N	undefined	25:07	[]	\N	2024-06-07 14:54:20.827-04	2024-06-07 14:54:20.827-04	\N
+3602	192	Spots Of Sunshine	\N	undefined	02:56	[]	\N	2024-06-07 14:54:20.84-04	2024-06-07 14:54:20.84-04	\N
+3603	192	Odyssey	\N	undefined	02:24	[]	\N	2024-06-07 14:54:20.852-04	2024-06-07 14:54:20.852-04	\N
+3604	192	Fresco	\N	undefined	21:38	[]	\N	2024-06-07 14:54:20.863-04	2024-06-07 14:54:20.863-04	\N
+3605	192	Piano Concerto: III. —	\N	undefined	08:14	[]	\N	2024-06-07 14:54:20.873-04	2024-06-07 14:54:20.873-04	\N
+3606	192	EXPO	\N	undefined	10:07	[]	\N	2024-06-07 14:54:20.885-04	2024-06-07 14:54:20.885-04	\N
+3607	192	Violin Concerto: II. —	\N	undefined	09:18	[]	\N	2024-06-07 14:54:20.906-04	2024-06-07 14:54:20.906-04	\N
+3608	192	Violin Concerto: I. —	\N	undefined	11:10	[]	\N	2024-06-07 14:54:20.917-04	2024-06-07 14:54:20.917-04	\N
+3609	192	Röda läppar	\N	undefined	03:08	[]	\N	2024-06-07 14:54:20.929-04	2024-06-07 14:54:20.929-04	\N
+3610	192	Peggie (Vad Är Du Rädd För?)	\N	undefined	04:21	[]	\N	2024-06-07 14:54:20.941-04	2024-06-07 14:54:20.941-04	\N
+3611	192	Månsken Peggie	\N	undefined	02:58	[]	\N	2024-06-07 14:54:20.951-04	2024-06-07 14:54:20.951-04	\N
+3612	192	När sekunderna försvinner	\N	undefined	05:28	[]	\N	2024-06-07 14:54:20.964-04	2024-06-07 14:54:20.964-04	\N
+3613	192	Omkring tiggarn från Luossa	\N	undefined	05:51	[]	\N	2024-06-07 14:54:20.978-04	2024-06-07 14:54:20.978-04	\N
+3614	192	Till min syster	\N	undefined	03:47	[]	\N	2024-06-07 14:54:20.994-04	2024-06-07 14:54:20.994-04	\N
+3615	192	Sista natten	\N	undefined	03:52	[]	\N	2024-06-07 14:54:21.005-04	2024-06-07 14:54:21.005-04	\N
+3616	192	Tårar över city	\N	undefined	05:33	[]	\N	2024-06-07 14:54:21.017-04	2024-06-07 14:54:21.017-04	\N
+3617	192	Ljusterö	\N	undefined	04:14	[]	\N	2024-06-07 14:54:21.029-04	2024-06-07 14:54:21.029-04	\N
+3618	192	Då tänker jag lite på dej	\N	undefined	03:56	[]	\N	2024-06-07 14:54:21.04-04	2024-06-07 14:54:21.04-04	\N
+3619	192	Ingen som vet	\N	undefined	04:29	[]	\N	2024-06-07 14:54:21.06-04	2024-06-07 14:54:21.06-04	\N
+3620	192	I alla mina drömmar	\N	undefined	04:37	[]	\N	2024-06-07 14:54:21.069-04	2024-06-07 14:54:21.069-04	\N
+3621	192	Jag saknar oss	\N	undefined	04:32	[]	\N	2024-06-07 14:54:21.079-04	2024-06-07 14:54:21.079-04	\N
+3622	192	Natt och dag	\N	undefined	04:09	[]	\N	2024-06-07 14:54:21.089-04	2024-06-07 14:54:21.089-04	\N
+3623	192	Det finns dom som aldrig sett en vän	\N	undefined	04:24	[]	\N	2024-06-07 14:54:21.098-04	2024-06-07 14:54:21.098-04	\N
+3624	192	Jag vill	\N	undefined	03:28	[]	\N	2024-06-07 14:54:21.109-04	2024-06-07 14:54:21.109-04	\N
+3625	192	Vem?	\N	undefined	03:56	[]	\N	2024-06-07 14:54:21.118-04	2024-06-07 14:54:21.118-04	\N
+3626	192	Persiennerna är nere	\N	undefined	04:24	[]	\N	2024-06-07 14:54:21.129-04	2024-06-07 14:54:21.129-04	\N
+3627	192	Håll mej	\N	undefined	04:32	[]	\N	2024-06-07 14:54:21.138-04	2024-06-07 14:54:21.138-04	\N
+3628	192	Lycklig Man	\N	undefined	04:00	[]	\N	2024-06-07 14:54:21.147-04	2024-06-07 14:54:21.147-04	\N
+3629	192	Ljudet av oss två	\N	undefined	05:38	[]	\N	2024-06-07 14:54:21.158-04	2024-06-07 14:54:21.158-04	\N
+3630	192	Farväl Marie Claire	\N	undefined	03:46	[]	\N	2024-06-07 14:54:21.176-04	2024-06-07 14:54:21.176-04	\N
+3631	192	Brooklandsvägen (Brookland Road)	\N	undefined	03:27	[]	\N	2024-06-07 14:54:21.201-04	2024-06-07 14:54:21.201-04	\N
+3632	192	17:e balladen	\N	undefined	04:01	[]	\N	2024-06-07 14:54:21.219-04	2024-06-07 14:54:21.219-04	\N
+3633	192	Han var min bäste vän (He Was a Friend of Mine)	\N	undefined	03:35	[]	\N	2024-06-07 14:54:21.228-04	2024-06-07 14:54:21.228-04	\N
+3634	192	Då känns det lite lugnare	\N	undefined	03:15	[]	\N	2024-06-07 14:54:21.237-04	2024-06-07 14:54:21.237-04	\N
+3635	192	Skuggan av en chans	\N	undefined	03:02	[]	\N	2024-06-07 14:54:21.247-04	2024-06-07 14:54:21.247-04	\N
+3636	192	Lindberg: Era - Live	\N	undefined	19:30	[]	\N	2024-06-07 14:54:21.257-04	2024-06-07 14:54:21.257-04	\N
+3637	193	Allen & Lucien	\N	undefined	01:58	[]	\N	2024-06-07 14:54:37.955-04	2024-06-07 14:54:37.955-04	\N
+3638	193	The Street (harp solo): Station IV. Jesus meets his Mother	\N	undefined	03:21	[]	\N	2024-06-07 14:54:37.971-04	2024-06-07 14:54:37.971-04	\N
+3639	193	Genshikaku Bakudan	\N	undefined	01:06	[]	\N	2024-06-07 14:54:37.983-04	2024-06-07 14:54:37.983-04	\N
+3640	193	Opening Cards	\N	undefined	01:53	[]	\N	2024-06-07 14:54:37.993-04	2024-06-07 14:54:37.993-04	\N
+3641	193	The Egg	\N	undefined	01:06	[]	\N	2024-06-07 14:54:38.003-04	2024-06-07 14:54:38.003-04	\N
+3642	193	Etude 1	\N	undefined	03:35	[]	\N	2024-06-07 14:54:38.015-04	2024-06-07 14:54:38.015-04	\N
+3643	193	Pottery Studio	\N	undefined	01:45	[]	\N	2024-06-07 14:54:38.025-04	2024-06-07 14:54:38.025-04	\N
+3644	193	The Revd Mustard his Installation Prelude	\N	undefined	03:35	[]	\N	2024-06-07 14:54:38.034-04	2024-06-07 14:54:38.034-04	\N
+3645	193	Hansu Sees Sunja	\N	undefined	01:46	[]	\N	2024-06-07 14:54:38.045-04	2024-06-07 14:54:38.045-04	\N
+3646	193	Etude No. 3: Etude 3	\N	undefined	05:03	[]	\N	2024-06-07 14:54:38.053-04	2024-06-07 14:54:38.053-04	\N
+3647	193	A Hudson Cycle	\N	undefined	03:21	[]	\N	2024-06-07 14:54:38.061-04	2024-06-07 14:54:38.061-04	\N
+3648	193	Funeral	\N	undefined	03:13	[]	\N	2024-06-07 14:54:38.069-04	2024-06-07 14:54:38.069-04	\N
+3649	193	Cycling Holiday	\N	undefined	01:41	[]	\N	2024-06-07 14:54:38.077-04	2024-06-07 14:54:38.077-04	\N
+3650	193	It''s Not Just About You	\N	undefined	01:30	[]	\N	2024-06-07 14:54:38.084-04	2024-06-07 14:54:38.084-04	\N
+3651	193	Perspective Lesson	\N	undefined	08:34	[]	\N	2024-06-07 14:54:38.095-04	2024-06-07 14:54:38.095-04	\N
+3652	193	Opening	\N	undefined	03:41	[]	\N	2024-06-07 14:54:38.102-04	2024-06-07 14:54:38.102-04	\N
+3653	193	Young Sunja	\N	undefined	01:39	[]	\N	2024-06-07 14:54:38.11-04	2024-06-07 14:54:38.11-04	\N
+3654	193	You Don''t Matter	\N	undefined	02:42	[]	\N	2024-06-07 14:54:38.118-04	2024-06-07 14:54:38.118-04	\N
+3655	193	Reading	\N	undefined	01:52	[]	\N	2024-06-07 14:54:38.129-04	2024-06-07 14:54:38.129-04	\N
+3656	193	Sick of Fish	\N	undefined	02:15	[]	\N	2024-06-07 14:54:38.14-04	2024-06-07 14:54:38.14-04	\N
+3657	193	Roads and Paths	\N	undefined	04:02	[]	\N	2024-06-07 14:54:38.15-04	2024-06-07 14:54:38.15-04	\N
+3658	193	Who Was She?	\N	undefined	06:49	[]	\N	2024-06-07 14:54:38.16-04	2024-06-07 14:54:38.16-04	\N
+3659	193	Go Back to Your Friends	\N	undefined	05:21	[]	\N	2024-06-07 14:54:38.169-04	2024-06-07 14:54:38.169-04	\N
+3660	193	Quiet Music	\N	undefined	03:54	[]	\N	2024-06-07 14:54:38.177-04	2024-06-07 14:54:38.177-04	\N
+3661	193	Four Studies: II. Fast Canons	\N	undefined	03:52	[]	\N	2024-06-07 14:54:38.184-04	2024-06-07 14:54:38.184-04	\N
+3662	193	Spying	\N	undefined	02:27	[]	\N	2024-06-07 14:54:38.195-04	2024-06-07 14:54:38.195-04	\N
+3663	193	The Mudang	\N	undefined	02:30	[]	\N	2024-06-07 14:54:38.204-04	2024-06-07 14:54:38.204-04	\N
+3664	193	Étude 3	\N	undefined	05:03	[]	\N	2024-06-07 14:54:38.211-04	2024-06-07 14:54:38.211-04	\N
+3665	193	In a Mist	\N	undefined	01:49	[]	\N	2024-06-07 14:54:38.22-04	2024-06-07 14:54:38.22-04	\N
+3666	193	The Only Tune: III. The Only Tune	\N	undefined	04:47	[]	\N	2024-06-07 14:54:38.229-04	2024-06-07 14:54:38.229-04	\N
+3667	193	Sea Side	\N	undefined	01:37	[]	\N	2024-06-07 14:54:38.237-04	2024-06-07 14:54:38.237-04	\N
+3668	193	Doublespeak	\N	undefined	09:06	[]	\N	2024-06-07 14:54:38.247-04	2024-06-07 14:54:38.247-04	\N
+3669	193	You Haven''t Changed	\N	undefined	02:03	[]	\N	2024-06-07 14:54:38.257-04	2024-06-07 14:54:38.257-04	\N
+3670	193	The Cove	\N	undefined	02:29	[]	\N	2024-06-07 14:54:38.267-04	2024-06-07 14:54:38.267-04	\N
+3671	193	Move	\N	undefined	02:35	[]	\N	2024-06-07 14:54:38.276-04	2024-06-07 14:54:38.276-04	\N
+3672	193	I Know	\N	undefined	01:54	[]	\N	2024-06-07 14:54:38.281-04	2024-06-07 14:54:38.281-04	\N
+3673	193	Tram at Dawn	\N	undefined	01:06	[]	\N	2024-06-07 14:54:38.285-04	2024-06-07 14:54:38.285-04	\N
+3674	193	Fourteen Years	\N	undefined	02:39	[]	\N	2024-06-07 14:54:38.29-04	2024-06-07 14:54:38.29-04	\N
+3675	193	Looking Closely	\N	undefined	07:47	[]	\N	2024-06-07 14:54:38.299-04	2024-06-07 14:54:38.299-04	\N
+3676	193	Drawing with a Camera	\N	undefined	07:07	[]	\N	2024-06-07 14:54:38.304-04	2024-06-07 14:54:38.304-04	\N
+3677	193	I Have No One Else to Ask	\N	undefined	03:43	[]	\N	2024-06-07 14:54:38.309-04	2024-06-07 14:54:38.309-04	\N
+3678	193	This Reminds Me	\N	undefined	01:58	[]	\N	2024-06-07 14:54:38.315-04	2024-06-07 14:54:38.315-04	\N
+3679	193	Ending	\N	undefined	02:07	[]	\N	2024-06-07 14:54:38.32-04	2024-06-07 14:54:38.32-04	\N
+3680	193	Train	\N	undefined	00:58	[]	\N	2024-06-07 14:54:38.325-04	2024-06-07 14:54:38.325-04	\N
+3681	193	The Wedding	\N	undefined	01:42	[]	\N	2024-06-07 14:54:38.33-04	2024-06-07 14:54:38.33-04	\N
+3682	193	It''s Delightful	\N	undefined	02:27	[]	\N	2024-06-07 14:54:38.335-04	2024-06-07 14:54:38.335-04	\N
+3683	193	Bridge of Tears	\N	undefined	03:24	[]	\N	2024-06-07 14:54:38.341-04	2024-06-07 14:54:38.341-04	\N
+3684	193	The Failed Visit	\N	undefined	04:60	[]	\N	2024-06-07 14:54:38.347-04	2024-06-07 14:54:38.347-04	\N
+3685	193	Plan On A Boat	\N	undefined	01:24	[]	\N	2024-06-07 14:54:38.353-04	2024-06-07 14:54:38.353-04	\N
+3686	194	Spiegel im spiegel	\N	undefined	08:23	[]	\N	2024-06-07 14:54:53.501-04	2024-06-07 14:54:53.501-04	\N
+3687	194	Spiegel im Spiegel - Version for Violin and Piano	\N	undefined	10:36	[]	\N	2024-06-07 14:54:53.52-04	2024-06-07 14:54:53.52-04	\N
+3688	194	Pärt: Spiegel im Spiegel	\N	undefined	09:05	[]	\N	2024-06-07 14:54:53.531-04	2024-06-07 14:54:53.531-04	\N
+3689	194	Für Alina	\N	undefined	10:48	[]	\N	2024-06-07 14:54:53.542-04	2024-06-07 14:54:53.542-04	\N
+3690	194	Spiegel im Spiegel	\N	undefined	08:15	[]	\N	2024-06-07 14:54:53.557-04	2024-06-07 14:54:53.557-04	\N
+3691	194	Spiegel im Spiegel, for Cello & Piano	\N	undefined	09:33	[]	\N	2024-06-07 14:54:53.567-04	2024-06-07 14:54:53.567-04	\N
+3692	194	Da pacem Domine	\N	undefined	05:43	[]	\N	2024-06-07 14:54:53.575-04	2024-06-07 14:54:53.575-04	\N
+3693	194	Spiegel im Spiegel - Version for Cello and Piano	\N	undefined	09:13	[]	\N	2024-06-07 14:54:53.581-04	2024-06-07 14:54:53.581-04	\N
+3694	194	Estonian Lullaby	\N	undefined	02:08	[]	\N	2024-06-07 14:54:53.594-04	2024-06-07 14:54:53.594-04	\N
+3695	194	Fratres	\N	undefined	11:28	[]	\N	2024-06-07 14:54:53.6-04	2024-06-07 14:54:53.6-04	\N
+3696	194	Spiegel im Spiegel for Violin and Piano	\N	undefined	08:35	[]	\N	2024-06-07 14:54:53.611-04	2024-06-07 14:54:53.611-04	\N
+3697	194	Cantus In Memory Of Benjamin Britten	\N	undefined	05:00	[]	\N	2024-06-07 14:54:53.617-04	2024-06-07 14:54:53.617-04	\N
+3698	194	Pärt: Spiegel im Spiegel (Excerpt)	\N	undefined	04:05	[]	\N	2024-06-07 14:54:53.623-04	2024-06-07 14:54:53.623-04	\N
+3699	194	Pärt: Pärt: Für Alina	\N	undefined	02:29	[]	\N	2024-06-07 14:54:53.635-04	2024-06-07 14:54:53.635-04	\N
+3700	194	Silouans Song	\N	undefined	05:47	[]	\N	2024-06-07 14:54:53.641-04	2024-06-07 14:54:53.641-04	\N
+3701	194	Summa	\N	undefined	05:10	[]	\N	2024-06-07 14:54:53.646-04	2024-06-07 14:54:53.646-04	\N
+3702	194	Veni Creator	\N	undefined	02:33	[]	\N	2024-06-07 14:54:53.659-04	2024-06-07 14:54:53.659-04	\N
+3703	194	My Heart''s in the Highlands	\N	undefined	08:40	[]	\N	2024-06-07 14:54:53.666-04	2024-06-07 14:54:53.666-04	\N
+3704	194	Greater Antiphons: II. O Adonai	\N	undefined	02:35	[]	\N	2024-06-07 14:54:53.672-04	2024-06-07 14:54:53.672-04	\N
+3705	194	Lamentate: Fragile e conciliante	\N	undefined	06:32	[]	\N	2024-06-07 14:54:53.679-04	2024-06-07 14:54:53.679-04	\N
+3706	194	Nunc Dimittis	\N	undefined	06:55	[]	\N	2024-06-07 14:54:53.684-04	2024-06-07 14:54:53.684-04	\N
+3707	194	The Woman with the Alabaster Box	\N	undefined	06:06	[]	\N	2024-06-07 14:54:53.692-04	2024-06-07 14:54:53.692-04	\N
+3708	194	Spiegel im Spiegel - Version for Violin and Piano / Reprise	\N	undefined	09:49	[]	\N	2024-06-07 14:54:53.705-04	2024-06-07 14:54:53.705-04	\N
+3709	194	Greater Antiphons: I. O Wisdom	\N	undefined	01:19	[]	\N	2024-06-07 14:54:53.713-04	2024-06-07 14:54:53.713-04	\N
+3710	194	Pärt: Cantus in memoriam Benjamin Britten	\N	undefined	06:49	[]	\N	2024-06-07 14:54:53.724-04	2024-06-07 14:54:53.724-04	\N
+3711	194	Spiegel im Spiegel (Version for Violin & Piano)	\N	undefined	11:26	[]	\N	2024-06-07 14:54:53.734-04	2024-06-07 14:54:53.734-04	\N
+3712	194	Greater Antiphons: IV. O Key of David	\N	undefined	01:45	[]	\N	2024-06-07 14:54:53.744-04	2024-06-07 14:54:53.744-04	\N
+3713	194	Spiegel Im Spiegel (Mirror In Mirror)	\N	undefined	07:07	[]	\N	2024-06-07 14:54:53.755-04	2024-06-07 14:54:53.755-04	\N
+3714	194	Tabula Rasa: II. Silentium - Live	\N	undefined	16:50	[]	\N	2024-06-07 14:54:53.764-04	2024-06-07 14:54:53.764-04	\N
+3715	194	Für Anna Maria No. 1 (2006)	\N	undefined	01:21	[]	\N	2024-06-07 14:54:53.778-04	2024-06-07 14:54:53.778-04	\N
+3716	194	Für Alina - Reprise	\N	undefined	10:53	[]	\N	2024-06-07 14:54:53.79-04	2024-06-07 14:54:53.79-04	\N
+3717	194	The Deer''s Cry	\N	undefined	04:11	[]	\N	2024-06-07 14:54:53.799-04	2024-06-07 14:54:53.799-04	\N
+3718	194	Littlemore Tractus	\N	undefined	07:29	[]	\N	2024-06-07 14:54:53.812-04	2024-06-07 14:54:53.812-04	\N
+3719	194	Stabat Mater	\N	undefined	26:03	[]	\N	2024-06-07 14:54:53.82-04	2024-06-07 14:54:53.82-04	\N
+3720	194	Vater Unser (Version for Cello and Piano)	\N	undefined	02:35	[]	\N	2024-06-07 14:54:53.835-04	2024-06-07 14:54:53.835-04	\N
+3721	194	Salve Regina	\N	undefined	12:52	[]	\N	2024-06-07 14:54:53.853-04	2024-06-07 14:54:53.853-04	\N
+3722	194	Cantus in memoriam Benjamin Britten	\N	undefined	07:14	[]	\N	2024-06-07 14:54:53.863-04	2024-06-07 14:54:53.863-04	\N
+3723	194	Spiegel Im Spiegel - Ambient Mix	\N	undefined	03:15	[]	\N	2024-06-07 14:54:53.872-04	2024-06-07 14:54:53.872-04	\N
+3724	194	Berliner Messe: I. Kyrie	\N	undefined	03:26	[]	\N	2024-06-07 14:54:53.883-04	2024-06-07 14:54:53.883-04	\N
+3725	194	Greater Antiphons: V. O Morning Star	\N	undefined	01:60	[]	\N	2024-06-07 14:54:53.894-04	2024-06-07 14:54:53.894-04	\N
+3726	194	Vater unser	\N	undefined	03:43	[]	\N	2024-06-07 14:54:53.908-04	2024-06-07 14:54:53.908-04	\N
+3727	194	Pärt: Fratres (1980 Version for Violin and Piano)	\N	undefined	11:22	[]	\N	2024-06-07 14:54:53.921-04	2024-06-07 14:54:53.921-04	\N
+3728	195	Electric Counterpoint: III. Fast	\N	undefined	04:39	[]	\N	2024-06-07 14:55:36.342-04	2024-06-07 14:55:36.342-04	\N
+3729	195	Electric Counterpoint: II. Slow	\N	undefined	03:21	[]	\N	2024-06-07 14:55:36.357-04	2024-06-07 14:55:36.357-04	\N
+3730	195	Music for 18 Musicians: Pulses	\N	undefined	05:26	[]	\N	2024-06-07 14:55:36.382-04	2024-06-07 14:55:36.382-04	\N
+3731	195	Music for 18 Musicians: Section I	\N	undefined	03:59	[]	\N	2024-06-07 14:55:36.395-04	2024-06-07 14:55:36.395-04	\N
+3732	195	Music for 18 Musicians: Section II	\N	undefined	05:13	[]	\N	2024-06-07 14:55:36.406-04	2024-06-07 14:55:36.406-04	\N
+3733	195	Duet	\N	undefined	04:56	[]	\N	2024-06-07 14:55:36.419-04	2024-06-07 14:55:36.419-04	\N
+3734	195	Music for 18 Musicians: Section IIIA	\N	undefined	03:55	[]	\N	2024-06-07 14:55:36.43-04	2024-06-07 14:55:36.43-04	\N
+3735	195	Pulses	\N	undefined	04:13	[]	\N	2024-06-07 14:55:36.441-04	2024-06-07 14:55:36.441-04	\N
+3736	195	Music for 18 Musicians: Section IIIB	\N	undefined	03:46	[]	\N	2024-06-07 14:55:36.451-04	2024-06-07 14:55:36.451-04	\N
+3737	195	Music for 18 Musicians: Section IV	\N	undefined	06:37	[]	\N	2024-06-07 14:55:36.461-04	2024-06-07 14:55:36.461-04	\N
+3738	195	Different Trains: America, Before the War	\N	undefined	08:59	[]	\N	2024-06-07 14:55:36.471-04	2024-06-07 14:55:36.471-04	\N
+3739	195	Mallet Quartet: I. Fast	\N	undefined	06:39	[]	\N	2024-06-07 14:55:36.484-04	2024-06-07 14:55:36.484-04	\N
+3740	195	Music for 18 Musicians: Section V	\N	undefined	06:49	[]	\N	2024-06-07 14:55:36.495-04	2024-06-07 14:55:36.495-04	\N
+3741	195	Duet for two Solo Violins and String Orchestra (Dedicated to and written for Yehudi Menuhin)	\N	undefined	05:35	[]	\N	2024-06-07 14:55:36.509-04	2024-06-07 14:55:36.509-04	\N
+3742	195	Octet	\N	undefined	17:39	[]	\N	2024-06-07 14:55:36.54-04	2024-06-07 14:55:36.54-04	\N
+3743	195	Music for 18 Musicians: Section VI	\N	undefined	04:54	[]	\N	2024-06-07 14:55:36.551-04	2024-06-07 14:55:36.551-04	\N
+3744	195	Music For 18 Musicians	\N	undefined	56:31	[]	\N	2024-06-07 14:55:36.561-04	2024-06-07 14:55:36.561-04	\N
+3745	195	Music for 18 Musicians: Section VII	\N	undefined	04:19	[]	\N	2024-06-07 14:55:36.574-04	2024-06-07 14:55:36.574-04	\N
+3746	195	Music for 18 Musicians: Section VIII	\N	undefined	03:35	[]	\N	2024-06-07 14:55:36.593-04	2024-06-07 14:55:36.593-04	\N
+3747	195	Music for 18 Musicians: Section IX	\N	undefined	05:24	[]	\N	2024-06-07 14:55:36.599-04	2024-06-07 14:55:36.599-04	\N
+3748	195	Electric Counterpoint: I. Fast	\N	undefined	06:51	[]	\N	2024-06-07 14:55:36.605-04	2024-06-07 14:55:36.605-04	\N
+3749	195	Music for 18 Musicians: Section X	\N	undefined	01:51	[]	\N	2024-06-07 14:55:36.61-04	2024-06-07 14:55:36.61-04	\N
+3750	195	Music for 18 Musicians: Section XI	\N	undefined	05:44	[]	\N	2024-06-07 14:55:36.614-04	2024-06-07 14:55:36.614-04	\N
+3751	195	Reich: Nagoya Marimbas, for 2 Marimbas	\N	undefined	04:55	[]	\N	2024-06-07 14:55:36.623-04	2024-06-07 14:55:36.623-04	\N
+3752	195	Music for 18 Musicians: Pulses II	\N	undefined	06:11	[]	\N	2024-06-07 14:55:36.628-04	2024-06-07 14:55:36.628-04	\N
+3753	195	Music For A Large Ensemble	\N	undefined	15:30	[]	\N	2024-06-07 14:55:36.633-04	2024-06-07 14:55:36.633-04	\N
+3754	195	Grand Street Counterpoint	\N	undefined	11:34	[]	\N	2024-06-07 14:55:36.636-04	2024-06-07 14:55:36.636-04	\N
+3755	195	Section I	\N	undefined	04:05	[]	\N	2024-06-07 14:55:36.64-04	2024-06-07 14:55:36.64-04	\N
+3756	195	Three Movements for Orchestra: 2. Mvt.2	\N	undefined	03:47	[]	\N	2024-06-07 14:55:36.645-04	2024-06-07 14:55:36.645-04	\N
+3757	195	Under the Weather MIX (Electric Counterpoint Remix)	\N	undefined	05:29	[]	\N	2024-06-07 14:55:36.652-04	2024-06-07 14:55:36.652-04	\N
+3758	195	Sweet Dreams My LA Ex - Radio Edit	\N	undefined	03:28	[]	\N	2024-06-07 14:55:36.657-04	2024-06-07 14:55:36.657-04	\N
+3759	195	Pulse	\N	undefined	14:22	[]	\N	2024-06-07 14:55:36.662-04	2024-06-07 14:55:36.662-04	\N
+3760	195	2x5: II. Slow	\N	undefined	03:12	[]	\N	2024-06-07 14:55:36.666-04	2024-06-07 14:55:36.666-04	\N
+3761	195	Section II	\N	undefined	04:03	[]	\N	2024-06-07 14:55:36.671-04	2024-06-07 14:55:36.671-04	\N
+3762	195	Nagoya Guitars	\N	undefined	04:54	[]	\N	2024-06-07 14:55:36.682-04	2024-06-07 14:55:36.682-04	\N
+3763	195	Music for Mallet Instruments, Voices and Organ	\N	undefined	16:59	[]	\N	2024-06-07 14:55:36.693-04	2024-06-07 14:55:36.693-04	\N
+3764	195	Different Trains: Europe, During the War	\N	undefined	07:31	[]	\N	2024-06-07 14:55:36.697-04	2024-06-07 14:55:36.697-04	\N
+3765	195	Different Trains: After the War	\N	undefined	10:31	[]	\N	2024-06-07 14:55:36.703-04	2024-06-07 14:55:36.703-04	\N
+3766	195	Music for 18 Musicians (1976): Pulses 1	\N	undefined	04:36	[]	\N	2024-06-07 14:55:36.707-04	2024-06-07 14:55:36.707-04	\N
+3767	195	Section IIIA	\N	undefined	03:47	[]	\N	2024-06-07 14:55:36.711-04	2024-06-07 14:55:36.711-04	\N
+3768	195	Violin Phase	\N	undefined	15:19	[]	\N	2024-06-07 14:55:36.716-04	2024-06-07 14:55:36.716-04	\N
+3769	196	7 Papillons: No. 5. —	\N	undefined	01:32	[]	\N	2024-06-07 14:57:33.089-04	2024-06-07 14:57:33.089-04	\N
+3770	196	7 Papillons: No. 2. —	\N	undefined	01:30	[]	\N	2024-06-07 14:57:33.102-04	2024-06-07 14:57:33.102-04	\N
+3771	196	7 Papillons: No. 7. —	\N	undefined	01:10	[]	\N	2024-06-07 14:57:33.114-04	2024-06-07 14:57:33.114-04	\N
+3772	196	7 Papillons: No. 3. —	\N	undefined	01:32	[]	\N	2024-06-07 14:57:33.127-04	2024-06-07 14:57:33.127-04	\N
+3773	196	7 Papillons: No. 6. —	\N	undefined	02:02	[]	\N	2024-06-07 14:57:33.138-04	2024-06-07 14:57:33.138-04	\N
+3774	196	7 Papillons: No. 4. —	\N	undefined	02:13	[]	\N	2024-06-07 14:57:33.15-04	2024-06-07 14:57:33.15-04	\N
+3775	196	7 Papillons: No. 1. —	\N	undefined	01:46	[]	\N	2024-06-07 14:57:33.162-04	2024-06-07 14:57:33.162-04	\N
+3776	196	L''Amour de loin, Premier acte: Traversée	\N	undefined	05:41	[]	\N	2024-06-07 14:57:33.174-04	2024-06-07 14:57:33.174-04	\N
+3777	196	Sept papillons: Papillons I	\N	undefined	01:24	[]	\N	2024-06-07 14:57:33.187-04	2024-06-07 14:57:33.187-04	\N
+3778	196	Petals	\N	undefined	10:39	[]	\N	2024-06-07 14:57:33.198-04	2024-06-07 14:57:33.198-04	\N
+3779	196	L''Amour de loin, Premier acte, Deuxième tableau: "Peut-être bien qu''elle n''existe pas" (Le Pèlerin)	\N	undefined	05:34	[]	\N	2024-06-07 14:57:33.204-04	2024-06-07 14:57:33.204-04	\N
+3780	196	L''Amour de loin, Quatrième acte, Troisième tableau: Tempête "Je devrais être l''homme le plus heureux du monde" (Jaufré)	\N	undefined	02:13	[]	\N	2024-06-07 14:57:33.21-04	2024-06-07 14:57:33.21-04	\N
+3781	196	L''Amour de loin, Deuxième acte, Deuxième tableau: L''Amour de loin. "Rien ne vous oblige à l''aimer" (Le Pèlerin)	\N	undefined	07:01	[]	\N	2024-06-07 14:57:33.217-04	2024-06-07 14:57:33.217-04	\N
+3782	196	L''Amour de loin, Premier acte, Premier tableau: "J''ai appris à parler du bonheur" (Jaufré Rudel, Jaufré)	\N	undefined	06:49	[]	\N	2024-06-07 14:57:33.225-04	2024-06-07 14:57:33.225-04	\N
+3783	196	L''Amour de loin, Premier acte, Deuxième tableau: "Qu''as-tu fait de moi, pèlerin?" (Le Pèlerin, Jaufré)	\N	undefined	02:24	[]	\N	2024-06-07 14:57:33.231-04	2024-06-07 14:57:33.231-04	\N
+3784	196	L''Amour de loin, Deuxième acte, Premier tableau: (Clémence)	\N	undefined	03:04	[]	\N	2024-06-07 14:57:33.237-04	2024-06-07 14:57:33.237-04	\N
+3785	196	L''Amour de loin, Quatrième acte, Troisième tableau: Tempête. Le Pèlerin: "Ces choses se savent, oui"	\N	undefined	04:04	[]	\N	2024-06-07 14:57:33.243-04	2024-06-07 14:57:33.243-04	\N
+3786	196	Sept papillons: Papillons II	\N	undefined	01:28	[]	\N	2024-06-07 14:57:33.248-04	2024-06-07 14:57:33.248-04	\N
+3787	196	Asteroid 4179 - Toutatis	\N	undefined	04:36	[]	\N	2024-06-07 14:57:33.254-04	2024-06-07 14:57:33.254-04	\N
+3788	196	Nuits, adieux (Version for 4 Voices & Electronics): I. Nuit I	\N	undefined	01:41	[]	\N	2024-06-07 14:57:33.26-04	2024-06-07 14:57:33.26-04	\N
+3789	196	Saariaho: Sept Papillons for Solo Cello	\N	undefined	11:29	[]	\N	2024-06-07 14:57:33.265-04	2024-06-07 14:57:33.265-04	\N
+3790	196	Cloud Trio: I. Calmo, meditato	\N	undefined	03:01	[]	\N	2024-06-07 14:57:33.273-04	2024-06-07 14:57:33.273-04	\N
+3791	196	L''Amour de loin, Cinquième acte, Premier tableau: Jardin de la Citadelle. "Comtesse, regardez" (Le Chœur des Tripolitaines)	\N	undefined	02:59	[]	\N	2024-06-07 14:57:33.281-04	2024-06-07 14:57:33.281-04	\N
+3792	196	L''Amour de loin, Troisième acte, Premier tableau: Au château de Blaye. Le Pèlerin: "Peut-être ferais-je mieux de m''en aller"	\N	undefined	04:28	[]	\N	2024-06-07 14:57:33.29-04	2024-06-07 14:57:33.29-04	\N
+3793	196	L''Amour de loin, Deuxième acte, Premier tableau: "Pèlerin, dites-moi" (Clémence)	\N	undefined	06:11	[]	\N	2024-06-07 14:57:33.299-04	2024-06-07 14:57:33.299-04	\N
+3794	196	L''Amour de loin, Troisième acte, Deuxième tableau: À Tripoli, sur la plage. "Non, par Notre Seigneur" (Clémence)	\N	undefined	03:02	[]	\N	2024-06-07 14:57:33.31-04	2024-06-07 14:57:33.31-04	\N
+3795	196	L''Amour de loin, Quatrième acte, Premier tableau: Mer indigo.	\N	undefined	05:27	[]	\N	2024-06-07 14:57:33.32-04	2024-06-07 14:57:33.32-04	\N
+3796	196	L''Amour de loin, Cinquième acte, Troisième tableau: J''espère encore. "J''espère encore, mon Dieu" (Clémence)	\N	undefined	03:19	[]	\N	2024-06-07 14:57:33.33-04	2024-06-07 14:57:33.33-04	\N
+3797	196	L''Amour de loin, Troisième acte, Premier tableau: "Au château de Blaye" - "Pèlerin, Pèlerin, dis-moi" (Jaufré)	\N	undefined	03:47	[]	\N	2024-06-07 14:57:33.339-04	2024-06-07 14:57:33.339-04	\N
+3798	196	L''Amour de loin, Quatrième acte, Deuxième tableau: Le Pèlerin. Songe: "Calme-toi, Jaufré"	\N	undefined	01:27	[]	\N	2024-06-07 14:57:33.349-04	2024-06-07 14:57:33.349-04	\N
+3799	196	L''Amour de loin, Troisième acte, Premier tableau: Au château de Blaye. Le Pèlerin: "Jaufré, elle sait"	\N	undefined	04:13	[]	\N	2024-06-07 14:57:33.36-04	2024-06-07 14:57:33.36-04	\N
+3800	196	L''Amour de loin, Quatrième acte, Premier tableau: Mer indigo. Jaufré: Me croiras-tu, Pèlerin"	\N	undefined	04:13	[]	\N	2024-06-07 14:57:33.37-04	2024-06-07 14:57:33.37-04	\N
+3801	196	L''Amour de loin, Cinquième acte, Quatrième tableau: "Vers toi qui es si loin" - "Si tu t''appelles Amour" (Clémence)	\N	undefined	06:01	[]	\N	2024-06-07 14:57:33.38-04	2024-06-07 14:57:33.38-04	\N
+3802	196	L''Amour de loin, Cinquième acte, Deuxième tableau: Si la mort pouvait attendre. "C''est vous, c''est vous" (Jaufré)	\N	undefined	04:19	[]	\N	2024-06-07 14:57:33.393-04	2024-06-07 14:57:33.393-04	\N
+3803	196	L''Amour de loin, Cinquième acte, Deuxième tableau: Si la mort pouvait attendre. Clémence: "J''aurais tant voulu"	\N	undefined	02:58	[]	\N	2024-06-07 14:57:33.409-04	2024-06-07 14:57:33.409-04	\N
+3804	196	L''Amour de loin, Quatrième acte, Deuxième tableau: Songe.	\N	undefined	02:09	[]	\N	2024-06-07 14:57:33.42-04	2024-06-07 14:57:33.42-04	\N
+3805	196	L''Amour de loin, Deuxième acte, Deuxième tableau: L''Amour de loin: "Ja mais d''amor" (Clémence)	\N	undefined	04:41	[]	\N	2024-06-07 14:57:33.43-04	2024-06-07 14:57:33.43-04	\N
+3806	196	L''Amour de loin, Cinquième acte, Deuxième tableau: Si la mort pouvait attendre. "Seigneur, si je pouvais rester ainsi" (Jaufré)	\N	undefined	04:14	[]	\N	2024-06-07 14:57:33.441-04	2024-06-07 14:57:33.441-04	\N
+3807	196	L''Amour de loin, Troisième acte, Deuxième tableau: À Tripoli, sur la plage. "Ben tenc lo Seignor per verai" (Clémence)	\N	undefined	04:40	[]	\N	2024-06-07 14:57:33.45-04	2024-06-07 14:57:33.45-04	\N
+3808	196	L''Amour de loin, Quatrième acte, Deuxième tableau: Songe: "Je l''ai vue, Pèlerin" (Jaufré)	\N	undefined	03:24	[]	\N	2024-06-07 14:57:33.46-04	2024-06-07 14:57:33.46-04	\N
+3809	196	L''Amour de loin, Cinquième acte, Troisième tableau: J''espère encore: "J''avais cru en toi" (Clémence)	\N	undefined	06:59	[]	\N	2024-06-07 14:57:33.468-04	2024-06-07 14:57:33.468-04	\N
+3810	196	L''Amour de loin, Deuxième acte, Premier tableau: "Un homme pense à vous" (Clémence, Le Pèlerin)	\N	undefined	02:25	[]	\N	2024-06-07 14:57:33.475-04	2024-06-07 14:57:33.475-04	\N
+3811	196	L''Amour de loin, Troisième acte, Premier tableau: Au château de Blaye.	\N	undefined	01:06	[]	\N	2024-06-07 14:57:33.482-04	2024-06-07 14:57:33.482-04	\N
+3812	196	L''Amour de loin, Cinquième acte, Premier tableau: Jardin de la Citadelle. Le Pèlerin: "Noble dame, je vous apporte une nouvelle"	\N	undefined	02:32	[]	\N	2024-06-07 14:57:33.489-04	2024-06-07 14:57:33.489-04	\N
+3813	196	Ciel d''hiver	\N	undefined	09:44	[]	\N	2024-06-07 14:57:33.498-04	2024-06-07 14:57:33.498-04	\N
+3814	196	Maa (Earth): VI. Fall	\N	undefined	05:25	[]	\N	2024-06-07 14:57:33.505-04	2024-06-07 14:57:33.505-04	\N
+3815	196	Neiges for 8 Cello: IV. Aiguilles de glace	\N	undefined	04:11	[]	\N	2024-06-07 14:57:33.515-04	2024-06-07 14:57:33.515-04	\N
+3816	196	7 Papillons for Cello: Papillon No. 3	\N	undefined	01:39	[]	\N	2024-06-07 14:57:33.524-04	2024-06-07 14:57:33.524-04	\N
+3817	196	Neiges for 8 Cello: V. Fleurs de neige	\N	undefined	03:19	[]	\N	2024-06-07 14:57:33.529-04	2024-06-07 14:57:33.529-04	\N
+3818	196	7 Papillons for Cello: Papillon No. 4	\N	undefined	02:09	[]	\N	2024-06-07 14:57:33.534-04	2024-06-07 14:57:33.534-04	\N
+3861	198	...Into the Light, Op. 193: ...Into the Light, Op. 193	\N	undefined	12:58	[]	\N	2024-06-07 15:00:37.177-04	2024-06-07 15:00:37.177-04	\N
+3862	198	Ay ay ay!	\N	undefined	03:28	[]	\N	2024-06-07 15:00:37.192-04	2024-06-07 15:00:37.192-04	\N
+3863	198	Quintet for Piano, Violin, Viola, Violoncello and Double Bass, Op. 72: III. Andantino cantabile - Doppio movimento	\N	undefined	10:07	[]	\N	2024-06-07 15:00:37.206-04	2024-06-07 15:00:37.206-04	\N
+3864	198	Quintet for Piano, Violin, Viola, Violoncello and Double Bass, Op. 72: I. Quasi allegro	\N	undefined	03:27	[]	\N	2024-06-07 15:00:37.216-04	2024-06-07 15:00:37.216-04	\N
+3865	198	Quintet for Piano, Violin, Viola, Violoncello and Double Bass, Op. 72: II. Andantino con moto	\N	undefined	04:38	[]	\N	2024-06-07 15:00:37.228-04	2024-06-07 15:00:37.228-04	\N
+3866	198	3 Songs for Children''s Choir: No. 3, A Lizard Stands and Weeps	\N	undefined	01:48	[]	\N	2024-06-07 15:00:37.243-04	2024-06-07 15:00:37.243-04	\N
+3867	198	Annunciation: II. A Dream	\N	undefined	01:34	[]	\N	2024-06-07 15:00:37.255-04	2024-06-07 15:00:37.255-04	\N
+3868	198	To Thee We Sing: I. To Thee We Sing	\N	undefined	01:38	[]	\N	2024-06-07 15:00:37.267-04	2024-06-07 15:00:37.267-04	\N
+3869	198	Annunciation: I. Advance...	\N	undefined	01:56	[]	\N	2024-06-07 15:00:37.289-04	2024-06-07 15:00:37.289-04	\N
+3870	198	3 Songs for Children''s Choir: No. 2, A Silly Ditty	\N	undefined	01:32	[]	\N	2024-06-07 15:00:37.299-04	2024-06-07 15:00:37.299-04	\N
+3871	198	To Thee We Sing II. O My Soul, Praise the Lord	\N	undefined	02:30	[]	\N	2024-06-07 15:00:37.315-04	2024-06-07 15:00:37.315-04	\N
+3872	198	3 Songs for Children''s Choir: No. 1, A Sevillian Ditty	\N	undefined	01:20	[]	\N	2024-06-07 15:00:37.326-04	2024-06-07 15:00:37.326-04	\N
+3873	198	To Thee We Sing: IV. O Quiet Light (Glorify the Name of the Lord)	\N	undefined	03:30	[]	\N	2024-06-07 15:00:37.34-04	2024-06-07 15:00:37.34-04	\N
+3874	198	To Thee We Sing: III. Now You Let Me Go	\N	undefined	02:00	[]	\N	2024-06-07 15:00:37.347-04	2024-06-07 15:00:37.347-04	\N
+3875	198	Annunciation: III. The Annunciation	\N	undefined	02:54	[]	\N	2024-06-07 15:00:37.353-04	2024-06-07 15:00:37.353-04	\N
+3876	198	Annunciation: IV. I Do Love You...	\N	undefined	02:50	[]	\N	2024-06-07 15:00:37.384-04	2024-06-07 15:00:37.384-04	\N
+3877	198	Quartet No. 2: Andantino	\N	undefined	06:21	[]	\N	2024-06-07 15:00:37.412-04	2024-06-07 15:00:37.412-04	\N
+3878	198	Quartet No. 2: Lento	\N	undefined	08:47	[]	\N	2024-06-07 15:00:37.42-04	2024-06-07 15:00:37.42-04	\N
+3879	198	Twelve Melancholic Waltzes, Op. 43b: No. 10, Parting	\N	undefined	02:09	[]	\N	2024-06-07 15:00:37.427-04	2024-06-07 15:00:37.427-04	\N
+3880	198	Diptych for Organ, Op. 70 (1992): No. 2, Enitharmon	\N	undefined	07:18	[]	\N	2024-06-07 15:00:37.435-04	2024-06-07 15:00:37.435-04	\N
+3881	198	DSCH, Op. 118bis (Version for Violin & Horn)	\N	undefined	05:19	[]	\N	2024-06-07 15:00:37.445-04	2024-06-07 15:00:37.445-04	\N
+3882	198	2 Fugues, Op. 6: No. 1, Andante	\N	undefined	04:17	[]	\N	2024-06-07 15:00:37.453-04	2024-06-07 15:00:37.453-04	\N
+3883	198	Diptych for Organ, Op. 70 (1992): No. 1, Los	\N	undefined	03:39	[]	\N	2024-06-07 15:00:37.464-04	2024-06-07 15:00:37.464-04	\N
+3884	198	Trinity Music, Op. 57 (1990)	\N	undefined	08:26	[]	\N	2024-06-07 15:00:37.473-04	2024-06-07 15:00:37.473-04	\N
+3885	198	Twelve Melancholic Waltzes, Op. 43b: No. 9, The Old Boatswain	\N	undefined	00:43	[]	\N	2024-06-07 15:00:37.482-04	2024-06-07 15:00:37.482-04	\N
+3886	198	Twelve Melancholic Waltzes, Op. 43b: No. 4, Mechanical Ballerina	\N	undefined	01:01	[]	\N	2024-06-07 15:00:37.492-04	2024-06-07 15:00:37.492-04	\N
+3887	198	Two Moods for Guitar: No. 2, Melancolico	\N	undefined	02:47	[]	\N	2024-06-07 15:00:37.502-04	2024-06-07 15:00:37.502-04	\N
+3888	198	2 Fugues, Op. 6: No. 2, Moderato	\N	undefined	03:55	[]	\N	2024-06-07 15:00:37.513-04	2024-06-07 15:00:37.513-04	\N
+3889	198	Twelve Melancholic Waltzes, Op. 43b: No. 1, New Year	\N	undefined	01:30	[]	\N	2024-06-07 15:00:37.534-04	2024-06-07 15:00:37.534-04	\N
+3890	198	Twelve Melancholic Waltzes, Op. 43b: No. 7, Summer Walk	\N	undefined	01:17	[]	\N	2024-06-07 15:00:37.545-04	2024-06-07 15:00:37.545-04	\N
+3891	198	Two Fugues For Solo Violin, Op. 6	\N	undefined	03:57	[]	\N	2024-06-07 15:00:37.557-04	2024-06-07 15:00:37.557-04	\N
+3892	198	Twelve Melancholic Waltzes, Op. 43b: No. 3, March Elegy	\N	undefined	00:36	[]	\N	2024-06-07 15:00:37.578-04	2024-06-07 15:00:37.578-04	\N
+3893	198	Twelve Melancholic Waltzes, Op. 43b: No. 2, Rêverie	\N	undefined	01:19	[]	\N	2024-06-07 15:00:37.589-04	2024-06-07 15:00:37.589-04	\N
+3894	198	Evening Song Opus 56 (1990)	\N	undefined	05:54	[]	\N	2024-06-07 15:00:37.601-04	2024-06-07 15:00:37.601-04	\N
+3895	198	Twelve Melancholic Waltzes, Op. 43b: No. 8, A Dreamy Lady	\N	undefined	01:17	[]	\N	2024-06-07 15:00:37.624-04	2024-06-07 15:00:37.624-04	\N
+3896	198	Twelve Melancholic Waltzes, Op. 43b: No. 11, Festive Evening	\N	undefined	01:02	[]	\N	2024-06-07 15:00:37.635-04	2024-06-07 15:00:37.635-04	\N
+3897	199	Pure Imagination (Opening Titles Version)	\N	undefined	01:05	[]	\N	2024-06-07 15:00:50.367-04	2024-06-07 15:00:50.367-04	\N
+3898	199	Welcome to Scrubbit''s	\N	undefined	03:16	[]	\N	2024-06-07 15:00:50.379-04	2024-06-07 15:00:50.379-04	\N
+3899	199	Wonka''s Case	\N	undefined	03:04	[]	\N	2024-06-07 15:00:50.388-04	2024-06-07 15:00:50.388-04	\N
+3900	199	Flying Chocolatiers	\N	undefined	01:27	[]	\N	2024-06-07 15:00:50.397-04	2024-06-07 15:00:50.397-04	\N
+3901	199	Willy and Noodle at the Zoo	\N	undefined	02:26	[]	\N	2024-06-07 15:00:50.409-04	2024-06-07 15:00:50.409-04	\N
+3902	199	The Letter ''A''	\N	undefined	01:37	[]	\N	2024-06-07 15:00:50.419-04	2024-06-07 15:00:50.419-04	\N
+3903	199	Mamma''s Secret	\N	undefined	02:42	[]	\N	2024-06-07 15:00:50.43-04	2024-06-07 15:00:50.43-04	\N
+3904	199	500 Monks, 1 Giraffe	\N	undefined	04:24	[]	\N	2024-06-07 15:00:50.439-04	2024-06-07 15:00:50.439-04	\N
+3905	199	Clock Tower	\N	undefined	00:49	[]	\N	2024-06-07 15:00:50.448-04	2024-06-07 15:00:50.448-04	\N
+3906	199	Death by Chocolate	\N	undefined	04:20	[]	\N	2024-06-07 15:00:50.461-04	2024-06-07 15:00:50.461-04	\N
+3907	199	The Oompa Loompa to the Rescue	\N	undefined	01:22	[]	\N	2024-06-07 15:00:50.471-04	2024-06-07 15:00:50.471-04	\N
+3908	199	Chocolate Fountain	\N	undefined	01:11	[]	\N	2024-06-07 15:00:50.479-04	2024-06-07 15:00:50.479-04	\N
+3909	199	Noodle Gives Affable the Ledger	\N	undefined	01:28	[]	\N	2024-06-07 15:00:50.491-04	2024-06-07 15:00:50.491-04	\N
+3910	199	Out To Lunch (End Titles) - From "Sing" Original Motion Picture Soundtrack	\N	undefined	04:25	[]	\N	2024-06-07 15:00:50.502-04	2024-06-07 15:00:50.502-04	\N
+3911	199	Visiting Nana (Eddie''s Tune)	\N	undefined	01:06	[]	\N	2024-06-07 15:00:50.511-04	2024-06-07 15:00:50.511-04	\N
+3912	199	Big Daddy Escapes	\N	undefined	00:59	[]	\N	2024-06-07 15:00:50.522-04	2024-06-07 15:00:50.522-04	\N
+3913	199	All Creatures Great and Small	\N	undefined	01:43	[]	\N	2024-06-07 15:00:50.532-04	2024-06-07 15:00:50.532-04	\N
+3914	199	Planning the Heist	\N	undefined	01:00	[]	\N	2024-06-07 15:00:50.544-04	2024-06-07 15:00:50.544-04	\N
+3915	199	Buster''s Pep Talk	\N	undefined	00:53	[]	\N	2024-06-07 15:00:50.554-04	2024-06-07 15:00:50.554-04	\N
+3916	199	Rosita''s Invention	\N	undefined	01:55	[]	\N	2024-06-07 15:00:50.565-04	2024-06-07 15:00:50.565-04	\N
+3917	199	Good Luck Everyone	\N	undefined	01:05	[]	\N	2024-06-07 15:00:50.576-04	2024-06-07 15:00:50.576-04	\N
+3918	199	Talk To Me, Crawley	\N	undefined	01:09	[]	\N	2024-06-07 15:00:50.587-04	2024-06-07 15:00:50.587-04	\N
+3919	199	Journey of the Sorcerer - Score	\N	undefined	01:15	[]	\N	2024-06-07 15:00:50.597-04	2024-06-07 15:00:50.597-04	\N
+3920	199	Fairground	\N	undefined	01:31	[]	\N	2024-06-07 15:00:50.609-04	2024-06-07 15:00:50.609-04	\N
+3921	199	Out to Lunch (End Titles)	\N	undefined	04:25	[]	\N	2024-06-07 15:00:50.62-04	2024-06-07 15:00:50.62-04	\N
+3922	199	The Moon Theatre / Golden Slumbers	\N	undefined	02:07	[]	\N	2024-06-07 15:00:50.629-04	2024-06-07 15:00:50.629-04	\N
+3923	199	Gang Getaway	\N	undefined	00:50	[]	\N	2024-06-07 15:00:50.64-04	2024-06-07 15:00:50.64-04	\N
+3924	199	The Selection	\N	undefined	01:24	[]	\N	2024-06-07 15:00:50.65-04	2024-06-07 15:00:50.65-04	\N
+3925	199	Dream Big Dreams	\N	undefined	01:33	[]	\N	2024-06-07 15:00:50.662-04	2024-06-07 15:00:50.662-04	\N
+3926	199	The Winds of Change	\N	undefined	02:44	[]	\N	2024-06-07 15:00:50.675-04	2024-06-07 15:00:50.675-04	\N
+3927	199	The Poolhouse	\N	undefined	02:10	[]	\N	2024-06-07 15:00:50.684-04	2024-06-07 15:00:50.684-04	\N
+3928	199	Prison Visit	\N	undefined	01:10	[]	\N	2024-06-07 15:00:50.695-04	2024-06-07 15:00:50.695-04	\N
+3929	199	Let''s Go to Work	\N	undefined	00:45	[]	\N	2024-06-07 15:00:50.703-04	2024-06-07 15:00:50.703-04	\N
+3930	199	Johnny Gets the Call	\N	undefined	00:42	[]	\N	2024-06-07 15:00:50.711-04	2024-06-07 15:00:50.711-04	\N
+3931	199	None Other Than Miss Nana Noodleman	\N	undefined	02:10	[]	\N	2024-06-07 15:00:50.719-04	2024-06-07 15:00:50.719-04	\N
+3932	199	Who Is This "Moon"?	\N	undefined	01:52	[]	\N	2024-06-07 15:00:50.728-04	2024-06-07 15:00:50.728-04	\N
+3933	199	Rosita Loses Out	\N	undefined	01:16	[]	\N	2024-06-07 15:00:50.736-04	2024-06-07 15:00:50.736-04	\N
+3934	199	Meena	\N	undefined	01:12	[]	\N	2024-06-07 15:00:50.744-04	2024-06-07 15:00:50.744-04	\N
+3935	199	Rosita Returns Home	\N	undefined	00:51	[]	\N	2024-06-07 15:00:50.753-04	2024-06-07 15:00:50.753-04	\N
+3936	199	Suite from Alice''s Adventures in Wonderland: The Mad Hatter''s Tea-Party	\N	undefined	03:08	[]	\N	2024-06-07 15:00:50.762-04	2024-06-07 15:00:50.762-04	\N
+3937	199	Suite from Alice''s Adventures in Wonderland: The Flower Garden Part II	\N	undefined	04:44	[]	\N	2024-06-07 15:00:50.772-04	2024-06-07 15:00:50.772-04	\N
+3938	199	Turns Out There’s Always A Choice	\N	undefined	01:41	[]	\N	2024-06-07 15:00:50.781-04	2024-06-07 15:00:50.781-04	\N
+3939	199	Suite from Alice''s Adventures in Wonderland: Prologue	\N	undefined	06:48	[]	\N	2024-06-07 15:00:50.79-04	2024-06-07 15:00:50.79-04	\N
+3940	199	Rosita, Star Of The Show	\N	undefined	00:46	[]	\N	2024-06-07 15:00:50.799-04	2024-06-07 15:00:50.799-04	\N
+3941	199	Suite from Alice''s Adventures in Wonderland: The Queen of Hearts'' Tango	\N	undefined	02:09	[]	\N	2024-06-07 15:00:50.809-04	2024-06-07 15:00:50.809-04	\N
+3942	199	Calloway Says No	\N	undefined	02:09	[]	\N	2024-06-07 15:00:50.819-04	2024-06-07 15:00:50.819-04	\N
+3943	199	Suite from Alice''s Adventures in Wonderland: Alice Alone	\N	undefined	04:18	[]	\N	2024-06-07 15:00:50.828-04	2024-06-07 15:00:50.828-04	\N
+3944	199	Suite from Alice''s Adventures in Wonderland: The Croquet Match	\N	undefined	05:33	[]	\N	2024-06-07 15:00:50.838-04	2024-06-07 15:00:50.838-04	\N
+3945	199	Suite from Alice''s Adventures in Wonderland: The Flower Garden Part I	\N	undefined	06:60	[]	\N	2024-06-07 15:00:50.847-04	2024-06-07 15:00:50.847-04	\N
+3946	199	The Hitchhiker''s Guide To The Galaxy - Score	\N	undefined	01:15	[]	\N	2024-06-07 15:00:50.856-04	2024-06-07 15:00:50.856-04	\N
+3947	200	Hilary’s Hoedown	\N	undefined	02:01	[]	\N	2024-06-07 15:02:06.326-04	2024-06-07 15:02:06.326-04	\N
+3948	200	Greek - Act 2: Scene 1b (Love Aria)	\N	undefined	04:02	[]	\N	2024-06-07 15:02:06.341-04	2024-06-07 15:02:06.341-04	\N
+3949	200	Blood on the Floor: Junior Addict	\N	undefined	05:50	[]	\N	2024-06-07 15:02:06.353-04	2024-06-07 15:02:06.353-04	\N
+3950	200	Blood on the Floor: Blood on the Floor	\N	undefined	08:41	[]	\N	2024-06-07 15:02:06.367-04	2024-06-07 15:02:06.367-04	\N
+3951	200	Blood on the Floor: Needles	\N	undefined	04:53	[]	\N	2024-06-07 15:02:06.379-04	2024-06-07 15:02:06.379-04	\N
+3952	200	Blood on the Floor: Shout	\N	undefined	05:35	[]	\N	2024-06-07 15:02:06.39-04	2024-06-07 15:02:06.39-04	\N
+3953	200	Blood on the Floor: Crackdown	\N	undefined	04:11	[]	\N	2024-06-07 15:02:06.401-04	2024-06-07 15:02:06.401-04	\N
+3954	200	Ceres	\N	undefined	06:40	[]	\N	2024-06-07 15:02:06.413-04	2024-06-07 15:02:06.413-04	\N
+3955	200	Lament for Solo Violin and String Orchestra	\N	undefined	13:21	[]	\N	2024-06-07 15:02:06.423-04	2024-06-07 15:02:06.423-04	\N
+3956	200	Turnage - Cantilena	\N	undefined	10:43	[]	\N	2024-06-07 15:02:06.432-04	2024-06-07 15:02:06.432-04	\N
+3957	200	Turnage - Slide Stride	\N	undefined	13:03	[]	\N	2024-06-07 15:02:06.441-04	2024-06-07 15:02:06.441-04	\N
+3958	200	Turnage - Two Vocalises: Vocalise	\N	undefined	02:33	[]	\N	2024-06-07 15:02:06.449-04	2024-06-07 15:02:06.449-04	\N
+3959	200	Turnage - This Silence: Dance	\N	undefined	08:22	[]	\N	2024-06-07 15:02:06.458-04	2024-06-07 15:02:06.458-04	\N
+3960	200	Turnage - This Silence: Dirge	\N	undefined	07:15	[]	\N	2024-06-07 15:02:06.467-04	2024-06-07 15:02:06.467-04	\N
+3961	200	Turnage - True Life Stories: Tune for Toru	\N	undefined	02:03	[]	\N	2024-06-07 15:02:06.475-04	2024-06-07 15:02:06.475-04	\N
+3962	200	Turnage - Two Baudelaire Songs: Eulogy	\N	undefined	09:60	[]	\N	2024-06-07 15:02:06.483-04	2024-06-07 15:02:06.483-04	\N
+3963	200	Turnage - True Life Stories: Song for Sally	\N	undefined	02:35	[]	\N	2024-06-07 15:02:06.493-04	2024-06-07 15:02:06.493-04	\N
+3964	200	Turnage - True Life Stories: Elegy For Andy	\N	undefined	03:29	[]	\N	2024-06-07 15:02:06.502-04	2024-06-07 15:02:06.502-04	\N
+3965	200	Turnage - True Life Stories: William''s Pavane	\N	undefined	01:42	[]	\N	2024-06-07 15:02:06.511-04	2024-06-07 15:02:06.511-04	\N
+3966	200	Turnage - Two Vocalises: Maclaren''s farewell	\N	undefined	03:08	[]	\N	2024-06-07 15:02:06.522-04	2024-06-07 15:02:06.522-04	\N
+3967	200	Turnage - True Life Stories: Edward''s refrain	\N	undefined	03:16	[]	\N	2024-06-07 15:02:06.532-04	2024-06-07 15:02:06.532-04	\N
+3968	200	Your Rockaby	\N	undefined	21:49	[]	\N	2024-06-07 15:02:06.541-04	2024-06-07 15:02:06.541-04	\N
+3969	200	Turnage - Two Baudelaire Songs: Harmonie du Soir	\N	undefined	05:52	[]	\N	2024-06-07 15:02:06.551-04	2024-06-07 15:02:06.551-04	\N
+3970	200	Turnage - Two Baudelaire Songs: L''invitation au voyage	\N	undefined	04:35	[]	\N	2024-06-07 15:02:06.56-04	2024-06-07 15:02:06.56-04	\N
+3971	200	Dispelling the Fears	\N	undefined	20:37	[]	\N	2024-06-07 15:02:06.571-04	2024-06-07 15:02:06.571-04	\N
+3972	200	Night Dances: 4. Dance 2	\N	undefined	03:35	[]	\N	2024-06-07 15:02:06.583-04	2024-06-07 15:02:06.583-04	\N
+3973	200	Night Dances: 2. Dance 1	\N	undefined	04:40	[]	\N	2024-06-07 15:02:06.592-04	2024-06-07 15:02:06.592-04	\N
+3974	200	Turnage: Three Screaming Popes	\N	undefined	15:47	[]	\N	2024-06-07 15:02:06.6-04	2024-06-07 15:02:06.6-04	\N
+3975	200	Night Dances: 3. Nocturne	\N	undefined	03:24	[]	\N	2024-06-07 15:02:06.621-04	2024-06-07 15:02:06.621-04	\N
+3976	200	Night Dances: 1. Prelude	\N	undefined	01:21	[]	\N	2024-06-07 15:02:06.633-04	2024-06-07 15:02:06.633-04	\N
+3977	200	Greek - Act 2: Scene 4c (Eddy''s Soliloquy of Regret)	\N	undefined	02:34	[]	\N	2024-06-07 15:02:06.644-04	2024-06-07 15:02:06.644-04	\N
+3978	200	The Torn Fields, for baritone and large ensemble: V. Interlude	\N	undefined	02:19	[]	\N	2024-06-07 15:02:06.653-04	2024-06-07 15:02:06.653-04	\N
+3979	200	The Torn Fields, for baritone and large ensemble: II. A son (Loss)	\N	undefined	02:47	[]	\N	2024-06-07 15:02:06.662-04	2024-06-07 15:02:06.662-04	\N
+3980	200	Twice Through the Heart, Dramatic scena for mezzo soprano and 16 players: II. Inside (part 1)	\N	undefined	03:18	[]	\N	2024-06-07 15:02:06.671-04	2024-06-07 15:02:06.671-04	\N
+3981	200	Twice Through the Heart, Dramatic scena for mezzo soprano and 16 players: VII. Interlude	\N	undefined	00:58	[]	\N	2024-06-07 15:02:06.681-04	2024-06-07 15:02:06.681-04	\N
+3982	200	Twice Through the Heart, Dramatic scena for mezzo soprano and 16 players: I. No Way Out	\N	undefined	03:11	[]	\N	2024-06-07 15:02:06.691-04	2024-06-07 15:02:06.691-04	\N
+3983	200	Greek - Act 2: Prologue	\N	undefined	02:10	[]	\N	2024-06-07 15:02:06.701-04	2024-06-07 15:02:06.701-04	\N
+3984	200	Greek - Act 1: Interlude 1 - Scene 5a (Café)	\N	undefined	02:46	[]	\N	2024-06-07 15:02:06.711-04	2024-06-07 15:02:06.711-04	\N
+3985	200	Greek - Act 2: Link 1 (Journey to the Sphinx)	\N	undefined	00:51	[]	\N	2024-06-07 15:02:06.72-04	2024-06-07 15:02:06.72-04	\N
+3986	200	Greek - Act 1: Scene 2a (Fortune-teller)	\N	undefined	04:06	[]	\N	2024-06-07 15:02:06.731-04	2024-06-07 15:02:06.731-04	\N
+3987	200	The Torn Fields, for baritone and large ensemble: III. The Immortals (No More Jokes)	\N	undefined	02:32	[]	\N	2024-06-07 15:02:06.74-04	2024-06-07 15:02:06.74-04	\N
+3988	200	Greek - Act 2: Conclusion	\N	undefined	01:34	[]	\N	2024-06-07 15:02:06.75-04	2024-06-07 15:02:06.75-04	\N
+3989	200	The Torn Fields, for baritone and large ensemble: VI. When you see millions of the mouthless dead (The Mouthless Dead)	\N	undefined	03:39	[]	\N	2024-06-07 15:02:06.762-04	2024-06-07 15:02:06.762-04	\N
+3990	200	Twice Through the Heart, Dramatic scena for mezzo soprano and 16 players: VIII. Landslide	\N	undefined	06:03	[]	\N	2024-06-07 15:02:06.771-04	2024-06-07 15:02:06.771-04	\N
+3991	200	Greek - Act 2: Scene 4a (Eddy''s Return)	\N	undefined	02:41	[]	\N	2024-06-07 15:02:06.786-04	2024-06-07 15:02:06.786-04	\N
+3992	200	Twice Through the Heart, Dramatic scena for mezzo soprano and 16 players: III. Love	\N	undefined	03:52	[]	\N	2024-06-07 15:02:06.803-04	2024-06-07 15:02:06.803-04	\N
+3993	200	The Torn Fields, for baritone and large ensemble: VII. Everyone Sang (Aftermath)	\N	undefined	03:10	[]	\N	2024-06-07 15:02:06.817-04	2024-06-07 15:02:06.817-04	\N
+3994	201	Anthracite Fields: IV. Flowers	\N	undefined	06:38	[]	\N	2024-06-07 15:07:39.895-04	2024-06-07 15:07:39.895-04	\N
+3995	201	Anthracite Fields: I. Foundation	\N	undefined	19:35	[]	\N	2024-06-07 15:07:39.911-04	2024-06-07 15:07:39.911-04	\N
+3996	201	Anthracite Fields: II. Breaker Boys	\N	undefined	14:24	[]	\N	2024-06-07 15:07:39.921-04	2024-06-07 15:07:39.921-04	\N
+3997	201	Anthracite Fields: V. Appliances	\N	undefined	12:32	[]	\N	2024-06-07 15:07:39.933-04	2024-06-07 15:07:39.933-04	\N
+3998	201	Reeling	\N	undefined	05:49	[]	\N	2024-06-07 15:07:39.941-04	2024-06-07 15:07:39.941-04	\N
+3999	201	Wolfe: Compassion	\N	undefined	06:46	[]	\N	2024-06-07 15:07:39.948-04	2024-06-07 15:07:39.948-04	\N
+4000	201	Destiny	\N	undefined	11:05	[]	\N	2024-06-07 15:07:39.957-04	2024-06-07 15:07:39.957-04	\N
+4001	201	Some Say	\N	undefined	09:48	[]	\N	2024-06-07 15:07:39.966-04	2024-06-07 15:07:39.966-04	\N
+4002	201	Fire in my mouth: IV. Fire	\N	undefined	15:32	[]	\N	2024-06-07 15:07:39.976-04	2024-06-07 15:07:39.976-04	\N
+4003	201	Fire in my mouth: II. Factory	\N	undefined	08:42	[]	\N	2024-06-07 15:07:39.986-04	2024-06-07 15:07:39.986-04	\N
+4004	201	Fire in my mouth: III. Protest	\N	undefined	12:41	[]	\N	2024-06-07 15:07:39.997-04	2024-06-07 15:07:39.997-04	\N
+4005	201	Fire in my mouth: I. Immigration	\N	undefined	11:24	[]	\N	2024-06-07 15:07:40.008-04	2024-06-07 15:07:40.008-04	\N
+4006	201	Anthracite Fields: III. Speech	\N	undefined	06:29	[]	\N	2024-06-07 15:07:40.02-04	2024-06-07 15:07:40.02-04	\N
+4007	201	LAD: II. The Slow Melody - arr. Sean Shibe for Guitar	\N	undefined	05:24	[]	\N	2024-06-07 15:07:40.034-04	2024-06-07 15:07:40.034-04	\N
+4008	201	Four Marys	\N	undefined	10:47	[]	\N	2024-06-07 15:07:40.047-04	2024-06-07 15:07:40.047-04	\N
+4009	201	Believing	\N	undefined	08:57	[]	\N	2024-06-07 15:07:40.056-04	2024-06-07 15:07:40.056-04	\N
+4010	201	Steel Hammer: Polly Ann - The Race	\N	undefined	15:49	[]	\N	2024-06-07 15:07:40.063-04	2024-06-07 15:07:40.063-04	\N
+4011	201	Steel Hammer: The States	\N	undefined	09:48	[]	\N	2024-06-07 15:07:40.07-04	2024-06-07 15:07:40.07-04	\N
+4012	201	LAD: I. [Drones only] - arr. Sean Shibe for Guitar	\N	undefined	07:49	[]	\N	2024-06-07 15:07:40.078-04	2024-06-07 15:07:40.078-04	\N
+4013	201	Dark Full Ride: Part I	\N	undefined	07:39	[]	\N	2024-06-07 15:07:40.084-04	2024-06-07 15:07:40.084-04	\N
+4014	201	LAD: I. —	\N	undefined	07:46	[]	\N	2024-06-07 15:07:40.089-04	2024-06-07 15:07:40.089-04	\N
+4015	201	Oxygen for 12 Flutes	\N	undefined	15:30	[]	\N	2024-06-07 15:07:40.095-04	2024-06-07 15:07:40.095-04	\N
+4016	201	Guard My Tongue	\N	undefined	07:45	[]	\N	2024-06-07 15:07:40.102-04	2024-06-07 15:07:40.102-04	\N
+4017	201	Steel Hammer: Mountain	\N	undefined	08:51	[]	\N	2024-06-07 15:07:40.108-04	2024-06-07 15:07:40.108-04	\N
+4018	201	Steel Hammer: Some Say	\N	undefined	09:48	[]	\N	2024-06-07 15:07:40.115-04	2024-06-07 15:07:40.115-04	\N
+4019	201	Into the Clouds	\N	undefined	06:10	[]	\N	2024-06-07 15:07:40.121-04	2024-06-07 15:07:40.121-04	\N
+4020	201	LAD: III. The Fast Melody - arr. Sean Shibe for Guitar	\N	undefined	03:26	[]	\N	2024-06-07 15:07:40.126-04	2024-06-07 15:07:40.126-04	\N
+4021	201	Steel Hammer: Destiny	\N	undefined	11:05	[]	\N	2024-06-07 15:07:40.131-04	2024-06-07 15:07:40.131-04	\N
+4022	201	Cha	\N	undefined	10:54	[]	\N	2024-06-07 15:07:40.143-04	2024-06-07 15:07:40.143-04	\N
+4023	201	Dig Deep	\N	undefined	13:51	[]	\N	2024-06-07 15:07:40.148-04	2024-06-07 15:07:40.148-04	\N
+4024	201	Earring	\N	undefined	02:07	[]	\N	2024-06-07 15:07:40.153-04	2024-06-07 15:07:40.153-04	\N
+4025	201	Oxygen	\N	undefined	15:20	[]	\N	2024-06-07 15:07:40.158-04	2024-06-07 15:07:40.158-04	\N
+4026	201	Big Beautiful Dark and Scary	\N	undefined	08:45	[]	\N	2024-06-07 15:07:40.163-04	2024-06-07 15:07:40.163-04	\N
+4027	201	Lad (Arr. for Violin & Electronics by Rakhi Singh)	\N	undefined	16:35	[]	\N	2024-06-07 15:07:40.171-04	2024-06-07 15:07:40.171-04	\N
+4028	201	Forbidden Love	\N	undefined	32:34	[]	\N	2024-06-07 15:07:40.176-04	2024-06-07 15:07:40.176-04	\N
+4029	201	Steel Hammer: Lord, Lord	\N	undefined	06:03	[]	\N	2024-06-07 15:07:40.181-04	2024-06-07 15:07:40.181-04	\N
+4030	201	East Broadway	\N	undefined	03:32	[]	\N	2024-06-07 15:07:40.186-04	2024-06-07 15:07:40.186-04	\N
+4031	201	Dark Full Ride: Pt. I	\N	undefined	07:39	[]	\N	2024-06-07 15:07:40.196-04	2024-06-07 15:07:40.196-04	\N
+4032	201	Lick	\N	undefined	09:19	[]	\N	2024-06-07 15:07:40.201-04	2024-06-07 15:07:40.201-04	\N
+4033	201	Emunah	\N	undefined	08:01	[]	\N	2024-06-07 15:07:40.207-04	2024-06-07 15:07:40.207-04	\N
+4034	201	LAD: II. —	\N	undefined	08:46	[]	\N	2024-06-07 15:07:40.213-04	2024-06-07 15:07:40.213-04	\N
+4035	201	Steel Hammer: Winner	\N	undefined	01:22	[]	\N	2024-06-07 15:07:40.22-04	2024-06-07 15:07:40.22-04	\N
+4036	201	Steel Hammer: Characteristics	\N	undefined	05:47	[]	\N	2024-06-07 15:07:40.233-04	2024-06-07 15:07:40.233-04	\N
+4037	201	Wölfe in der Nacht	\N	undefined	04:00	[]	\N	2024-06-07 15:07:40.241-04	2024-06-07 15:07:40.241-04	\N
+4038	201	Wolfe: Lost Thing	\N	undefined	05:33	[]	\N	2024-06-07 15:07:40.248-04	2024-06-07 15:07:40.248-04	\N
+4039	201	Wolfe: Amelia, Flying	\N	undefined	04:50	[]	\N	2024-06-07 15:07:40.256-04	2024-06-07 15:07:40.256-04	\N
+4040	203	Impromptu (Thomas''s piece)	\N	undefined	02:27	[]	\N	2024-06-07 15:17:49.735-04	2024-06-07 15:17:49.735-04	\N
+4041	203	Vespers for a New Dark Age: I. Wayward Free Radical Dreams	\N	undefined	05:13	[]	\N	2024-06-07 15:17:49.751-04	2024-06-07 15:17:49.751-04	\N
+4042	203	Sinfonia (for Orbiting Spheres)	\N	undefined	08:47	[]	\N	2024-06-07 15:17:49.764-04	2024-06-07 15:17:49.764-04	\N
+4043	203	Dark with Excessive Bright	\N	undefined	14:06	[]	\N	2024-06-07 15:17:49.775-04	2024-06-07 15:17:49.775-04	\N
+4044	203	These Worlds in Us	\N	undefined	08:46	[]	\N	2024-06-07 15:17:49.787-04	2024-06-07 15:17:49.787-04	\N
+4045	203	A Thousand Tongues	\N	undefined	06:44	[]	\N	2024-06-07 15:17:49.796-04	2024-06-07 15:17:49.796-04	\N
+4046	203	Vespers for Violin	\N	undefined	05:53	[]	\N	2024-06-07 15:17:49.805-04	2024-06-07 15:17:49.805-04	\N
+4047	203	Orpheus Undone: Pt. 1: Behold the Machine, O Death	\N	undefined	09:50	[]	\N	2024-06-07 15:17:49.815-04	2024-06-07 15:17:49.815-04	\N
+4048	203	Dark with Excessive Bright: Concerto for Contrabass and String Orchestra - ACO Originals, Live from City Recital Hall, Sydney, 2018	\N	undefined	12:43	[]	\N	2024-06-07 15:17:49.824-04	2024-06-07 15:17:49.824-04	\N
+4049	203	Proving Up, Pt. 5: Nore at a Soft Canter	\N	undefined	12:38	[]	\N	2024-06-07 15:17:49.834-04	2024-06-07 15:17:49.834-04	\N
+4050	203	Proving Up: Epilogue (All That''s Required)	\N	undefined	08:07	[]	\N	2024-06-07 15:17:49.844-04	2024-06-07 15:17:49.844-04	\N
+4051	203	Proving Up, Pt. 6: Sodbuster	\N	undefined	20:17	[]	\N	2024-06-07 15:17:49.854-04	2024-06-07 15:17:49.854-04	\N
+4052	203	Proving Up: Prologue (Uncle Sam''s Farm)	\N	undefined	04:41	[]	\N	2024-06-07 15:17:49.865-04	2024-06-07 15:17:49.865-04	\N
+4053	203	Proving Up, Pt. 2: Miles Will Prove Up	\N	undefined	07:17	[]	\N	2024-06-07 15:17:49.877-04	2024-06-07 15:17:49.877-04	\N
+4054	203	Proving Up, Pt. 1: The Settler’s Scar	\N	undefined	09:39	[]	\N	2024-06-07 15:17:49.888-04	2024-06-07 15:17:49.888-04	\N
+4055	203	Proving Up, Pt. 3: How Pa Obtained the Glass	\N	undefined	10:06	[]	\N	2024-06-07 15:17:49.898-04	2024-06-07 15:17:49.898-04	\N
+4056	203	Proving Up, Pt. 4: Strange Dreams	\N	undefined	07:01	[]	\N	2024-06-07 15:17:49.91-04	2024-06-07 15:17:49.91-04	\N
+4057	203	A Thousand Tongues (Lorna Dune Remix)	\N	undefined	07:19	[]	\N	2024-06-07 15:17:49.919-04	2024-06-07 15:17:49.919-04	\N
+4058	203	Vespers for a New Dark Age: VI. Interlude 2	\N	undefined	02:37	[]	\N	2024-06-07 15:17:49.929-04	2024-06-07 15:17:49.929-04	\N
+4059	203	Vespers for a New Dark Age: VII. Machine	\N	undefined	04:47	[]	\N	2024-06-07 15:17:49.939-04	2024-06-07 15:17:49.939-04	\N
+4060	203	Vespers for a New Dark Age: II. Hello Lord	\N	undefined	02:27	[]	\N	2024-06-07 15:17:49.951-04	2024-06-07 15:17:49.951-04	\N
+4061	203	Vespers for a New Dark Age: III. Interlude 1	\N	undefined	02:38	[]	\N	2024-06-07 15:17:49.961-04	2024-06-07 15:17:49.961-04	\N
+4062	203	Vespers for a New Dark Age: V. New Dark Age	\N	undefined	02:40	[]	\N	2024-06-07 15:17:49.97-04	2024-06-07 15:17:49.97-04	\N
+4063	203	Vespers for a New Dark Age: VIII. Postlude	\N	undefined	04:35	[]	\N	2024-06-07 15:17:49.981-04	2024-06-07 15:17:49.981-04	\N
+4064	203	Vespers for a New Dark Age: IV. Come On All You	\N	undefined	05:35	[]	\N	2024-06-07 15:17:49.99-04	2024-06-07 15:17:49.99-04	\N
+4065	203	Dark with Excessive Bright (Arr. For solo violin and string quintet)	\N	undefined	13:53	[]	\N	2024-06-07 15:17:49.999-04	2024-06-07 15:17:49.999-04	\N
+4066	203	Orpheus Undone: Pt. 2: We of Violence, We Endure	\N	undefined	05:07	[]	\N	2024-06-07 15:17:50.009-04	2024-06-07 15:17:50.009-04	\N
+4067	203	Isabelle Eberhardt Dreams of Pianos	\N	undefined	08:42	[]	\N	2024-06-07 15:17:50.019-04	2024-06-07 15:17:50.019-04	\N
+4068	203	In Spite of All This	\N	undefined	08:35	[]	\N	2024-06-07 15:17:50.028-04	2024-06-07 15:17:50.028-04	\N
+4069	203	Song from the Uproar: I am not mine	\N	undefined	03:34	[]	\N	2024-06-07 15:17:50.038-04	2024-06-07 15:17:50.038-04	\N
+4070	203	Death Valley Junction	\N	undefined	08:53	[]	\N	2024-06-07 15:17:50.056-04	2024-06-07 15:17:50.056-04	\N
+4071	203	Song from the Uproar: I have arrived	\N	undefined	05:06	[]	\N	2024-06-07 15:17:50.066-04	2024-06-07 15:17:50.066-04	\N
+4072	203	Song from the Uproar: This world within me Is too small	\N	undefined	04:13	[]	\N	2024-06-07 15:17:50.075-04	2024-06-07 15:17:50.075-04	\N
+4073	203	Hail, Horrors, Hail	\N	undefined	02:27	[]	\N	2024-06-07 15:17:50.083-04	2024-06-07 15:17:50.083-04	\N
+4074	203	Tooth And Nail	\N	undefined	09:60	[]	\N	2024-06-07 15:17:50.089-04	2024-06-07 15:17:50.089-04	\N
+4075	203	Millennium Canticles: Pt. 4, Choir of the Holy Locusts	\N	undefined	02:47	[]	\N	2024-06-07 15:17:50.094-04	2024-06-07 15:17:50.094-04	\N
+4076	203	Magic With Everyday Objects	\N	undefined	08:19	[]	\N	2024-06-07 15:17:50.1-04	2024-06-07 15:17:50.1-04	\N
+4077	203	Song from the Uproar: 100 Names for God	\N	undefined	05:56	[]	\N	2024-06-07 15:17:50.106-04	2024-06-07 15:17:50.106-04	\N
+4078	203	Vesper Sparrow	\N	undefined	05:00	[]	\N	2024-06-07 15:17:50.113-04	2024-06-07 15:17:50.113-04	\N
+4079	203	Millennium Canticles: Pt. 5, Survival Psalm	\N	undefined	01:51	[]	\N	2024-06-07 15:17:50.119-04	2024-06-07 15:17:50.119-04	\N
+4080	203	Song from the Uproar: Capsized Heart	\N	undefined	02:23	[]	\N	2024-06-07 15:17:50.125-04	2024-06-07 15:17:50.125-04	\N
+4081	203	Song from the Uproar: Barrel at the breast	\N	undefined	02:18	[]	\N	2024-06-07 15:17:50.131-04	2024-06-07 15:17:50.131-04	\N
+4082	203	Song from the Uproar: Chanson	\N	undefined	06:00	[]	\N	2024-06-07 15:17:50.138-04	2024-06-07 15:17:50.138-04	\N
+4083	203	Millennium Canticles: Pt. 1, Famous Disaster Psalm	\N	undefined	02:01	[]	\N	2024-06-07 15:17:50.145-04	2024-06-07 15:17:50.145-04	\N
+4084	203	Song from the Uproar: Mektoub (It Is Written), Pt. I: Death moves his hands through me again	\N	undefined	06:03	[]	\N	2024-06-07 15:17:50.151-04	2024-06-07 15:17:50.151-04	\N
+4085	203	Still Life With Avalanche	\N	undefined	08:46	[]	\N	2024-06-07 15:17:50.157-04	2024-06-07 15:17:50.157-04	\N
+4086	203	Cathedral City	\N	undefined	04:57	[]	\N	2024-06-07 15:17:50.161-04	2024-06-07 15:17:50.161-04	\N
+4087	203	Tooth and Nail	\N	undefined	09:60	[]	\N	2024-06-07 15:17:50.167-04	2024-06-07 15:17:50.167-04	\N
+4088	203	Song from the Uproar: You Are the dust	\N	undefined	03:58	[]	\N	2024-06-07 15:17:50.173-04	2024-06-07 15:17:50.173-04	\N
+4089	203	Song from the Uproar: Interlude	\N	undefined	02:12	[]	\N	2024-06-07 15:17:50.179-04	2024-06-07 15:17:50.179-04	\N
+4090	204	Need a Little Time off for Bad Behavior	\N	undefined	03:00	[]	\N	2024-06-07 15:18:03.129-04	2024-06-07 15:18:03.129-04	\N
+4091	204	Little Bad Girl (feat. Taio Cruz & Ludacris)	\N	undefined	03:12	[]	\N	2024-06-07 15:18:03.144-04	2024-06-07 15:18:03.144-04	\N
+4092	204	Five Little Monkeys Jumping on the Bed	\N	undefined	01:41	[]	\N	2024-06-07 15:18:03.156-04	2024-06-07 15:18:03.156-04	\N
+4093	204	Love Don''t Let Me Go	\N	undefined	03:37	[]	\N	2024-06-07 15:18:03.167-04	2024-06-07 15:18:03.167-04	\N
+4094	204	A Little Too Not Over You	\N	undefined	03:18	[]	\N	2024-06-07 15:18:03.181-04	2024-06-07 15:18:03.181-04	\N
+4095	204	9MM	\N	undefined	04:07	[]	\N	2024-06-07 15:18:03.192-04	2024-06-07 15:18:03.192-04	\N
+4096	204	I Can Only Imagine (feat. Chris Brown & Lil Wayne)	\N	undefined	03:30	[]	\N	2024-06-07 15:18:03.206-04	2024-06-07 15:18:03.206-04	\N
+4097	204	A Lil'' Ain''t Enough	\N	undefined	04:42	[]	\N	2024-06-07 15:18:03.219-04	2024-06-07 15:18:03.219-04	\N
+4098	204	Little Mo'' Betta	\N	undefined	03:20	[]	\N	2024-06-07 15:18:03.232-04	2024-06-07 15:18:03.232-04	\N
+4099	204	Under The Sea (From "The Little Mermaid")	\N	undefined	01:51	[]	\N	2024-06-07 15:18:03.243-04	2024-06-07 15:18:03.243-04	\N
+4100	204	Shawty Say	\N	undefined	03:38	[]	\N	2024-06-07 15:18:03.254-04	2024-06-07 15:18:03.254-04	\N
+4101	204	Light My Body Up (feat. Nicki Minaj & Lil Wayne)	\N	undefined	03:46	[]	\N	2024-06-07 15:18:03.274-04	2024-06-07 15:18:03.274-04	\N
+4102	204	Three Little Muffins	\N	undefined	01:21	[]	\N	2024-06-07 15:18:03.292-04	2024-06-07 15:18:03.292-04	\N
+4103	204	Little Amens	\N	undefined	03:13	[]	\N	2024-06-07 15:18:03.313-04	2024-06-07 15:18:03.313-04	\N
+4104	204	Just a Little More Love - Elektro Edit	\N	undefined	03:35	[]	\N	2024-06-07 15:18:03.324-04	2024-06-07 15:18:03.324-04	\N
+4105	204	My Little Boat	\N	undefined	02:52	[]	\N	2024-06-07 15:18:03.336-04	2024-06-07 15:18:03.336-04	\N
+4106	204	Sensible Shoes	\N	undefined	05:09	[]	\N	2024-06-07 15:18:03.347-04	2024-06-07 15:18:03.347-04	\N
+4107	204	Just a Little More Love (feat. Chris Willis) - Jack Back 2018 Remix	\N	undefined	03:24	[]	\N	2024-06-07 15:18:03.357-04	2024-06-07 15:18:03.357-04	\N
+4108	204	Give A Little	\N	undefined	03:05	[]	\N	2024-06-07 15:18:03.368-04	2024-06-07 15:18:03.368-04	\N
+4109	204	Light My Body Up (feat. Nicki Minaj & Lil Wayne) - Tujamo Remix	\N	undefined	03:34	[]	\N	2024-06-07 15:18:03.377-04	2024-06-07 15:18:03.377-04	\N
+4110	204	Little Kid	\N	undefined	02:18	[]	\N	2024-06-07 15:18:03.396-04	2024-06-07 15:18:03.396-04	\N
+4111	204	Save a Little Corner	\N	undefined	02:11	[]	\N	2024-06-07 15:18:03.408-04	2024-06-07 15:18:03.408-04	\N
+4112	204	It''s Showtime!	\N	undefined	03:47	[]	\N	2024-06-07 15:18:03.419-04	2024-06-07 15:18:03.419-04	\N
+4113	204	Little Bad Girl	\N	undefined	03:13	[]	\N	2024-06-07 15:18:03.429-04	2024-06-07 15:18:03.429-04	\N
+4114	204	Tell the Truth	\N	undefined	05:18	[]	\N	2024-06-07 15:18:03.437-04	2024-06-07 15:18:03.437-04	\N
+4115	204	Need a Little Time Off for Bad Behavior	\N	undefined	03:01	[]	\N	2024-06-07 15:18:03.445-04	2024-06-07 15:18:03.445-04	\N
+4116	204	With a Little Bit of True Love	\N	undefined	05:23	[]	\N	2024-06-07 15:18:03.453-04	2024-06-07 15:18:03.453-04	\N
+4117	204	Get a Little Dirt on Your Hands	\N	undefined	03:41	[]	\N	2024-06-07 15:18:03.462-04	2024-06-07 15:18:03.462-04	\N
+4118	204	Little House On The Prairie	\N	undefined	02:57	[]	\N	2024-06-07 15:18:03.47-04	2024-06-07 15:18:03.47-04	\N
+4119	204	Distortion - Vocal Edit Remix	\N	undefined	03:11	[]	\N	2024-06-07 15:18:03.479-04	2024-06-07 15:18:03.479-04	\N
+4120	204	When They''re Gone (Lyle County)	\N	undefined	03:42	[]	\N	2024-06-07 15:18:03.489-04	2024-06-07 15:18:03.489-04	\N
+4121	204	I lie	\N	undefined	05:13	[]	\N	2024-06-07 15:18:03.499-04	2024-06-07 15:18:03.499-04	\N
+4122	204	Always There for You, My Little One	\N	undefined	01:43	[]	\N	2024-06-07 15:18:03.517-04	2024-06-07 15:18:03.517-04	\N
+4123	204	The Little Time I Have	\N	undefined	03:33	[]	\N	2024-06-07 15:18:03.527-04	2024-06-07 15:18:03.527-04	\N
+4124	204	Five Little Toes	\N	undefined	01:10	[]	\N	2024-06-07 15:18:03.537-04	2024-06-07 15:18:03.537-04	\N
+4125	204	Drop in the Bucket	\N	undefined	05:06	[]	\N	2024-06-07 15:18:03.548-04	2024-06-07 15:18:03.548-04	\N
+4126	204	A Little Goes a Long Way	\N	undefined	03:29	[]	\N	2024-06-07 15:18:03.558-04	2024-06-07 15:18:03.558-04	\N
+4127	204	Hammerhead Shark	\N	undefined	03:35	[]	\N	2024-06-07 15:18:03.569-04	2024-06-07 15:18:03.569-04	\N
+4128	204	Big Train - 2007 Remaster	\N	undefined	04:15	[]	\N	2024-06-07 15:18:03.579-04	2024-06-07 15:18:03.579-04	\N
+4129	204	A Little Kiss	\N	undefined	01:22	[]	\N	2024-06-07 15:18:03.591-04	2024-06-07 15:18:03.591-04	\N
+4130	204	The Little That I Know	\N	undefined	03:05	[]	\N	2024-06-07 15:18:03.601-04	2024-06-07 15:18:03.601-04	\N
+4131	204	Shoot It	\N	undefined	04:14	[]	\N	2024-06-07 15:18:03.621-04	2024-06-07 15:18:03.621-04	\N
+4132	204	Try a Little Tenderness	\N	undefined	06:03	[]	\N	2024-06-07 15:18:03.633-04	2024-06-07 15:18:03.633-04	\N
+4133	204	A Little More Trust - Single Version	\N	undefined	03:09	[]	\N	2024-06-07 15:18:03.642-04	2024-06-07 15:18:03.642-04	\N
+4134	205	Stay Down - Apple Music Live	\N	undefined	02:49	[]	\N	2024-06-07 15:18:14.279-04	2024-06-07 15:18:14.279-04	\N
+4135	205	My Yungin	\N	undefined	02:17	[]	\N	2024-06-07 15:18:14.291-04	2024-06-07 15:18:14.291-04	\N
+4136	205	Sweet Tea	\N	undefined	03:41	[]	\N	2024-06-07 15:18:14.3-04	2024-06-07 15:18:14.3-04	\N
+4137	205	Stay Down (with 6LACK & Young Thug)	\N	undefined	02:49	[]	\N	2024-06-07 15:18:14.307-04	2024-06-07 15:18:14.307-04	\N
+4138	205	WHAT YOU NEED	\N	undefined	02:55	[]	\N	2024-06-07 15:18:14.325-04	2024-06-07 15:18:14.325-04	\N
+4219	206	Lost at Sea	\N	undefined	01:36	[]	\N	2024-06-07 15:18:47.131-04	2024-06-07 15:18:47.131-04	\N
+4139	205	Outside (Tiny Yung Freestyle)	\N	undefined	02:26	[]	\N	2024-06-07 15:18:14.336-04	2024-06-07 15:18:14.336-04	\N
+4140	205	Barefoot	\N	undefined	03:23	[]	\N	2024-06-07 15:18:14.344-04	2024-06-07 15:18:14.344-04	\N
+4141	205	Pass Me The Lighter (Feat. Young Thug)	\N	undefined	03:39	[]	\N	2024-06-07 15:18:14.353-04	2024-06-07 15:18:14.353-04	\N
+4142	205	No Love (feat. Young Thug)	\N	undefined	04:26	[]	\N	2024-06-07 15:18:14.363-04	2024-06-07 15:18:14.363-04	\N
+4143	205	So What	\N	undefined	03:10	[]	\N	2024-06-07 15:18:14.374-04	2024-06-07 15:18:14.374-04	\N
+4144	205	To The Moon (feat. Young Thug)	\N	undefined	03:04	[]	\N	2024-06-07 15:18:14.383-04	2024-06-07 15:18:14.383-04	\N
+4145	205	Yungin	\N	undefined	02:23	[]	\N	2024-06-07 15:18:14.392-04	2024-06-07 15:18:14.392-04	\N
+4146	205	Stay Down	\N	undefined	02:49	[]	\N	2024-06-07 15:18:14.4-04	2024-06-07 15:18:14.4-04	\N
+4147	205	East Bay to San Jo	\N	undefined	02:32	[]	\N	2024-06-07 15:18:14.408-04	2024-06-07 15:18:14.408-04	\N
+4148	205	Sugar Waist	\N	undefined	03:37	[]	\N	2024-06-07 15:18:14.42-04	2024-06-07 15:18:14.42-04	\N
+4149	205	I Told Her (feat. Young Thug)	\N	undefined	03:57	[]	\N	2024-06-07 15:18:14.428-04	2024-06-07 15:18:14.428-04	\N
+4150	205	I Done Seen	\N	undefined	03:56	[]	\N	2024-06-07 15:18:14.444-04	2024-06-07 15:18:14.444-04	\N
+4151	205	Purple Rain	\N	undefined	02:50	[]	\N	2024-06-07 15:18:14.454-04	2024-06-07 15:18:14.454-04	\N
+4152	205	Trap House (Remix)	\N	undefined	04:42	[]	\N	2024-06-07 15:18:14.47-04	2024-06-07 15:18:14.47-04	\N
+4153	205	Street Love (feat. Yung Main)	\N	undefined	02:55	[]	\N	2024-06-07 15:18:14.483-04	2024-06-07 15:18:14.483-04	\N
+4154	205	Supremacy	\N	undefined	02:29	[]	\N	2024-06-07 15:18:14.493-04	2024-06-07 15:18:14.493-04	\N
+4155	205	Not The Same (feat. Young Thug)	\N	undefined	03:24	[]	\N	2024-06-07 15:18:14.501-04	2024-06-07 15:18:14.501-04	\N
+4156	205	Alone With You - Radio-Edit	\N	undefined	03:08	[]	\N	2024-06-07 15:18:14.515-04	2024-06-07 15:18:14.515-04	\N
+4157	205	Phantom	\N	undefined	02:01	[]	\N	2024-06-07 15:18:14.523-04	2024-06-07 15:18:14.523-04	\N
+4158	205	Go Crazy (feat. Yungmain)	\N	undefined	04:11	[]	\N	2024-06-07 15:18:14.532-04	2024-06-07 15:18:14.532-04	\N
+4159	205	Fall In Love	\N	undefined	03:19	[]	\N	2024-06-07 15:18:14.54-04	2024-06-07 15:18:14.54-04	\N
+4160	205	Stay Focused (Feat. Young Thug)	\N	undefined	04:36	[]	\N	2024-06-07 15:18:14.549-04	2024-06-07 15:18:14.549-04	\N
+4161	205	Diamonds Dancing (feat. Young Thug)	\N	undefined	02:53	[]	\N	2024-06-07 15:18:14.556-04	2024-06-07 15:18:14.556-04	\N
+4162	205	Los 3 Mosqueteros	\N	undefined	03:14	[]	\N	2024-06-07 15:18:14.568-04	2024-06-07 15:18:14.568-04	\N
+4163	205	Deja Vú	\N	undefined	02:14	[]	\N	2024-06-07 15:18:14.577-04	2024-06-07 15:18:14.577-04	\N
+4164	205	GEMINI	\N	undefined	03:20	[]	\N	2024-06-07 15:18:14.584-04	2024-06-07 15:18:14.584-04	\N
+4165	205	Alone With You	\N	undefined	03:41	[]	\N	2024-06-07 15:18:14.592-04	2024-06-07 15:18:14.592-04	\N
+4166	205	IFHMF	\N	undefined	01:36	[]	\N	2024-06-07 15:18:14.604-04	2024-06-07 15:18:14.604-04	\N
+4167	205	Lonely Night	\N	undefined	03:27	[]	\N	2024-06-07 15:18:14.618-04	2024-06-07 15:18:14.618-04	\N
+4168	205	Internet	\N	undefined	02:54	[]	\N	2024-06-07 15:18:14.63-04	2024-06-07 15:18:14.63-04	\N
+4169	205	Good Luck (feat. Young Thug)	\N	undefined	03:39	[]	\N	2024-06-07 15:18:14.64-04	2024-06-07 15:18:14.64-04	\N
+4170	205	euphoria	\N	undefined	02:12	[]	\N	2024-06-07 15:18:14.651-04	2024-06-07 15:18:14.651-04	\N
+4171	205	Bridges	\N	undefined	01:48	[]	\N	2024-06-07 15:18:14.665-04	2024-06-07 15:18:14.665-04	\N
+4172	205	TrustOnlyBrothers (feat. YungLiV)	\N	undefined	03:14	[]	\N	2024-06-07 15:18:14.682-04	2024-06-07 15:18:14.682-04	\N
+4173	205	Around my Way	\N	undefined	03:42	[]	\N	2024-06-07 15:18:14.689-04	2024-06-07 15:18:14.689-04	\N
+4174	205	Like Me	\N	undefined	02:34	[]	\N	2024-06-07 15:18:14.697-04	2024-06-07 15:18:14.697-04	\N
+4175	205	New Blender	\N	undefined	03:36	[]	\N	2024-06-07 15:18:14.702-04	2024-06-07 15:18:14.702-04	\N
+4176	205	Trapped	\N	undefined	03:12	[]	\N	2024-06-07 15:18:14.706-04	2024-06-07 15:18:14.706-04	\N
+4177	205	When The Door Closes	\N	undefined	03:26	[]	\N	2024-06-07 15:18:14.711-04	2024-06-07 15:18:14.711-04	\N
+4178	205	Heart For Sale	\N	undefined	02:55	[]	\N	2024-06-07 15:18:14.715-04	2024-06-07 15:18:14.715-04	\N
+4179	205	nothing	\N	undefined	02:36	[]	\N	2024-06-07 15:18:14.719-04	2024-06-07 15:18:14.719-04	\N
+4180	205	Pass Me the Lighter	\N	undefined	03:39	[]	\N	2024-06-07 15:18:14.722-04	2024-06-07 15:18:14.722-04	\N
+4181	206	Nemo Egg (Main Title)	\N	undefined	01:16	[]	\N	2024-06-07 15:18:46.822-04	2024-06-07 15:18:46.822-04	\N
+4182	206	The Only Way is Down	\N	undefined	01:14	[]	\N	2024-06-07 15:18:46.837-04	2024-06-07 15:18:46.837-04	\N
+4183	206	American Beauty	\N	undefined	03:06	[]	\N	2024-06-07 15:18:46.849-04	2024-06-07 15:18:46.849-04	\N
+4184	206	Finding Nemo	\N	undefined	01:19	[]	\N	2024-06-07 15:18:46.862-04	2024-06-07 15:18:46.862-04	\N
+4185	206	Define Dancing	\N	undefined	02:23	[]	\N	2024-06-07 15:18:46.872-04	2024-06-07 15:18:46.872-04	\N
+4186	206	1917	\N	undefined	01:17	[]	\N	2024-06-07 15:18:46.889-04	2024-06-07 15:18:46.889-04	\N
+4187	206	Any Other Name	\N	undefined	04:07	[]	\N	2024-06-07 15:18:46.899-04	2024-06-07 15:18:46.899-04	\N
+4188	206	Finding Dory (Main Title)	\N	undefined	00:55	[]	\N	2024-06-07 15:18:46.907-04	2024-06-07 15:18:46.907-04	\N
+4189	206	EVE	\N	undefined	01:02	[]	\N	2024-06-07 15:18:46.913-04	2024-06-07 15:18:46.913-04	\N
+4190	206	Come Back to Us	\N	undefined	05:40	[]	\N	2024-06-07 15:18:46.925-04	2024-06-07 15:18:46.925-04	\N
+4191	206	Field Trip	\N	undefined	00:58	[]	\N	2024-06-07 15:18:46.933-04	2024-06-07 15:18:46.933-04	\N
+4192	206	Road To Perdition	\N	undefined	03:56	[]	\N	2024-06-07 15:18:46.938-04	2024-06-07 15:18:46.938-04	\N
+4193	206	Wow	\N	undefined	02:31	[]	\N	2024-06-07 15:18:46.944-04	2024-06-07 15:18:46.944-04	\N
+4194	206	Victoria & Abdul	\N	undefined	01:59	[]	\N	2024-06-07 15:18:46.951-04	2024-06-07 15:18:46.951-04	\N
+4195	206	Haiku	\N	undefined	01:41	[]	\N	2024-06-07 15:18:46.957-04	2024-06-07 15:18:46.957-04	\N
+4196	206	Elemental	\N	undefined	03:44	[]	\N	2024-06-07 15:18:46.965-04	2024-06-07 15:18:46.965-04	\N
+4197	206	Shawshank Prison - Stoic Theme	\N	undefined	01:53	[]	\N	2024-06-07 15:18:46.971-04	2024-06-07 15:18:46.971-04	\N
+4198	206	First Day	\N	undefined	01:16	[]	\N	2024-06-07 15:18:46.977-04	2024-06-07 15:18:46.977-04	\N
+4199	206	Danger of Hell	\N	undefined	02:28	[]	\N	2024-06-07 15:18:46.984-04	2024-06-07 15:18:46.984-04	\N
+4200	206	Wall-E	\N	undefined	01:60	[]	\N	2024-06-07 15:18:46.99-04	2024-06-07 15:18:46.99-04	\N
+4201	206	The Night Window	\N	undefined	03:41	[]	\N	2024-06-07 15:18:46.999-04	2024-06-07 15:18:46.999-04	\N
+4202	206	Brooks Was Here	\N	undefined	05:06	[]	\N	2024-06-07 15:18:47.007-04	2024-06-07 15:18:47.007-04	\N
+4203	206	The Green Mile	\N	undefined	03:39	[]	\N	2024-06-07 15:18:47.016-04	2024-06-07 15:18:47.016-04	\N
+4204	206	Stop Wade!	\N	undefined	02:45	[]	\N	2024-06-07 15:18:47.024-04	2024-06-07 15:18:47.024-04	\N
+4205	206	All That Love''s About	\N	undefined	00:37	[]	\N	2024-06-07 15:18:47.034-04	2024-06-07 15:18:47.034-04	\N
+4206	206	Walkaway	\N	undefined	01:52	[]	\N	2024-06-07 15:18:47.045-04	2024-06-07 15:18:47.045-04	\N
+4207	206	Any Other Name (From "American Beauty")	\N	undefined	04:09	[]	\N	2024-06-07 15:18:47.054-04	2024-06-07 15:18:47.054-04	\N
+4208	206	Bubble Date	\N	undefined	02:52	[]	\N	2024-06-07 15:18:47.062-04	2024-06-07 15:18:47.062-04	\N
+4209	206	Orchard House (Main Title) - Instrumental	\N	undefined	03:26	[]	\N	2024-06-07 15:18:47.068-04	2024-06-07 15:18:47.068-04	\N
+4210	206	End Title	\N	undefined	04:06	[]	\N	2024-06-07 15:18:47.074-04	2024-06-07 15:18:47.074-04	\N
+4211	206	Whisper Of A Thrill	\N	undefined	05:43	[]	\N	2024-06-07 15:18:47.083-04	2024-06-07 15:18:47.083-04	\N
+4212	206	The Letter That Never Came	\N	undefined	04:14	[]	\N	2024-06-07 15:18:47.089-04	2024-06-07 15:18:47.089-04	\N
+4213	206	Sixteen Hundred Men	\N	undefined	06:32	[]	\N	2024-06-07 15:18:47.095-04	2024-06-07 15:18:47.095-04	\N
+4214	206	Across The Ocean	\N	undefined	03:37	[]	\N	2024-06-07 15:18:47.101-04	2024-06-07 15:18:47.101-04	\N
+4215	206	Valley of the Shadow - Instrumental	\N	undefined	02:09	[]	\N	2024-06-07 15:18:47.106-04	2024-06-07 15:18:47.106-04	\N
+4216	206	Mr. Ray, Scientist	\N	undefined	01:28	[]	\N	2024-06-07 15:18:47.112-04	2024-06-07 15:18:47.112-04	\N
+4217	206	2815 A.D.	\N	undefined	03:28	[]	\N	2024-06-07 15:18:47.119-04	2024-06-07 15:18:47.119-04	\N
+4218	206	News Travels	\N	undefined	01:12	[]	\N	2024-06-07 15:18:47.124-04	2024-06-07 15:18:47.124-04	\N
+4220	206	Fronds Like These	\N	undefined	01:55	[]	\N	2024-06-07 15:18:47.136-04	2024-06-07 15:18:47.136-04	\N
+4221	206	First Date	\N	undefined	01:20	[]	\N	2024-06-07 15:18:47.142-04	2024-06-07 15:18:47.142-04	\N
+4222	206	Spring - Instrumental	\N	undefined	00:57	[]	\N	2024-06-07 15:18:47.15-04	2024-06-07 15:18:47.15-04	\N
+4223	206	Fellowship	\N	undefined	05:06	[]	\N	2024-06-07 15:18:47.16-04	2024-06-07 15:18:47.16-04	\N
+4224	206	Aurora	\N	undefined	01:45	[]	\N	2024-06-07 15:18:47.165-04	2024-06-07 15:18:47.165-04	\N
+4225	206	Cold Lamb Sandwich	\N	undefined	01:43	[]	\N	2024-06-07 15:18:47.17-04	2024-06-07 15:18:47.17-04	\N
+4226	206	Quite a View	\N	undefined	01:25	[]	\N	2024-06-07 15:18:47.175-04	2024-06-07 15:18:47.175-04	\N
+4227	206	Arose	\N	undefined	01:05	[]	\N	2024-06-07 15:18:47.181-04	2024-06-07 15:18:47.181-04	\N
+4228	206	Full Purple	\N	undefined	02:05	[]	\N	2024-06-07 15:18:47.187-04	2024-06-07 15:18:47.187-04	\N
+4229	206	The Seas with Nemo and Friends Medley - From "The Seas with Nemo and Friends"	\N	undefined	04:42	[]	\N	2024-06-07 15:18:47.193-04	2024-06-07 15:18:47.193-04	\N
+4230	209	City Boy	\N	undefined	11:15	[]	\N	2024-06-11 08:58:02.274-04	2024-06-11 08:58:02.274-04	\N
+4231	209	Clearing, Dawn, Dance	\N	undefined	10:16	[]	\N	2024-06-11 08:58:02.296-04	2024-06-11 08:58:02.296-04	\N
+4232	209	A e I O U	\N	undefined	06:17	[]	\N	2024-06-11 08:58:02.31-04	2024-06-11 08:58:02.31-04	\N
+4233	209	Change	\N	undefined	13:28	[]	\N	2024-06-11 08:58:02.321-04	2024-06-11 08:58:02.321-04	\N
+4234	209	Montmartre	\N	undefined	05:17	[]	\N	2024-06-11 08:58:02.334-04	2024-06-11 08:58:02.334-04	\N
+4235	209	In Teaching Others We Teach Ourselves	\N	undefined	09:57	[]	\N	2024-06-11 08:58:02.343-04	2024-06-11 08:58:02.343-04	\N
+4236	209	In Teaching Others We Teach Ourselves (Son Lux Remix)	\N	undefined	07:16	[]	\N	2024-06-11 08:58:02.351-04	2024-06-11 08:58:02.351-04	\N
+4237	209	Together	\N	undefined	13:36	[]	\N	2024-06-11 08:58:02.358-04	2024-06-11 08:58:02.358-04	\N
+4238	209	Folk Music	\N	undefined	10:19	[]	\N	2024-06-11 08:58:02.365-04	2024-06-11 08:58:02.365-04	\N
+4239	209	Still Point	\N	undefined	12:40	[]	\N	2024-06-11 08:58:02.375-04	2024-06-11 08:58:02.375-04	\N
+4240	209	Run Away	\N	undefined	04:17	[]	\N	2024-06-11 08:58:02.387-04	2024-06-11 08:58:02.387-04	\N
+4241	209	Still Point: Still Point	\N	undefined	12:40	[]	\N	2024-06-11 08:58:02.393-04	2024-06-11 08:58:02.393-04	\N
+4242	209	Escape	\N	undefined	14:05	[]	\N	2024-06-11 08:58:02.397-04	2024-06-11 08:58:02.397-04	\N
+4243	209	The Night Gatherers	\N	undefined	12:60	[]	\N	2024-06-11 08:58:02.408-04	2024-06-11 08:58:02.408-04	\N
+4244	209	First Ballade	\N	undefined	07:48	[]	\N	2024-06-11 08:58:02.415-04	2024-06-11 08:58:02.415-04	\N
+4245	209	Sing Along	\N	undefined	06:10	[]	\N	2024-06-11 08:58:02.421-04	2024-06-11 08:58:02.421-04	\N
+4246	209	Four on the Floor	\N	undefined	10:45	[]	\N	2024-06-11 08:58:02.43-04	2024-06-11 08:58:02.43-04	\N
+4247	209	Green Fields of Amerikay	\N	undefined	11:33	[]	\N	2024-06-11 08:58:02.436-04	2024-06-11 08:58:02.436-04	\N
+4248	209	Ill	\N	undefined	07:41	[]	\N	2024-06-11 08:58:02.441-04	2024-06-11 08:58:02.441-04	\N
+4249	209	A Serious Man	\N	undefined	16:08	[]	\N	2024-06-11 08:58:02.45-04	2024-06-11 08:58:02.45-04	\N
+4250	209	A E I O U	\N	undefined	06:17	[]	\N	2024-06-11 08:58:02.49-04	2024-06-11 08:58:02.49-04	\N
+4251	210	Musica Celestis for cello and orchestra	\N	undefined	12:35	[]	\N	2024-06-11 09:01:19.162-04	2024-06-11 09:01:19.162-04	\N
+4252	210	Musica Celestis	\N	undefined	12:04	[]	\N	2024-06-11 09:01:19.171-04	2024-06-11 09:01:19.171-04	\N
+4253	210	Dreamsongs: II. Kora Song	\N	undefined	13:04	[]	\N	2024-06-11 09:01:19.178-04	2024-06-11 09:01:19.178-04	\N
+4254	210	Dreamsongs: I. Floating Dreamsongs	\N	undefined	13:01	[]	\N	2024-06-11 09:01:19.185-04	2024-06-11 09:01:19.185-04	\N
+4255	210	Before Sleep and Dreams: IV. Lights Before Sleep	\N	undefined	02:19	[]	\N	2024-06-11 09:01:19.19-04	2024-06-11 09:01:19.19-04	\N
+4256	210	Air for cello and orchestra	\N	undefined	11:46	[]	\N	2024-06-11 09:01:19.194-04	2024-06-11 09:01:19.194-04	\N
+4257	210	Colored Field: concerto for cello and orchestra: I. Colored Field	\N	undefined	12:17	[]	\N	2024-06-11 09:01:19.2-04	2024-06-11 09:01:19.2-04	\N
+4258	210	AIR for violin	\N	undefined	11:38	[]	\N	2024-06-11 09:01:19.203-04	2024-06-11 09:01:19.203-04	\N
+4259	210	On Hearing Nightbirds at Dusk	\N	undefined	04:03	[]	\N	2024-06-11 09:01:19.207-04	2024-06-11 09:01:19.207-04	\N
+4260	210	Before Sleep and Dreams: I. Before	\N	undefined	04:44	[]	\N	2024-06-11 09:01:19.211-04	2024-06-11 09:01:19.211-04	\N
+4261	210	Air (Version for Flute & String Quartet)	\N	undefined	12:00	[]	\N	2024-06-11 09:01:19.216-04	2024-06-11 09:01:19.216-04	\N
+4262	210	Ecstatic Meditations: No. 2. How the Soul Speaks to God	\N	undefined	04:34	[]	\N	2024-06-11 09:01:19.221-04	2024-06-11 09:01:19.221-04	\N
+4263	210	Aaron Jay Kernis Comments	\N	undefined	00:59	[]	\N	2024-06-11 09:01:19.225-04	2024-06-11 09:01:19.225-04	\N
+4264	210	Tumbalalaika (Arr. Aaron Jay Kernis)	\N	undefined	00:56	[]	\N	2024-06-11 09:01:19.229-04	2024-06-11 09:01:19.229-04	\N
+4265	210	Brilliant Sky, Infinite Sky: III. A Song on The End of The World	\N	undefined	08:18	[]	\N	2024-06-11 09:01:19.234-04	2024-06-11 09:01:19.234-04	\N
+4266	210	Love Scenes, Part III: We Are Going to Shoot at The Heart	\N	undefined	03:32	[]	\N	2024-06-11 09:01:19.238-04	2024-06-11 09:01:19.238-04	\N
+4267	210	Love Scenes, Part II. Second Interlude: I''ll Open The Window	\N	undefined	02:15	[]	\N	2024-06-11 09:01:19.242-04	2024-06-11 09:01:19.242-04	\N
+4268	210	Brilliant Sky, Infinite Sky: I. Dream Landscape	\N	undefined	05:01	[]	\N	2024-06-11 09:01:19.251-04	2024-06-11 09:01:19.251-04	\N
+4269	210	Love Scenes, Part III: Parting	\N	undefined	01:54	[]	\N	2024-06-11 09:01:19.255-04	2024-06-11 09:01:19.255-04	\N
+4270	210	Morningsongs: III. Walking Barefoot	\N	undefined	06:22	[]	\N	2024-06-11 09:01:19.26-04	2024-06-11 09:01:19.26-04	\N
+4271	210	Morningsongs: I. Paris	\N	undefined	03:12	[]	\N	2024-06-11 09:01:19.264-04	2024-06-11 09:01:19.264-04	\N
+4272	210	Brilliant Sky, Infinite Sky: II. The Sky My Husband	\N	undefined	04:34	[]	\N	2024-06-11 09:01:19.269-04	2024-06-11 09:01:19.269-04	\N
+4273	210	Morningsongs: II. The Blue Animals	\N	undefined	05:43	[]	\N	2024-06-11 09:01:19.272-04	2024-06-11 09:01:19.272-04	\N
+4274	210	Love Scenes, Part I. First Interlude: A Spring	\N	undefined	01:40	[]	\N	2024-06-11 09:01:19.275-04	2024-06-11 09:01:19.275-04	\N
+4275	210	Love Scenes, Part I: A Night of Love (Serenade)	\N	undefined	02:34	[]	\N	2024-06-11 09:01:19.278-04	2024-06-11 09:01:19.278-04	\N
+4276	210	Love Scenes, Part III. Epilogue: We Are Going to Throttle Each Other	\N	undefined	03:04	[]	\N	2024-06-11 09:01:19.282-04	2024-06-11 09:01:19.282-04	\N
+4277	210	Love Scenes: Prologue - I am Filled With Love	\N	undefined	01:17	[]	\N	2024-06-11 09:01:19.285-04	2024-06-11 09:01:19.285-04	\N
+4278	210	Love Scenes, Part I: You Are Warm	\N	undefined	04:39	[]	\N	2024-06-11 09:01:19.288-04	2024-06-11 09:01:19.288-04	\N
+4279	210	Brilliant Sky, Infinite Sky: IV. Brilliant Sky	\N	undefined	07:06	[]	\N	2024-06-11 09:01:19.291-04	2024-06-11 09:01:19.291-04	\N
+4280	210	Love Scenes, Part II: As The Tongue of a Wild Cat	\N	undefined	00:23	[]	\N	2024-06-11 09:01:19.294-04	2024-06-11 09:01:19.294-04	\N
+4281	210	Love Scenes, Part II: Love Separates The Lovers	\N	undefined	04:10	[]	\N	2024-06-11 09:01:19.297-04	2024-06-11 09:01:19.297-04	\N
+4282	210	Love Scenes, Part I: A Gentle World	\N	undefined	01:54	[]	\N	2024-06-11 09:01:19.301-04	2024-06-11 09:01:19.301-04	\N
+4283	210	Le Quattro Stagioni Della Cucina Futurismo: Manifesto - Produced	\N	undefined	04:08	[]	\N	2024-06-11 09:01:19.304-04	2024-06-11 09:01:19.304-04	\N
+4284	210	Meditation (In Memory of John Lennon) (Produced)	\N	undefined	09:47	[]	\N	2024-06-11 09:01:19.307-04	2024-06-11 09:01:19.307-04	\N
+4285	210	Air (Produced)	\N	undefined	12:00	[]	\N	2024-06-11 09:01:19.309-04	2024-06-11 09:01:19.309-04	\N
+4286	210	Before Sleep and Dreams: Lights Before Sleep - Produced	\N	undefined	02:04	[]	\N	2024-06-11 09:01:19.312-04	2024-06-11 09:01:19.312-04	\N
+4287	210	Before Sleep and Dreams: Play Before Lullaby - Produced	\N	undefined	03:05	[]	\N	2024-06-11 09:01:19.315-04	2024-06-11 09:01:19.315-04	\N
+4288	210	Before Sleep and Dreams: Before - Produced	\N	undefined	04:33	[]	\N	2024-06-11 09:01:19.318-04	2024-06-11 09:01:19.318-04	\N
+4289	210	Le Quattro Stagioni Della Cucina Futurismo: Springtime Meal of theWord in Liberty - Produced	\N	undefined	04:23	[]	\N	2024-06-11 09:01:19.321-04	2024-06-11 09:01:19.321-04	\N
+4290	210	Le Quattro Stagioni Della Cucina Futurismo: Nocturnal Love Feast - Produced	\N	undefined	04:13	[]	\N	2024-06-11 09:01:19.324-04	2024-06-11 09:01:19.324-04	\N
+4291	210	Before Sleep and Dreams: Before Sleep and Dreams - Produced	\N	undefined	05:57	[]	\N	2024-06-11 09:01:19.328-04	2024-06-11 09:01:19.328-04	\N
+4292	210	Before Sleep and Dreams: Lullaby - Produced	\N	undefined	08:13	[]	\N	2024-06-11 09:01:19.332-04	2024-06-11 09:01:19.332-04	\N
+4293	210	Le Quattro Stagioni Della Cucina Futurismo: Autumn Musical Dinner - Produced	\N	undefined	03:18	[]	\N	2024-06-11 09:01:19.336-04	2024-06-11 09:01:19.336-04	\N
+4294	210	Le Quattro Stagioni Della Cucina Futurismo: Heroic Winter Dinner - Produced	\N	undefined	03:44	[]	\N	2024-06-11 09:01:19.34-04	2024-06-11 09:01:19.34-04	\N
+4295	210	Songs Of Innocents, Book Two: John, Tom And James	\N	undefined	03:08	[]	\N	2024-06-11 09:01:19.343-04	2024-06-11 09:01:19.343-04	\N
+4296	210	Songs Of Innocents, Book Two: Tumbling	\N	undefined	04:37	[]	\N	2024-06-11 09:01:19.345-04	2024-06-11 09:01:19.345-04	\N
+4297	210	Songs Of Innocents, Book One: Introduction: Scene From Childhood	\N	undefined	02:13	[]	\N	2024-06-11 09:01:19.354-04	2024-06-11 09:01:19.354-04	\N
+4298	210	Simple Songs: Rumi	\N	undefined	03:01	[]	\N	2024-06-11 09:01:19.358-04	2024-06-11 09:01:19.358-04	\N
+4299	210	Simple Songs: Psalm 131	\N	undefined	08:04	[]	\N	2024-06-11 09:01:19.362-04	2024-06-11 09:01:19.362-04	\N
+4300	210	Songs Of Innocents, Book Two: Painting The Gate	\N	undefined	01:09	[]	\N	2024-06-11 09:01:19.365-04	2024-06-11 09:01:19.365-04	\N
+4301	211	Gene Takes a Drink	\N	undefined	05:57	[]	\N	2024-06-11 09:11:22.226-04	2024-06-11 09:11:22.226-04	\N
+4302	211	Timber (HPRIZM/High Priest of APC Remix)	\N	undefined	04:08	[]	\N	2024-06-11 09:11:22.242-04	2024-06-11 09:11:22.242-04	\N
+4303	211	Josie and the Pussycats (Josie Jam)	\N	undefined	01:35	[]	\N	2024-06-11 09:11:22.252-04	2024-06-11 09:11:22.252-04	\N
+4304	211	Magic Feeling	\N	undefined	03:38	[]	\N	2024-06-11 09:11:22.259-04	2024-06-11 09:11:22.259-04	\N
+4305	211	Turn Out the Lights	\N	undefined	05:31	[]	\N	2024-06-11 09:11:22.266-04	2024-06-11 09:11:22.266-04	\N
+4306	211	What You Won''t Do for Love	\N	undefined	04:56	[]	\N	2024-06-11 09:11:22.271-04	2024-06-11 09:11:22.271-04	\N
+4307	211	1/1 (arr. M. Gordon)	\N	undefined	16:26	[]	\N	2024-06-11 09:11:22.278-04	2024-06-11 09:11:22.278-04	\N
+4308	211	When Johnny Comes Marching Home	\N	undefined	01:01	[]	\N	2024-06-11 09:11:22.284-04	2024-06-11 09:11:22.284-04	\N
+4309	211	Trance: Trance 4	\N	undefined	07:23	[]	\N	2024-06-11 09:11:22.29-04	2024-06-11 09:11:22.29-04	\N
+4310	211	THE MORE I LOVE MY LIFE - Radio Edit	\N	undefined	05:47	[]	\N	2024-06-11 09:11:22.297-04	2024-06-11 09:11:22.297-04	\N
+4311	211	THE MORE I LOVE MY LIFE - Radio Extended	\N	undefined	05:47	[]	\N	2024-06-11 09:11:22.303-04	2024-06-11 09:11:22.303-04	\N
+4312	211	America the Beautiful	\N	undefined	01:04	[]	\N	2024-06-11 09:11:22.312-04	2024-06-11 09:11:22.312-04	\N
+4313	211	Autumn Leaves	\N	undefined	07:10	[]	\N	2024-06-11 09:11:22.32-04	2024-06-11 09:11:22.32-04	\N
+4314	211	Light Is Calling	\N	undefined	07:03	[]	\N	2024-06-11 09:11:22.328-04	2024-06-11 09:11:22.328-04	\N
+4315	211	Industry	\N	undefined	11:24	[]	\N	2024-06-11 09:11:22.336-04	2024-06-11 09:11:22.336-04	\N
+4316	211	Kitty Gordon''s	\N	undefined	03:27	[]	\N	2024-06-11 09:11:22.344-04	2024-06-11 09:11:22.344-04	\N
+4317	211	Gordon: Acoustic Aphasia	\N	undefined	03:59	[]	\N	2024-06-11 09:11:22.352-04	2024-06-11 09:11:22.352-04	\N
+4318	211	Lord Gordon	\N	undefined	02:60	[]	\N	2024-06-11 09:11:22.361-04	2024-06-11 09:11:22.361-04	\N
+4319	211	St. Remy	\N	undefined	13:32	[]	\N	2024-06-11 09:11:22.369-04	2024-06-11 09:11:22.369-04	\N
+4320	211	Arles	\N	undefined	08:16	[]	\N	2024-06-11 09:11:22.379-04	2024-06-11 09:11:22.379-04	\N
+4321	211	Borinage	\N	undefined	07:59	[]	\N	2024-06-11 09:11:22.387-04	2024-06-11 09:11:22.387-04	\N
+4322	211	London	\N	undefined	11:36	[]	\N	2024-06-11 09:11:22.396-04	2024-06-11 09:11:22.396-04	\N
+4323	211	The Hague: Part I	\N	undefined	09:04	[]	\N	2024-06-11 09:11:22.404-04	2024-06-11 09:11:22.404-04	\N
+4324	211	Timber: Part II	\N	undefined	12:11	[]	\N	2024-06-11 09:11:22.414-04	2024-06-11 09:11:22.414-04	\N
+4325	211	Timber: Part III	\N	undefined	07:10	[]	\N	2024-06-11 09:11:22.423-04	2024-06-11 09:11:22.423-04	\N
+4326	211	Timber: Part I	\N	undefined	08:34	[]	\N	2024-06-11 09:11:22.432-04	2024-06-11 09:11:22.432-04	\N
+4327	211	8 (Side A)	\N	undefined	05:50	[]	\N	2024-06-11 09:11:22.442-04	2024-06-11 09:11:22.442-04	\N
+4328	211	8 (Side C)	\N	undefined	03:02	[]	\N	2024-06-11 09:11:22.453-04	2024-06-11 09:11:22.453-04	\N
+4329	211	8 (Side B)	\N	undefined	04:16	[]	\N	2024-06-11 09:11:22.463-04	2024-06-11 09:11:22.463-04	\N
+4330	211	8	\N	undefined	53:23	[]	\N	2024-06-11 09:11:22.471-04	2024-06-11 09:11:22.471-04	\N
+4331	211	8 (Side D)	\N	undefined	04:55	[]	\N	2024-06-11 09:11:22.479-04	2024-06-11 09:11:22.479-04	\N
+4332	211	Anonymous Man, Pt. 1 "A Tale"	\N	undefined	05:40	[]	\N	2024-06-11 09:11:22.485-04	2024-06-11 09:11:22.485-04	\N
+4333	211	Taps	\N	undefined	01:01	[]	\N	2024-06-11 09:11:22.491-04	2024-06-11 09:11:22.491-04	\N
+4334	211	Timber (Squarepusher Remix)	\N	undefined	09:04	[]	\N	2024-06-11 09:11:22.497-04	2024-06-11 09:11:22.497-04	\N
+4335	211	Timber (Hauschka Remix)	\N	undefined	05:56	[]	\N	2024-06-11 09:11:22.502-04	2024-06-11 09:11:22.502-04	\N
+4336	211	Dixie	\N	undefined	00:54	[]	\N	2024-06-11 09:11:22.509-04	2024-06-11 09:11:22.509-04	\N
+4337	211	Exalted	\N	undefined	09:04	[]	\N	2024-06-11 09:11:22.516-04	2024-06-11 09:11:22.516-04	\N
+4338	211	Timber (Tim Hecker Remix)	\N	undefined	04:54	[]	\N	2024-06-11 09:11:22.524-04	2024-06-11 09:11:22.524-04	\N
+4339	211	The Sad Park: Pt. 3, I Just Heard That on the News That the Buildings Are Crashing Down	\N	undefined	08:39	[]	\N	2024-06-11 09:11:22.53-04	2024-06-11 09:11:22.53-04	\N
+4340	211	Timber (Sam Pluta Remix)	\N	undefined	10:46	[]	\N	2024-06-11 09:11:22.536-04	2024-06-11 09:11:22.536-04	\N
+4341	211	Potassium	\N	undefined	11:31	[]	\N	2024-06-11 09:11:22.543-04	2024-06-11 09:11:22.543-04	\N
+4342	211	The Sad Park: Pt. 1, Two Evil Planes Broke in Little Pieces and Fire Came	\N	undefined	09:55	[]	\N	2024-06-11 09:11:22.55-04	2024-06-11 09:11:22.55-04	\N
+4343	211	Clouded Yellow	\N	undefined	10:23	[]	\N	2024-06-11 09:11:22.556-04	2024-06-11 09:11:22.556-04	\N
+4344	211	The Sad Park: Pt. 4, And All the Persons That Were in the Airplane Died	\N	undefined	03:24	[]	\N	2024-06-11 09:11:22.563-04	2024-06-11 09:11:22.563-04	\N
+4345	211	Timber (Jóhann Jóhannsson Remix)	\N	undefined	08:34	[]	\N	2024-06-11 09:11:22.571-04	2024-06-11 09:11:22.571-04	\N
+4346	211	The Sad Park: Pt. 2, There Was a Big Boom and Then There Was Teeny Fiery Coming Out	\N	undefined	06:25	[]	\N	2024-06-11 09:11:22.578-04	2024-06-11 09:11:22.578-04	\N
+4347	211	Timber (Live)	\N	undefined	50:41	[]	\N	2024-06-11 09:11:22.586-04	2024-06-11 09:11:22.586-04	\N
+4348	211	Timber (Oneohtrix Point Never Remix)	\N	undefined	04:07	[]	\N	2024-06-11 09:11:22.596-04	2024-06-11 09:11:22.596-04	\N
+4349	211	Natural History (Live)	\N	undefined	24:41	[]	\N	2024-06-11 09:11:22.604-04	2024-06-11 09:11:22.604-04	\N
+4350	211	Rewriting Beethoven''s Seventh Symphony: Pt. 1 (Live)	\N	undefined	05:47	[]	\N	2024-06-11 09:11:22.611-04	2024-06-11 09:11:22.611-04	\N
+4351	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Spring 1 - 2012	\N	undefined	02:32	[]	\N	2024-06-11 09:13:28.124-04	2024-06-11 09:13:28.124-04	\N
+4352	212	On the Nature of Daylight	\N	undefined	06:12	[]	\N	2024-06-11 09:13:28.14-04	2024-06-11 09:13:28.14-04	\N
+4353	212	Movement, Before All Flowers - Edit	\N	undefined	03:39	[]	\N	2024-06-11 09:13:28.151-04	2024-06-11 09:13:28.151-04	\N
+4354	212	Dream 1 (before the wind blows it all away) - Pt. 8	\N	undefined	01:59	[]	\N	2024-06-11 09:13:28.168-04	2024-06-11 09:13:28.168-04	\N
+4355	212	Movement, Before All Flowers	\N	undefined	04:18	[]	\N	2024-06-11 09:13:28.177-04	2024-06-11 09:13:28.177-04	\N
+4356	212	The Departure	\N	undefined	01:16	[]	\N	2024-06-11 09:13:28.184-04	2024-06-11 09:13:28.184-04	\N
+4357	212	Vladimir''s Blues	\N	undefined	01:19	[]	\N	2024-06-11 09:13:28.191-04	2024-06-11 09:13:28.191-04	\N
+4358	212	Written on the Sky	\N	undefined	01:40	[]	\N	2024-06-11 09:13:28.198-04	2024-06-11 09:13:28.198-04	\N
+4359	212	Dream 1 (before the wind blows it all away) - Pt. 1	\N	undefined	02:33	[]	\N	2024-06-11 09:13:28.208-04	2024-06-11 09:13:28.208-04	\N
+4425	213	Songbirdsongs: IV. August Voices	\N	undefined	04:34	[]	\N	2024-06-11 09:14:05.955-04	2024-06-11 09:14:05.955-04	\N
+4360	212	Dream 1 (before the wind blows it all away) - Pt. 4	\N	undefined	02:14	[]	\N	2024-06-11 09:13:28.212-04	2024-06-11 09:13:28.212-04	\N
+4361	212	November	\N	undefined	06:07	[]	\N	2024-06-11 09:13:28.217-04	2024-06-11 09:13:28.217-04	\N
+4362	212	Dream 1 (before the wind blows it all away) - Pt. 2	\N	undefined	02:22	[]	\N	2024-06-11 09:13:28.223-04	2024-06-11 09:13:28.223-04	\N
+4363	212	The End of All Our Exploring	\N	undefined	03:35	[]	\N	2024-06-11 09:13:28.229-04	2024-06-11 09:13:28.229-04	\N
+4364	212	She Remembers	\N	undefined	03:49	[]	\N	2024-06-11 09:13:28.235-04	2024-06-11 09:13:28.235-04	\N
+4365	212	A Catalogue of Afternoons	\N	undefined	01:51	[]	\N	2024-06-11 09:13:28.239-04	2024-06-11 09:13:28.239-04	\N
+4366	212	To the Stars	\N	undefined	03:30	[]	\N	2024-06-11 09:13:28.244-04	2024-06-11 09:13:28.244-04	\N
+4367	212	The Twins (Prague) - Remastered 2022	\N	undefined	02:05	[]	\N	2024-06-11 09:13:28.25-04	2024-06-11 09:13:28.25-04	\N
+4368	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Spring 2 - 2012	\N	undefined	03:19	[]	\N	2024-06-11 09:13:28.263-04	2024-06-11 09:13:28.263-04	\N
+4369	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Spring 3 - 2012	\N	undefined	03:09	[]	\N	2024-06-11 09:13:28.268-04	2024-06-11 09:13:28.268-04	\N
+4370	212	Departure (Home)	\N	undefined	01:54	[]	\N	2024-06-11 09:13:28.273-04	2024-06-11 09:13:28.273-04	\N
+4371	212	Dream 1 (before the wind blows it all away) - Pt. 3	\N	undefined	02:19	[]	\N	2024-06-11 09:13:28.278-04	2024-06-11 09:13:28.278-04	\N
+4372	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Summer 3 - 2012	\N	undefined	05:01	[]	\N	2024-06-11 09:13:28.284-04	2024-06-11 09:13:28.284-04	\N
+4373	212	On the Nature of Daylight (Entropy)	\N	undefined	06:54	[]	\N	2024-06-11 09:13:28.29-04	2024-06-11 09:13:28.29-04	\N
+4374	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Spring 0 - 2012	\N	undefined	00:42	[]	\N	2024-06-11 09:13:28.296-04	2024-06-11 09:13:28.296-04	\N
+4375	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Autumn 3 - 2012	\N	undefined	01:45	[]	\N	2024-06-11 09:13:28.302-04	2024-06-11 09:13:28.302-04	\N
+4376	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Winter 1 - 2012	\N	undefined	03:01	[]	\N	2024-06-11 09:13:28.307-04	2024-06-11 09:13:28.307-04	\N
+4377	212	Cumulonimbus - Pt. 1	\N	undefined	03:21	[]	\N	2024-06-11 09:13:28.311-04	2024-06-11 09:13:28.311-04	\N
+4378	212	To the Stars - From "Ad Astra" Soundtrack	\N	undefined	03:30	[]	\N	2024-06-11 09:13:28.316-04	2024-06-11 09:13:28.316-04	\N
+4379	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Summer 1 - 2012	\N	undefined	04:11	[]	\N	2024-06-11 09:13:28.322-04	2024-06-11 09:13:28.322-04	\N
+4380	212	Dream 1 (before the wind blows it all away) - Pt. 6	\N	undefined	02:22	[]	\N	2024-06-11 09:13:28.329-04	2024-06-11 09:13:28.329-04	\N
+4381	212	Dream 2 (entropy) - Pt. 4	\N	undefined	03:01	[]	\N	2024-06-11 09:13:28.336-04	2024-06-11 09:13:28.336-04	\N
+4382	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Spring 1 - 2022	\N	undefined	02:32	[]	\N	2024-06-11 09:13:28.341-04	2024-06-11 09:13:28.341-04	\N
+4383	212	The Mind’s Eye	\N	undefined	02:48	[]	\N	2024-06-11 09:13:28.346-04	2024-06-11 09:13:28.346-04	\N
+4384	212	Recomposed By Max Richter: Vivaldi, The Four Seasons: Summer 2 - 2012	\N	undefined	03:59	[]	\N	2024-06-11 09:13:28.352-04	2024-06-11 09:13:28.352-04	\N
+4385	212	Dream 1 (before the wind blows it all away) - Pt. 7	\N	undefined	02:19	[]	\N	2024-06-11 09:13:28.358-04	2024-06-11 09:13:28.358-04	\N
+4386	212	Dream 13 - Short Edit	\N	undefined	03:23	[]	\N	2024-06-11 09:13:28.368-04	2024-06-11 09:13:28.368-04	\N
+4387	212	Dream 1 (before the wind blows it all away) - Pt. 5	\N	undefined	02:23	[]	\N	2024-06-11 09:13:28.374-04	2024-06-11 09:13:28.374-04	\N
+4388	212	A Blessing	\N	undefined	02:32	[]	\N	2024-06-11 09:13:28.38-04	2024-06-11 09:13:28.38-04	\N
+4389	212	Miss Sloane Solo	\N	undefined	02:08	[]	\N	2024-06-11 09:13:28.384-04	2024-06-11 09:13:28.384-04	\N
+4390	212	Lamentation for a Lost Life	\N	undefined	02:21	[]	\N	2024-06-11 09:13:28.39-04	2024-06-11 09:13:28.39-04	\N
+4391	212	The Consolations of Philosophy	\N	undefined	05:37	[]	\N	2024-06-11 09:13:28.397-04	2024-06-11 09:13:28.397-04	\N
+4392	212	Cumulonimbus - Pt. 2	\N	undefined	06:49	[]	\N	2024-06-11 09:13:28.402-04	2024-06-11 09:13:28.402-04	\N
+4393	212	The Quality of Mercy	\N	undefined	04:12	[]	\N	2024-06-11 09:13:28.408-04	2024-06-11 09:13:28.408-04	\N
+4394	212	Horizon Variations	\N	undefined	01:53	[]	\N	2024-06-11 09:13:28.419-04	2024-06-11 09:13:28.419-04	\N
+4395	212	Dream 3 (in the midst of my life)	\N	undefined	10:04	[]	\N	2024-06-11 09:13:28.426-04	2024-06-11 09:13:28.426-04	\N
+4396	213	Become Ocean	\N	undefined	42:14	[]	\N	2024-06-11 09:14:05.661-04	2024-06-11 09:14:05.661-04	\N
+4397	213	The Wind in High Places: I. Above Sunset Pass	\N	undefined	07:25	[]	\N	2024-06-11 09:14:05.677-04	2024-06-11 09:14:05.677-04	\N
+4398	213	Become River	\N	undefined	14:55	[]	\N	2024-06-11 09:14:05.689-04	2024-06-11 09:14:05.689-04	\N
+4399	213	Canticles of the Sky: I. Sky with Four Suns	\N	undefined	04:24	[]	\N	2024-06-11 09:14:05.701-04	2024-06-11 09:14:05.701-04	\N
+4400	213	Waves & Particles: I. Particle Dust	\N	undefined	09:17	[]	\N	2024-06-11 09:14:05.715-04	2024-06-11 09:14:05.715-04	\N
+4401	213	Waves & Particles: II. Spectral Waves	\N	undefined	07:34	[]	\N	2024-06-11 09:14:05.727-04	2024-06-11 09:14:05.727-04	\N
+4402	213	The Wind in High Places: II. Maclaren Summit	\N	undefined	04:56	[]	\N	2024-06-11 09:14:05.737-04	2024-06-11 09:14:05.737-04	\N
+4403	213	In The White Silence: Letter B	\N	undefined	03:44	[]	\N	2024-06-11 09:14:05.748-04	2024-06-11 09:14:05.748-04	\N
+4404	213	Become Desert	\N	undefined	40:22	[]	\N	2024-06-11 09:14:05.759-04	2024-06-11 09:14:05.759-04	\N
+4405	213	Waves & Particles: IV. Triadic Waves	\N	undefined	05:25	[]	\N	2024-06-11 09:14:05.79-04	2024-06-11 09:14:05.79-04	\N
+4406	213	Waves & Particles: V. Murmurs in a Chromatic Field	\N	undefined	07:54	[]	\N	2024-06-11 09:14:05.8-04	2024-06-11 09:14:05.8-04	\N
+4407	213	Waves & Particles: III. Velocity Waves	\N	undefined	09:08	[]	\N	2024-06-11 09:14:05.813-04	2024-06-11 09:14:05.813-04	\N
+4408	213	The Farthest Place	\N	undefined	10:55	[]	\N	2024-06-11 09:14:05.823-04	2024-06-11 09:14:05.823-04	\N
+4409	213	Darkness and Scattered Light	\N	undefined	16:32	[]	\N	2024-06-11 09:14:05.834-04	2024-06-11 09:14:05.834-04	\N
+4410	213	Three High Places (Double Bass Version): I. Above Sunset Pass	\N	undefined	05:13	[]	\N	2024-06-11 09:14:05.845-04	2024-06-11 09:14:05.845-04	\N
+4411	213	Three High Places (Double Bass Version): II. The Wind at Maclaren Summit	\N	undefined	04:42	[]	\N	2024-06-11 09:14:05.858-04	2024-06-11 09:14:05.858-04	\N
+4412	213	Arctic Dreams: No. 1, The Place Where You Go to Listen	\N	undefined	06:26	[]	\N	2024-06-11 09:14:05.866-04	2024-06-11 09:14:05.866-04	\N
+4413	213	Lines Made by Walking: III. Down the Mountain	\N	undefined	12:07	[]	\N	2024-06-11 09:14:05.874-04	2024-06-11 09:14:05.874-04	\N
+4414	213	In The White Silence: Letter R	\N	undefined	05:07	[]	\N	2024-06-11 09:14:05.881-04	2024-06-11 09:14:05.881-04	\N
+4415	213	Waves & Particles: VI. Particles Rising	\N	undefined	09:07	[]	\N	2024-06-11 09:14:05.887-04	2024-06-11 09:14:05.887-04	\N
+4416	213	Three High Places (Double Bass Version): III. Looking Toward Hope	\N	undefined	05:42	[]	\N	2024-06-11 09:14:05.893-04	2024-06-11 09:14:05.893-04	\N
+4417	213	Canticles of the Sky: II. Sky with Four Moons	\N	undefined	04:24	[]	\N	2024-06-11 09:14:05.901-04	2024-06-11 09:14:05.901-04	\N
+4418	213	Three Nocturnes: II. Night Wind	\N	undefined	04:45	[]	\N	2024-06-11 09:14:05.908-04	2024-06-11 09:14:05.908-04	\N
+4419	213	Three Nocturnes: I. Moonrise	\N	undefined	04:40	[]	\N	2024-06-11 09:14:05.915-04	2024-06-11 09:14:05.915-04	\N
+4420	213	Canticles of the Sky: III. Sky with Nameless Colors	\N	undefined	04:26	[]	\N	2024-06-11 09:14:05.922-04	2024-06-11 09:14:05.922-04	\N
+4421	213	Ilimaq: The Sunken Gamelan	\N	undefined	03:28	[]	\N	2024-06-11 09:14:05.929-04	2024-06-11 09:14:05.929-04	\N
+4422	213	Songbirdsongs: III. Meadowdance	\N	undefined	03:47	[]	\N	2024-06-11 09:14:05.942-04	2024-06-11 09:14:05.942-04	\N
+4423	213	Songbirdsongs: I. Wood Thrush	\N	undefined	04:35	[]	\N	2024-06-11 09:14:05.947-04	2024-06-11 09:14:05.947-04	\N
+4424	213	Songbirdsongs: V. Mourning Dove	\N	undefined	05:50	[]	\N	2024-06-11 09:14:05.951-04	2024-06-11 09:14:05.951-04	\N
+4426	213	Songbirdsongs: VIII. Joyful Noise	\N	undefined	03:20	[]	\N	2024-06-11 09:14:05.958-04	2024-06-11 09:14:05.958-04	\N
+4427	213	Songbirdsongs: VII. Notquitespringdawn	\N	undefined	03:43	[]	\N	2024-06-11 09:14:05.962-04	2024-06-11 09:14:05.962-04	\N
+4428	213	Songbirdsongs: II. Morningfieldsong	\N	undefined	03:54	[]	\N	2024-06-11 09:14:05.968-04	2024-06-11 09:14:05.968-04	\N
+4429	213	Songbirdsongs: VI. Apple Blossom Round	\N	undefined	01:55	[]	\N	2024-06-11 09:14:05.974-04	2024-06-11 09:14:05.974-04	\N
+4430	213	Strange Birds Passing	\N	undefined	06:43	[]	\N	2024-06-11 09:14:05.978-04	2024-06-11 09:14:05.978-04	\N
+4431	213	Songbirdsongs: IX. Evensong	\N	undefined	07:02	[]	\N	2024-06-11 09:14:05.983-04	2024-06-11 09:14:05.983-04	\N
+4432	213	Arctic Dreams: No. 5, River with No Willows	\N	undefined	06:26	[]	\N	2024-06-11 09:14:05.989-04	2024-06-11 09:14:05.989-04	\N
+4433	213	Arctic Dreams: No. 2, Pointed Mountains Scattered All Around	\N	undefined	07:13	[]	\N	2024-06-11 09:14:05.992-04	2024-06-11 09:14:05.992-04	\N
+4434	213	Arctic Dreams: No. 3, The Circle of Suns and Moons	\N	undefined	07:48	[]	\N	2024-06-11 09:14:05.996-04	2024-06-11 09:14:05.996-04	\N
+4435	213	Arctic Dreams: No. 6, One That Stays All Winter	\N	undefined	06:56	[]	\N	2024-06-11 09:14:06.001-04	2024-06-11 09:14:06.001-04	\N
+4436	213	Arctic Dreams: No. 7, Where the Waves Splash, Hitting Again and Again	\N	undefined	01:53	[]	\N	2024-06-11 09:14:06.008-04	2024-06-11 09:14:06.008-04	\N
+4437	213	Arctic Dreams: No. 4, The Circle of Winds	\N	undefined	07:12	[]	\N	2024-06-11 09:14:06.013-04	2024-06-11 09:14:06.013-04	\N
+4438	213	Lines Made by Walking: II. Along the Ridges	\N	undefined	10:10	[]	\N	2024-06-11 09:14:06.018-04	2024-06-11 09:14:06.018-04	\N
+4439	213	In The White Silence: Letter F	\N	undefined	03:34	[]	\N	2024-06-11 09:14:06.023-04	2024-06-11 09:14:06.023-04	\N
+4440	213	In The White Silence: Letter C	\N	undefined	03:43	[]	\N	2024-06-11 09:14:06.028-04	2024-06-11 09:14:06.028-04	\N
+4441	213	In The White Silence: Letter D	\N	undefined	04:04	[]	\N	2024-06-11 09:14:06.032-04	2024-06-11 09:14:06.032-04	\N
+4442	213	In The White Silence: Letter H	\N	undefined	05:06	[]	\N	2024-06-11 09:14:06.037-04	2024-06-11 09:14:06.037-04	\N
+4443	214	Seven Disobediences for piano and ensemble: No. 1, Seek	\N	undefined	01:36	[]	\N	2024-06-11 09:14:25.398-04	2024-06-11 09:14:25.398-04	\N
+4444	214	Whirld: IV. Rubedo	\N	undefined	05:58	[]	\N	2024-06-11 09:14:25.413-04	2024-06-11 09:14:25.413-04	\N
+4445	214	Whirld: II. Albedo	\N	undefined	03:45	[]	\N	2024-06-11 09:14:25.424-04	2024-06-11 09:14:25.424-04	\N
+4446	214	Stride	\N	undefined	09:11	[]	\N	2024-06-11 09:14:25.436-04	2024-06-11 09:14:25.436-04	\N
+4447	214	Whirld: I. Nigredo	\N	undefined	05:60	[]	\N	2024-06-11 09:14:25.447-04	2024-06-11 09:14:25.447-04	\N
+4448	214	Elegi (2009)	\N	undefined	03:21	[]	\N	2024-06-11 09:14:25.457-04	2024-06-11 09:14:25.457-04	\N
+4449	214	Wallin: Etude 3	\N	undefined	04:53	[]	\N	2024-06-11 09:14:25.469-04	2024-06-11 09:14:25.469-04	\N
+4450	214	Wallin: Changes	\N	undefined	10:13	[]	\N	2024-06-11 09:14:25.478-04	2024-06-11 09:14:25.478-04	\N
+4451	214	Rolf Wallin: Twine (1995)	\N	undefined	11:28	[]	\N	2024-06-11 09:14:25.488-04	2024-06-11 09:14:25.488-04	\N
+4452	214	Wallin: 7 imperatives, I. Seek	\N	undefined	00:52	[]	\N	2024-06-11 09:14:25.501-04	2024-06-11 09:14:25.501-04	\N
+4453	214	Wallin: 7 imperatives, IV. Spin	\N	undefined	03:26	[]	\N	2024-06-11 09:14:25.51-04	2024-06-11 09:14:25.51-04	\N
+4454	214	Wallin: 7 imperatives, II. Push	\N	undefined	05:07	[]	\N	2024-06-11 09:14:25.519-04	2024-06-11 09:14:25.519-04	\N
+4455	214	Wallin: 7 imperatives, V. Stab	\N	undefined	00:32	[]	\N	2024-06-11 09:14:25.531-04	2024-06-11 09:14:25.531-04	\N
+4456	214	Wallin: 7 imperatives, III. Sink	\N	undefined	02:26	[]	\N	2024-06-11 09:14:25.541-04	2024-06-11 09:14:25.541-04	\N
+4457	214	Wallin: 7 imperatives, VI. Lean	\N	undefined	08:24	[]	\N	2024-06-11 09:14:25.551-04	2024-06-11 09:14:25.551-04	\N
+4458	214	Concerto for Timpani and Orchestra	\N	undefined	19:44	[]	\N	2024-06-11 09:14:25.565-04	2024-06-11 09:14:25.565-04	\N
+4459	214	Boyl	\N	undefined	17:03	[]	\N	2024-06-11 09:14:25.575-04	2024-06-11 09:14:25.575-04	\N
+4460	214	Concerto for Clarinet and Orchestra	\N	undefined	14:16	[]	\N	2024-06-11 09:14:25.583-04	2024-06-11 09:14:25.583-04	\N
+4461	214	Ground for Cello and String Orchestra	\N	undefined	20:05	[]	\N	2024-06-11 09:14:25.598-04	2024-06-11 09:14:25.598-04	\N
+4462	214	Wallin: 7 imperatives, VII. Quit	\N	undefined	00:21	[]	\N	2024-06-11 09:14:25.608-04	2024-06-11 09:14:25.608-04	\N
+4463	214	Prillar	\N	undefined	10:30	[]	\N	2024-06-11 09:14:25.618-04	2024-06-11 09:14:25.618-04	\N
+4464	214	Birds Within Us: III. Skylark	\N	undefined	04:28	[]	\N	2024-06-11 09:14:25.626-04	2024-06-11 09:14:25.626-04	\N
+4465	214	Seven Disobediences for piano and ensemble: No. 4, Spin	\N	undefined	03:55	[]	\N	2024-06-11 09:14:25.633-04	2024-06-11 09:14:25.633-04	\N
+4466	214	Schoenberg/Schaathun/Wallin: 12 kleine Klavierstucke I	\N	undefined	01:47	[]	\N	2024-06-11 09:14:25.643-04	2024-06-11 09:14:25.643-04	\N
+4467	214	Dawn Chorus 2 (Improvisation)	\N	undefined	02:52	[]	\N	2024-06-11 09:14:25.652-04	2024-06-11 09:14:25.652-04	\N
+4468	214	Seven Disobediences for piano and ensemble: No. 2, Push	\N	undefined	05:12	[]	\N	2024-06-11 09:14:25.66-04	2024-06-11 09:14:25.66-04	\N
+4469	214	Dawn Chorus 1 (Improvisation)	\N	undefined	02:36	[]	\N	2024-06-11 09:14:25.668-04	2024-06-11 09:14:25.668-04	\N
+4470	214	Birds Within Us: II. Nightingale	\N	undefined	05:35	[]	\N	2024-06-11 09:14:25.68-04	2024-06-11 09:14:25.68-04	\N
+4471	214	Dawn Chorus 3 (Improvisation)	\N	undefined	02:31	[]	\N	2024-06-11 09:14:25.694-04	2024-06-11 09:14:25.694-04	\N
+4472	214	Seven Disobediences for piano and ensemble: No. 5, Stab	\N	undefined	00:42	[]	\N	2024-06-11 09:14:25.702-04	2024-06-11 09:14:25.702-04	\N
+4473	214	Seven Disobediences for piano and ensemble: No. 7, Quit	\N	undefined	00:25	[]	\N	2024-06-11 09:14:25.71-04	2024-06-11 09:14:25.71-04	\N
+4474	214	Birds Within Us: I. Starling	\N	undefined	06:01	[]	\N	2024-06-11 09:14:25.717-04	2024-06-11 09:14:25.717-04	\N
+4475	214	Seven Disobediences for piano and ensemble: No. 6, Lean	\N	undefined	08:06	[]	\N	2024-06-11 09:14:25.724-04	2024-06-11 09:14:25.724-04	\N
+4476	214	Dawn Chorus 4 (Improvisation)	\N	undefined	06:29	[]	\N	2024-06-11 09:14:25.73-04	2024-06-11 09:14:25.73-04	\N
+4477	214	Seven Disobediences for piano and ensemble: No.3, Sink	\N	undefined	02:01	[]	\N	2024-06-11 09:14:25.736-04	2024-06-11 09:14:25.736-04	\N
+4478	214	Schoenberg/Schaathun/Wallin: 12 kleine Klavierstucke IX	\N	undefined	00:52	[]	\N	2024-06-11 09:14:25.741-04	2024-06-11 09:14:25.741-04	\N
+4479	214	Schoenberg/Schaathun/Wallin: 12 kleine Klavierstucke VI	\N	undefined	00:30	[]	\N	2024-06-11 09:14:25.748-04	2024-06-11 09:14:25.748-04	\N
+4480	214	...Though What Made It Has Gone...	\N	undefined	14:59	[]	\N	2024-06-11 09:14:25.754-04	2024-06-11 09:14:25.754-04	\N
+4481	214	Manyworlds	\N	undefined	30:46	[]	\N	2024-06-11 09:14:25.761-04	2024-06-11 09:14:25.761-04	\N
+4482	214	Trumpet Concerto "Fisher King"	\N	undefined	27:20	[]	\N	2024-06-11 09:14:25.768-04	2024-06-11 09:14:25.768-04	\N
+4483	214	Id	\N	undefined	17:22	[]	\N	2024-06-11 09:14:25.781-04	2024-06-11 09:14:25.781-04	\N
+4484	214	Das war schon!: V. Herr Stahr	\N	undefined	06:33	[]	\N	2024-06-11 09:14:25.798-04	2024-06-11 09:14:25.798-04	\N
+4485	214	Tides	\N	undefined	25:56	[]	\N	2024-06-11 09:14:25.806-04	2024-06-11 09:14:25.806-04	\N
+4486	214	Das war schon!: IV. Es klinget…	\N	undefined	05:22	[]	\N	2024-06-11 09:14:25.824-04	2024-06-11 09:14:25.824-04	\N
+4487	214	Das war schon!: III. 3 x 3	\N	undefined	00:50	[]	\N	2024-06-11 09:14:25.833-04	2024-06-11 09:14:25.833-04	\N
+4488	215	Carlo	\N	undefined	20:37	[]	\N	2024-06-11 09:14:44.76-04	2024-06-11 09:14:44.76-04	\N
+4489	215	Bliss, Act I, Scene 1, "Death and Transfiguration": "Hey, listen you lot, I''ve something to tell you!"	\N	undefined	03:45	[]	\N	2024-06-11 09:14:44.776-04	2024-06-11 09:14:44.776-04	\N
+4490	215	Was it a voice? (Music for Ascension Day)	\N	undefined	07:52	[]	\N	2024-06-11 09:14:44.789-04	2024-06-11 09:14:44.789-04	\N
+4491	215	Piano Concert "Gneixendorf Music - A Winter Journey": I. Gneixendorf? That Sounds Like a Breaking Axle! - Live	\N	undefined	14:01	[]	\N	2024-06-11 09:14:44.798-04	2024-06-11 09:14:44.798-04	\N
+4492	215	Bliss, Act I, Scene 2, "Limbo": "Welcome to Hell, Father!"	\N	undefined	03:57	[]	\N	2024-06-11 09:14:44.804-04	2024-06-11 09:14:44.804-04	\N
+4493	215	Bliss, Act I, Scene 2, "Limbo": "Did you see his wife?"	\N	undefined	02:04	[]	\N	2024-06-11 09:14:44.812-04	2024-06-11 09:14:44.812-04	\N
+4494	215	Piano Concert "Gneixendorf Music - A Winter Journey": III. Applause, Friends, the Comedy Is Over - Live	\N	undefined	02:57	[]	\N	2024-06-11 09:14:44.819-04	2024-06-11 09:14:44.819-04	\N
+4495	215	Bliss, Act I, Scene 1, "Death and Transfiguration": "This is a catastrophe"	\N	undefined	01:45	[]	\N	2024-06-11 09:14:44.828-04	2024-06-11 09:14:44.828-04	\N
+4496	215	Komarov''s Fall	\N	undefined	07:49	[]	\N	2024-06-11 09:14:44.835-04	2024-06-11 09:14:44.835-04	\N
+4497	215	Piano Concert "Gneixendorf Music - A Winter Journey": II. Difficult Decisions. Must It Be? - Live	\N	undefined	08:23	[]	\N	2024-06-11 09:14:44.845-04	2024-06-11 09:14:44.845-04	\N
+4498	215	Dean: Pastoral Symphony	\N	undefined	16:44	[]	\N	2024-06-11 09:14:44.853-04	2024-06-11 09:14:44.853-04	\N
+4499	215	Shadow Music: III. Voices and Shadows	\N	undefined	09:14	[]	\N	2024-06-11 09:14:44.863-04	2024-06-11 09:14:44.863-04	\N
+4500	215	Shadow Music: II. Forgotten Garden	\N	undefined	07:51	[]	\N	2024-06-11 09:14:44.872-04	2024-06-11 09:14:44.872-04	\N
+4501	215	Game Over	\N	undefined	14:58	[]	\N	2024-06-11 09:14:44.882-04	2024-06-11 09:14:44.882-04	\N
+4502	215	Between Moments	\N	undefined	06:16	[]	\N	2024-06-11 09:14:44.896-04	2024-06-11 09:14:44.896-04	\N
+4503	215	Testament	\N	undefined	15:12	[]	\N	2024-06-11 09:14:44.906-04	2024-06-11 09:14:44.906-04	\N
+4504	215	Etüdenfest	\N	undefined	10:54	[]	\N	2024-06-11 09:14:44.915-04	2024-06-11 09:14:44.915-04	\N
+4505	215	Shadow Music: I. Prelude	\N	undefined	02:54	[]	\N	2024-06-11 09:14:44.926-04	2024-06-11 09:14:44.926-04	\N
+4506	215	Short Stories: No. 3, Embers	\N	undefined	02:14	[]	\N	2024-06-11 09:14:44.935-04	2024-06-11 09:14:44.935-04	\N
+4507	215	Shadow Music: III. Voices & Shadows	\N	undefined	07:36	[]	\N	2024-06-11 09:14:44.945-04	2024-06-11 09:14:44.945-04	\N
+4508	215	Short Stories: No. 1, Devotional	\N	undefined	02:43	[]	\N	2024-06-11 09:14:44.965-04	2024-06-11 09:14:44.965-04	\N
+4509	215	Short Stories: No. 5, Arietta	\N	undefined	02:00	[]	\N	2024-06-11 09:14:44.972-04	2024-06-11 09:14:44.972-04	\N
+4510	215	Testament (After Beethoven) [Version for Orchestra]	\N	undefined	13:57	[]	\N	2024-06-11 09:14:44.979-04	2024-06-11 09:14:44.979-04	\N
+4511	215	Short Stories: No. 2, Premonitions	\N	undefined	01:53	[]	\N	2024-06-11 09:14:44.985-04	2024-06-11 09:14:44.985-04	\N
+4512	215	Short Stories: No. 4, Komarov''s Last Words	\N	undefined	03:23	[]	\N	2024-06-11 09:14:44.998-04	2024-06-11 09:14:44.998-04	\N
+4513	215	Vexations and Devotions: III. The Path to Your Door	\N	undefined	12:41	[]	\N	2024-06-11 09:14:45.011-04	2024-06-11 09:14:45.011-04	\N
+4514	215	The Lost Art of Letter Writing: I. Hamburg, 1854	\N	undefined	12:12	[]	\N	2024-06-11 09:14:45.017-04	2024-06-11 09:14:45.017-04	\N
+4515	215	Vexations and Devotions: II. Bell and Anti-Bell	\N	undefined	15:39	[]	\N	2024-06-11 09:14:45.024-04	2024-06-11 09:14:45.024-04	\N
+4516	215	The Lost Art of Letter Writing: III. Vienna, 1886	\N	undefined	04:09	[]	\N	2024-06-11 09:14:45.032-04	2024-06-11 09:14:45.032-04	\N
+4517	215	The Lost Art of Letter Writing: II. The Hague, 1882	\N	undefined	09:60	[]	\N	2024-06-11 09:14:45.039-04	2024-06-11 09:14:45.039-04	\N
+4518	215	Vexations and Devotions: I. Watching Others	\N	undefined	09:05	[]	\N	2024-06-11 09:14:45.055-04	2024-06-11 09:14:45.055-04	\N
+4519	215	The Lost Art of Letter Writing: IV. Jerilderie, 1879	\N	undefined	07:42	[]	\N	2024-06-11 09:14:45.064-04	2024-06-11 09:14:45.064-04	\N
+4520	215	Electric Preludes: 5. Perpetuum mobile - Live from City Recital Hall, Sydney, 2013	\N	undefined	05:49	[]	\N	2024-06-11 09:14:45.072-04	2024-06-11 09:14:45.072-04	\N
+4521	215	Electric Preludes: 2. Topography - Papunya - Live from City Recital Hall, Sydney, 2013	\N	undefined	02:59	[]	\N	2024-06-11 09:14:45.082-04	2024-06-11 09:14:45.082-04	\N
+4522	215	Electric Preludes: 6. Berceuse - Live from City Recital Hall, Sydney, 2013	\N	undefined	04:46	[]	\N	2024-06-11 09:14:45.091-04	2024-06-11 09:14:45.091-04	\N
+4523	215	Electric Preludes: 3. Peripeteia - Live from City Recital Hall, Sydney, 2013	\N	undefined	01:23	[]	\N	2024-06-11 09:14:45.1-04	2024-06-11 09:14:45.1-04	\N
+4524	215	Electric Preludes: 4. The Beyonds of Mirrors - Live from City Recital Hall, Sydney, 2013	\N	undefined	02:57	[]	\N	2024-06-11 09:14:45.11-04	2024-06-11 09:14:45.11-04	\N
+4525	215	Electric Preludes: 1. Abandoned Playground - Live from City Recital Hall, Sydney, 2013	\N	undefined	04:01	[]	\N	2024-06-11 09:14:45.122-04	2024-06-11 09:14:45.122-04	\N
+4526	215	The Siduri Dances	\N	undefined	12:23	[]	\N	2024-06-11 09:14:45.132-04	2024-06-11 09:14:45.132-04	\N
+4527	215	Dramatis personæ: III. The Accidental Revolutionary	\N	undefined	09:41	[]	\N	2024-06-11 09:14:45.143-04	2024-06-11 09:14:45.143-04	\N
+4528	215	Dramatis personæ: I. Fall of a Superhero	\N	undefined	13:16	[]	\N	2024-06-11 09:14:45.155-04	2024-06-11 09:14:45.155-04	\N
+4529	215	Dramatis personæ: II. Soliloquy	\N	undefined	08:33	[]	\N	2024-06-11 09:14:45.164-04	2024-06-11 09:14:45.164-04	\N
+4530	215	Winter Songs: II. (If in beginning twilight winter will stand)	\N	undefined	07:43	[]	\N	2024-06-11 09:14:45.176-04	2024-06-11 09:14:45.176-04	\N
+4531	215	Winter Songs: III. (Who Are you little i) - [n]	\N	undefined	06:49	[]	\N	2024-06-11 09:14:45.185-04	2024-06-11 09:14:45.185-04	\N
+4532	215	Winter Songs: I. (Introduction) - [e] - [n]	\N	undefined	12:11	[]	\N	2024-06-11 09:14:45.196-04	2024-06-11 09:14:45.196-04	\N
+4533	215	String Quartet No. 2, "And Once I Played Ophelia": II. Hushed, distant	\N	undefined	07:31	[]	\N	2024-06-11 09:14:45.206-04	2024-06-11 09:14:45.206-04	\N
+4534	216	Symphony No. 4, "In the Shadow of No Towers": I. The New Normal	\N	undefined	09:42	[]	\N	2024-06-11 09:15:06.857-04	2024-06-11 09:15:06.857-04	\N
+4535	216	Kol Nidrei	\N	undefined	07:49	[]	\N	2024-06-11 09:15:06.871-04	2024-06-11 09:15:06.871-04	\N
+4536	216	Piano Miniature No. 4	\N	undefined	00:52	[]	\N	2024-06-11 09:15:06.886-04	2024-06-11 09:15:06.886-04	\N
+4537	216	Piano Miniature No. 2	\N	undefined	00:58	[]	\N	2024-06-11 09:15:06.902-04	2024-06-11 09:15:06.902-04	\N
+4538	216	4 Critical Models: I. Catchword: A Modernists'' ''Dilemma''	\N	undefined	04:07	[]	\N	2024-06-11 09:15:06.913-04	2024-06-11 09:15:06.913-04	\N
+4539	216	3 Novelettes: No. 2, Serenade	\N	undefined	04:18	[]	\N	2024-06-11 09:15:06.924-04	2024-06-11 09:15:06.924-04	\N
+4540	216	4 Critical Models: III. Catchword: An Oriental(ist) Model	\N	undefined	02:54	[]	\N	2024-06-11 09:15:06.934-04	2024-06-11 09:15:06.934-04	\N
+4541	216	Piano Miniature No. 1, "Nocturnal Snapshot"	\N	undefined	01:17	[]	\N	2024-06-11 09:15:06.945-04	2024-06-11 09:15:06.945-04	\N
+4542	216	Airs: I. Prelude	\N	undefined	01:02	[]	\N	2024-06-11 09:15:06.955-04	2024-06-11 09:15:06.955-04	\N
+4543	216	4 Critical Models: II. Intervention: Une Musique Informelle	\N	undefined	03:05	[]	\N	2024-06-11 09:15:06.965-04	2024-06-11 09:15:06.965-04	\N
+4544	216	Lamentation and Satire: I. Lamentation	\N	undefined	06:43	[]	\N	2024-06-11 09:15:06.976-04	2024-06-11 09:15:06.976-04	\N
+4545	216	Piano Miniature No. 6, "Addio"	\N	undefined	01:57	[]	\N	2024-06-11 09:15:06.987-04	2024-06-11 09:15:06.987-04	\N
+4546	216	Litany	\N	undefined	04:36	[]	\N	2024-06-11 09:15:07.001-04	2024-06-11 09:15:07.001-04	\N
+4547	216	Piano Miniature No. 5	\N	undefined	01:00	[]	\N	2024-06-11 09:15:07.008-04	2024-06-11 09:15:07.008-04	\N
+4548	216	3 Novelettes: No. 1, Cadenzas	\N	undefined	03:27	[]	\N	2024-06-11 09:15:07.016-04	2024-06-11 09:15:07.016-04	\N
+4549	216	Airs: IV. Toccata	\N	undefined	04:56	[]	\N	2024-06-11 09:15:07.023-04	2024-06-11 09:15:07.023-04	\N
+4550	216	Lamentation and Satire: II. Satire	\N	undefined	03:19	[]	\N	2024-06-11 09:15:07.031-04	2024-06-11 09:15:07.031-04	\N
+4551	216	3 Novelettes: No. 3, Dance Montage	\N	undefined	04:19	[]	\N	2024-06-11 09:15:07.037-04	2024-06-11 09:15:07.037-04	\N
+4552	216	Airs: III. Intermezzo	\N	undefined	02:02	[]	\N	2024-06-11 09:15:07.055-04	2024-06-11 09:15:07.055-04	\N
+4553	216	3 Novelettes: No. 2. Serenade	\N	undefined	04:18	[]	\N	2024-06-11 09:15:07.064-04	2024-06-11 09:15:07.064-04	\N
+4554	216	Piano Miniature No. 3	\N	undefined	00:54	[]	\N	2024-06-11 09:15:07.079-04	2024-06-11 09:15:07.079-04	\N
+4555	216	Airs: II. Fantasy	\N	undefined	03:50	[]	\N	2024-06-11 09:15:07.093-04	2024-06-11 09:15:07.093-04	\N
+4556	216	4 Critical Models: IV. Intervention: A Dialectical Synthesis	\N	undefined	03:35	[]	\N	2024-06-11 09:15:07.12-04	2024-06-11 09:15:07.12-04	\N
+4557	216	3 Novelettes: No. 3. Dance Montage	\N	undefined	04:19	[]	\N	2024-06-11 09:15:07.129-04	2024-06-11 09:15:07.129-04	\N
+4558	216	3 Novelettes: No. 1. Cadenzas	\N	undefined	03:27	[]	\N	2024-06-11 09:15:07.17-04	2024-06-11 09:15:07.17-04	\N
+4559	216	Zabur, Pt. 2: Part II: Hear my prayer, O Lord (Chorus)	\N	undefined	03:01	[]	\N	2024-06-11 09:15:07.201-04	2024-06-11 09:15:07.201-04	\N
+4560	216	Zabur, Pt. 1: Part I: There is an occasional crackle far away (Dawoūd)	\N	undefined	04:30	[]	\N	2024-06-11 09:15:07.207-04	2024-06-11 09:15:07.207-04	\N
+4561	216	Zabur, Pt. 2: Part II: In the beginning you laid the foundations (Dawoūd, Chorus)	\N	undefined	04:42	[]	\N	2024-06-11 09:15:07.214-04	2024-06-11 09:15:07.214-04	\N
+4562	216	Zabur, Pt. 2: Part II: I tried to get the children to play, but they won''t (Jibreel, Dawoūd)	\N	undefined	04:02	[]	\N	2024-06-11 09:15:07.221-04	2024-06-11 09:15:07.221-04	\N
+4563	216	Zabur, Pt. 2: Part II: This is inspiring! (Dawoūd)	\N	undefined	01:01	[]	\N	2024-06-11 09:15:07.226-04	2024-06-11 09:15:07.226-04	\N
+4564	216	Zabur, Pt. 2: Part II: Can we tell them we are hungry? (Children)	\N	undefined	03:07	[]	\N	2024-06-11 09:15:07.23-04	2024-06-11 09:15:07.23-04	\N
+4565	216	Zabur, Pt. 1: Part I: The Lord scoffs at them (Dawoūd, Chorus)	\N	undefined	03:09	[]	\N	2024-06-11 09:15:07.235-04	2024-06-11 09:15:07.235-04	\N
+4566	216	Zabur, Pt. 2: Part II: Yes, children, this is the power of art (Jibreel, Chorus)	\N	undefined	01:50	[]	\N	2024-06-11 09:15:07.241-04	2024-06-11 09:15:07.241-04	\N
+4567	217	Avner Dorman: Mandolin Concerto. Adagio religioso - 2006	\N	undefined	05:57	[]	\N	2024-06-11 09:15:21.679-04	2024-06-11 09:15:21.679-04	\N
+4568	217	Piccolo Concerto: I. Allegro - groovy, serious, and dramatic	\N	undefined	05:53	[]	\N	2024-06-11 09:15:21.695-04	2024-06-11 09:15:21.695-04	\N
+4569	217	Spices, Perfumes, Toxins!: I. Spices. Allegro	\N	undefined	10:08	[]	\N	2024-06-11 09:15:21.708-04	2024-06-11 09:15:21.708-04	\N
+4570	217	Spices, Perfumes, Toxins!: III. Toxins. Presto energico	\N	undefined	07:31	[]	\N	2024-06-11 09:15:21.722-04	2024-06-11 09:15:21.722-04	\N
+4571	217	Spices, Perfumes, Toxins!: II. Perfumes. Adagio	\N	undefined	10:16	[]	\N	2024-06-11 09:15:21.735-04	2024-06-11 09:15:21.735-04	\N
+4572	217	Memory Games	\N	undefined	05:01	[]	\N	2024-06-11 09:15:21.747-04	2024-06-11 09:15:21.747-04	\N
+4573	217	Frozen in Time: I. Indoafrica	\N	undefined	09:40	[]	\N	2024-06-11 09:15:21.761-04	2024-06-11 09:15:21.761-04	\N
+4574	217	Udacrep Akubrad	\N	undefined	08:41	[]	\N	2024-06-11 09:15:21.772-04	2024-06-11 09:15:21.772-04	\N
+4575	217	3 Butterfly Songs: No. 1, Blue Butterfly Day	\N	undefined	03:27	[]	\N	2024-06-11 09:15:21.787-04	2024-06-11 09:15:21.787-04	\N
+4576	217	Elegy for the Victims of Indifference for Cello and Accordion	\N	undefined	06:25	[]	\N	2024-06-11 09:15:21.801-04	2024-06-11 09:15:21.801-04	\N
+4577	217	Udakrep Akubrad (Arr. for 3 Marimbas and Percussion)	\N	undefined	08:32	[]	\N	2024-06-11 09:15:21.814-04	2024-06-11 09:15:21.814-04	\N
+4578	217	3 Butterfly Songs: No. 2, Anosia Plexippus	\N	undefined	02:50	[]	\N	2024-06-11 09:15:21.835-04	2024-06-11 09:15:21.835-04	\N
+4579	217	3 Butterfly Songs: No. 3, The butterfly counts not months, but moments…	\N	undefined	02:43	[]	\N	2024-06-11 09:15:21.845-04	2024-06-11 09:15:21.845-04	\N
+4580	217	Avner Dorman: Mandolin Concerto. Adagio - 2006	\N	undefined	04:15	[]	\N	2024-06-11 09:15:21.861-04	2024-06-11 09:15:21.861-04	\N
+4581	217	Avner Dorman: Mandolin Concerto. Allegro - 2006	\N	undefined	05:49	[]	\N	2024-06-11 09:15:21.869-04	2024-06-11 09:15:21.869-04	\N
+4582	217	Piano Concerto in A Major: III. Presto	\N	undefined	05:31	[]	\N	2024-06-11 09:15:21.879-04	2024-06-11 09:15:21.879-04	\N
+4583	217	Piano Concerto in A Major: I. Allegro	\N	undefined	05:05	[]	\N	2024-06-11 09:15:21.889-04	2024-06-11 09:15:21.889-04	\N
+4584	217	Mandolin Concerto: III. Meno mosso - Adagio	\N	undefined	05:13	[]	\N	2024-06-11 09:15:21.899-04	2024-06-11 09:15:21.899-04	\N
+4585	217	Mandolin Concerto: II. Allegro	\N	undefined	05:10	[]	\N	2024-06-11 09:15:21.909-04	2024-06-11 09:15:21.909-04	\N
+4586	217	Mandolin Concerto: I. Adagio religioso - Allegro - Andante - Presto - Adagio - Andante	\N	undefined	06:40	[]	\N	2024-06-11 09:15:21.917-04	2024-06-11 09:15:21.917-04	\N
+4587	217	Piano Concerto in A Major: II. Andante	\N	undefined	04:34	[]	\N	2024-06-11 09:15:21.936-04	2024-06-11 09:15:21.936-04	\N
+4588	217	Concerto Grosso: III. Adagio	\N	undefined	02:50	[]	\N	2024-06-11 09:15:21.947-04	2024-06-11 09:15:21.947-04	\N
+4589	217	Piccolo Concerto: I. Allegro - Groovy, serious, and dramatic	\N	undefined	05:53	[]	\N	2024-06-11 09:15:21.968-04	2024-06-11 09:15:21.968-04	\N
+4590	217	Concerto Grosso: II. Presto	\N	undefined	06:35	[]	\N	2024-06-11 09:15:21.979-04	2024-06-11 09:15:21.979-04	\N
+4591	217	Piccolo Concerto: III. Presto	\N	undefined	04:19	[]	\N	2024-06-11 09:15:21.998-04	2024-06-11 09:15:21.998-04	\N
+4592	217	Piccolo Concerto: II. Adagio cantabile	\N	undefined	05:25	[]	\N	2024-06-11 09:15:22.008-04	2024-06-11 09:15:22.008-04	\N
+4593	217	Concerto Grosso: I. Adagio - Allegro dramatico - Adagio	\N	undefined	04:50	[]	\N	2024-06-11 09:15:22.027-04	2024-06-11 09:15:22.027-04	\N
+4594	217	Uriah (The Man the King Wanted Dead): I. Andantino indignato	\N	undefined	01:23	[]	\N	2024-06-11 09:15:22.096-04	2024-06-11 09:15:22.096-04	\N
+4595	217	Ellef Symphony: I. Fear	\N	undefined	02:36	[]	\N	2024-06-11 09:15:22.111-04	2024-06-11 09:15:22.111-04	\N
+4596	217	Uriah (The Man the King Wanted Dead): III. Presto barbaro	\N	undefined	06:11	[]	\N	2024-06-11 09:15:22.121-04	2024-06-11 09:15:22.121-04	\N
+4597	217	Siklòn	\N	undefined	08:36	[]	\N	2024-06-11 09:15:22.131-04	2024-06-11 09:15:22.131-04	\N
+4598	217	Ellef Symphony: IV. ...(silence)	\N	undefined	05:17	[]	\N	2024-06-11 09:15:22.142-04	2024-06-11 09:15:22.142-04	\N
+4599	217	After Brahms: II. Dilcatamente con molta espressione	\N	undefined	05:03	[]	\N	2024-06-11 09:15:22.152-04	2024-06-11 09:15:22.152-04	\N
+4600	217	Uriah (The Man the King Wanted Dead): II. Lento, dawn in the desert	\N	undefined	02:49	[]	\N	2024-06-11 09:15:22.163-04	2024-06-11 09:15:22.163-04	\N
+4601	217	Ellef Symphony: III. Elegy	\N	undefined	03:54	[]	\N	2024-06-11 09:15:22.175-04	2024-06-11 09:15:22.175-04	\N
+4602	217	After Brahms: I. Allegro con molto appassionato	\N	undefined	02:07	[]	\N	2024-06-11 09:15:22.185-04	2024-06-11 09:15:22.185-04	\N
+4603	217	Uriah (The Man the King Wanted Dead): IV. The Song of the Angels	\N	undefined	01:23	[]	\N	2024-06-11 09:15:22.202-04	2024-06-11 09:15:22.202-04	\N
+4604	218	Plan & Elevation: V. The Beech Tree	\N	undefined	02:36	[]	\N	2024-06-11 09:15:39.128-04	2024-06-11 09:15:39.128-04	\N
+4605	218	Plan & Elevation: IV. The Orangery	\N	undefined	01:58	[]	\N	2024-06-11 09:15:39.141-04	2024-06-11 09:15:39.141-04	\N
+4606	218	Partita for 8 Singers: 3. Courante	\N	undefined	08:59	[]	\N	2024-06-11 09:15:39.153-04	2024-06-11 09:15:39.153-04	\N
+4607	218	Partita for 8 Singers: 1. Allemande	\N	undefined	05:53	[]	\N	2024-06-11 09:15:39.166-04	2024-06-11 09:15:39.166-04	\N
+4608	218	Slow Motion (feat. Ringdown)	\N	undefined	04:02	[]	\N	2024-06-11 09:15:39.178-04	2024-06-11 09:15:39.178-04	\N
+4609	218	Entr''acte	\N	undefined	11:00	[]	\N	2024-06-11 09:15:39.19-04	2024-06-11 09:15:39.19-04	\N
+4610	218	And the Swallow	\N	undefined	04:02	[]	\N	2024-06-11 09:15:39.201-04	2024-06-11 09:15:39.201-04	\N
+4611	218	Caroline Shaw: The Observatory	\N	undefined	13:46	[]	\N	2024-06-11 09:15:39.215-04	2024-06-11 09:15:39.215-04	\N
+4612	218	To Music	\N	undefined	05:57	[]	\N	2024-06-11 09:15:39.227-04	2024-06-11 09:15:39.227-04	\N
+4613	218	Partita for 8 Voices: No. 3, Courante	\N	undefined	08:59	[]	\N	2024-06-11 09:15:39.239-04	2024-06-11 09:15:39.239-04	\N
+4614	218	Rectangles and Circumstance	\N	undefined	02:55	[]	\N	2024-06-11 09:15:39.25-04	2024-06-11 09:15:39.25-04	\N
+4615	218	Partita for 8 Singers: 2. Sarabande	\N	undefined	04:49	[]	\N	2024-06-11 09:15:39.263-04	2024-06-11 09:15:39.263-04	\N
+4616	218	Partita for 8 Singers: 4. Passacaglia	\N	undefined	05:56	[]	\N	2024-06-11 09:15:39.277-04	2024-06-11 09:15:39.277-04	\N
+4617	218	Plan & Elevation: I. The Ellipse	\N	undefined	03:59	[]	\N	2024-06-11 09:15:39.289-04	2024-06-11 09:15:39.289-04	\N
+4618	218	Valencia	\N	undefined	05:50	[]	\N	2024-06-11 09:15:39.299-04	2024-06-11 09:15:39.299-04	\N
+4619	218	Plan & Elevation: III. The Herbaceous Border	\N	undefined	03:31	[]	\N	2024-06-11 09:15:39.321-04	2024-06-11 09:15:39.321-04	\N
+4620	218	The Evergreen: IV. Root	\N	undefined	08:00	[]	\N	2024-06-11 09:15:39.331-04	2024-06-11 09:15:39.331-04	\N
+4621	218	And So	\N	undefined	05:07	[]	\N	2024-06-11 09:15:39.341-04	2024-06-11 09:15:39.341-04	\N
+4622	218	Plan & Elevation: II. The Cutting Garden	\N	undefined	02:56	[]	\N	2024-06-11 09:15:39.35-04	2024-06-11 09:15:39.35-04	\N
+4623	218	Limestone & Felt	\N	undefined	05:42	[]	\N	2024-06-11 09:15:39.361-04	2024-06-11 09:15:39.361-04	\N
+4624	218	Inhale	\N	undefined	04:37	[]	\N	2024-06-11 09:15:39.372-04	2024-06-11 09:15:39.372-04	\N
+4625	218	and the swallow	\N	undefined	03:42	[]	\N	2024-06-11 09:15:39.383-04	2024-06-11 09:15:39.383-04	\N
+4626	218	Punctum	\N	undefined	09:33	[]	\N	2024-06-11 09:15:39.389-04	2024-06-11 09:15:39.389-04	\N
+4627	218	To the Sky	\N	undefined	03:60	[]	\N	2024-06-11 09:15:39.395-04	2024-06-11 09:15:39.395-04	\N
+4628	218	Other Song	\N	undefined	05:02	[]	\N	2024-06-11 09:15:39.41-04	2024-06-11 09:15:39.41-04	\N
+4629	218	Ritornello 2.sq.2.j.a	\N	undefined	16:37	[]	\N	2024-06-11 09:15:39.415-04	2024-06-11 09:15:39.415-04	\N
+4630	218	Let the Soil Play Its Simple Part	\N	undefined	04:38	[]	\N	2024-06-11 09:15:39.422-04	2024-06-11 09:15:39.422-04	\N
+4631	218	Three Essays: First Essay (Nimrod)	\N	undefined	08:30	[]	\N	2024-06-11 09:15:39.427-04	2024-06-11 09:15:39.427-04	\N
+4632	218	Blueprint	\N	undefined	07:21	[]	\N	2024-06-11 09:15:39.432-04	2024-06-11 09:15:39.432-04	\N
+4633	218	The Flood Is Following Me	\N	undefined	02:58	[]	\N	2024-06-11 09:15:39.437-04	2024-06-11 09:15:39.437-04	\N
+4634	218	To the Hands: No. 1. Prelude: Wordless	\N	undefined	02:12	[]	\N	2024-06-11 09:15:39.455-04	2024-06-11 09:15:39.455-04	\N
+4635	218	The Evergreen: I. Moss	\N	undefined	05:05	[]	\N	2024-06-11 09:15:39.461-04	2024-06-11 09:15:39.461-04	\N
+4636	218	To the Hands: No. 2. In Medio (In The Midst)	\N	undefined	02:60	[]	\N	2024-06-11 09:15:39.467-04	2024-06-11 09:15:39.467-04	\N
+4637	218	Everything	\N	undefined	01:34	[]	\N	2024-06-11 09:15:39.476-04	2024-06-11 09:15:39.476-04	\N
+4638	218	Cast the Bells in Sand	\N	undefined	04:45	[]	\N	2024-06-11 09:15:39.491-04	2024-06-11 09:15:39.491-04	\N
+4639	218	The Evergreen: II. Stem	\N	undefined	03:10	[]	\N	2024-06-11 09:15:39.496-04	2024-06-11 09:15:39.496-04	\N
+4640	218	Three Essays: Second Essay (Echo)	\N	undefined	06:19	[]	\N	2024-06-11 09:15:39.502-04	2024-06-11 09:15:39.502-04	\N
+4641	218	Three Essays: Third Essay (Ruby)	\N	undefined	05:14	[]	\N	2024-06-11 09:15:39.511-04	2024-06-11 09:15:39.511-04	\N
+4642	218	Partita for 8 Voices: No. 2, Sarabande	\N	undefined	04:49	[]	\N	2024-06-11 09:15:39.517-04	2024-06-11 09:15:39.517-04	\N
+4643	218	It''s Doctor Fleishman	\N	undefined	01:07	[]	\N	2024-06-11 09:15:39.524-04	2024-06-11 09:15:39.524-04	\N
+4644	218	Ring of Copper	\N	undefined	01:24	[]	\N	2024-06-11 09:15:39.53-04	2024-06-11 09:15:39.53-04	\N
+4645	218	Partita for 8 Voices: No. 1, Allemande	\N	undefined	05:53	[]	\N	2024-06-11 09:15:39.537-04	2024-06-11 09:15:39.537-04	\N
+4646	218	A Veil Awave Upon the Waves	\N	undefined	03:21	[]	\N	2024-06-11 09:15:39.546-04	2024-06-11 09:15:39.546-04	\N
+4647	219	Snider: Mass for the Endangered: Agnus Dei	\N	undefined	10:02	[]	\N	2024-06-11 09:15:49.905-04	2024-06-11 09:15:49.905-04	\N
+4648	219	Penelope: Nausicaa	\N	undefined	02:57	[]	\N	2024-06-11 09:15:49.919-04	2024-06-11 09:15:49.919-04	\N
+4649	219	Everything That Ever Was	\N	undefined	07:06	[]	\N	2024-06-11 09:15:49.933-04	2024-06-11 09:15:49.933-04	\N
+4650	219	Snider: Mass for the Endangered: Kyrie	\N	undefined	06:44	[]	\N	2024-06-11 09:15:49.947-04	2024-06-11 09:15:49.947-04	\N
+4651	219	Snider: Mass for the Endangered: Gloria	\N	undefined	06:12	[]	\N	2024-06-11 09:15:49.959-04	2024-06-11 09:15:49.959-04	\N
+4652	219	Snider: Mass for the Endangered: Alleluia	\N	undefined	04:19	[]	\N	2024-06-11 09:15:49.971-04	2024-06-11 09:15:49.971-04	\N
+4653	219	Snider: Mass for the Endangered: Sanctus - Benedictus	\N	undefined	07:03	[]	\N	2024-06-11 09:15:49.982-04	2024-06-11 09:15:49.982-04	\N
+4654	219	Penelope: IV. The Lotus Eaters	\N	undefined	06:00	[]	\N	2024-06-11 09:15:49.993-04	2024-06-11 09:15:49.993-04	\N
+4655	219	Penelope: Home	\N	undefined	06:23	[]	\N	2024-06-11 09:15:50.005-04	2024-06-11 09:15:50.005-04	\N
+4656	219	Penelope: Circe and the Hanged Man	\N	undefined	04:13	[]	\N	2024-06-11 09:15:50.016-04	2024-06-11 09:15:50.016-04	\N
+4657	219	Penelope: The Stranger with the Face of a Man I Loved	\N	undefined	05:44	[]	\N	2024-06-11 09:15:50.029-04	2024-06-11 09:15:50.029-04	\N
+4658	219	Penelope: This Is What You''re Like	\N	undefined	05:07	[]	\N	2024-06-11 09:15:50.043-04	2024-06-11 09:15:50.043-04	\N
+4659	219	Unremembered: The Orchard	\N	undefined	04:46	[]	\N	2024-06-11 09:15:50.056-04	2024-06-11 09:15:50.056-04	\N
+4660	219	The Currents	\N	undefined	07:35	[]	\N	2024-06-11 09:15:50.068-04	2024-06-11 09:15:50.068-04	\N
+4661	219	Penelope: The Lotus Eaters	\N	undefined	05:54	[]	\N	2024-06-11 09:15:50.081-04	2024-06-11 09:15:50.081-04	\N
+4662	219	Snider: Mass for the Endangered: Credo	\N	undefined	08:03	[]	\N	2024-06-11 09:15:50.095-04	2024-06-11 09:15:50.095-04	\N
+4663	219	Sarah Kirkland Snider: The Blue Hour: No. 14, He told her how	\N	undefined	01:54	[]	\N	2024-06-11 09:15:50.138-04	2024-06-11 09:15:50.138-04	\N
+4664	219	Sarah Kirkland Snider: The Blue Hour: No. 22, My dear	\N	undefined	01:50	[]	\N	2024-06-11 09:15:50.147-04	2024-06-11 09:15:50.147-04	\N
+4665	219	Sarah Kirkland Snider: The Blue Hour: No. 16, I am alone	\N	undefined	05:07	[]	\N	2024-06-11 09:15:50.155-04	2024-06-11 09:15:50.155-04	\N
+4666	219	Sarah Kirkland Snider: The Blue Hour: No. 37, Yet the women	\N	undefined	01:44	[]	\N	2024-06-11 09:15:50.161-04	2024-06-11 09:15:50.161-04	\N
+4667	219	Sarah Kirkland Snider: The Blue Hour: No. 28, She heard no one''s footsteps	\N	undefined	02:12	[]	\N	2024-06-11 09:15:50.171-04	2024-06-11 09:15:50.171-04	\N
+4668	219	Sarah Kirkland Snider: The Blue Hour: No. 9, Early summer’s green plums	\N	undefined	02:18	[]	\N	2024-06-11 09:15:50.177-04	2024-06-11 09:15:50.177-04	\N
+4669	219	Sarah Kirkland Snider: The Blue Hour: No. 6, Angelica-balefire	\N	undefined	02:10	[]	\N	2024-06-11 09:15:50.183-04	2024-06-11 09:15:50.183-04	\N
+4670	219	Unremembered: No. 3, The Barn	\N	undefined	04:26	[]	\N	2024-06-11 09:15:50.19-04	2024-06-11 09:15:50.19-04	\N
+4671	219	Unremembered: No. 1, Prelude	\N	undefined	02:44	[]	\N	2024-06-11 09:15:50.196-04	2024-06-11 09:15:50.196-04	\N
+4672	219	Unremembered: No. 5, The Slaughterhouse	\N	undefined	04:46	[]	\N	2024-06-11 09:15:50.202-04	2024-06-11 09:15:50.202-04	\N
+4673	219	Unremembered: No. 11, The Orchard	\N	undefined	04:16	[]	\N	2024-06-11 09:15:50.209-04	2024-06-11 09:15:50.209-04	\N
+4674	219	Unremembered: No. 2, The Estate	\N	undefined	03:35	[]	\N	2024-06-11 09:15:50.215-04	2024-06-11 09:15:50.215-04	\N
+4675	219	Unremembered: No. 8, The Witch	\N	undefined	06:30	[]	\N	2024-06-11 09:15:50.22-04	2024-06-11 09:15:50.22-04	\N
+4676	219	Unremembered: No. 12, The Song	\N	undefined	03:36	[]	\N	2024-06-11 09:15:50.228-04	2024-06-11 09:15:50.228-04	\N
+4677	219	Unremembered: No. 9, The River	\N	undefined	03:43	[]	\N	2024-06-11 09:15:50.234-04	2024-06-11 09:15:50.234-04	\N
+4678	219	Unremembered: No. 10, The Speakers	\N	undefined	03:55	[]	\N	2024-06-11 09:15:50.255-04	2024-06-11 09:15:50.255-04	\N
+4679	219	Unremembered: No. 7, The Swan	\N	undefined	03:59	[]	\N	2024-06-11 09:15:50.26-04	2024-06-11 09:15:50.26-04	\N
+4680	219	Unremembered: No. 4, The Guest	\N	undefined	04:45	[]	\N	2024-06-11 09:15:50.266-04	2024-06-11 09:15:50.266-04	\N
+4681	219	Unremembered: No. 6, The Girl	\N	undefined	02:54	[]	\N	2024-06-11 09:15:50.28-04	2024-06-11 09:15:50.28-04	\N
+4682	219	Penelope: I Died of Waiting	\N	undefined	01:10	[]	\N	2024-06-11 09:15:50.294-04	2024-06-11 09:15:50.294-04	\N
+4683	219	Penelope: Open Hands	\N	undefined	01:06	[]	\N	2024-06-11 09:15:50.3-04	2024-06-11 09:15:50.3-04	\N
+4684	220	Calling	\N	undefined	12:49	[]	\N	2024-06-11 09:16:05.777-04	2024-06-11 09:16:05.777-04	\N
+4685	220	Urushi	\N	undefined	04:24	[]	\N	2024-06-11 09:16:05.795-04	2024-06-11 09:16:05.795-04	\N
+4686	220	Oboro	\N	undefined	03:19	[]	\N	2024-06-11 09:16:05.807-04	2024-06-11 09:16:05.807-04	\N
+4687	220	Spring and Asura (Akashi Takashima Version)	\N	undefined	06:03	[]	\N	2024-06-11 09:16:05.818-04	2024-06-11 09:16:05.818-04	\N
+4688	220	Glacier	\N	undefined	05:10	[]	\N	2024-06-11 09:16:05.831-04	2024-06-11 09:16:05.831-04	\N
+4689	220	Bibi	\N	undefined	04:12	[]	\N	2024-06-11 09:16:05.843-04	2024-06-11 09:16:05.843-04	\N
+4690	220	Contour (Arr. for Bass Clarinet)	\N	undefined	07:07	[]	\N	2024-06-11 09:16:05.853-04	2024-06-11 09:16:05.853-04	\N
+4691	220	Pictured Within "Birthday Variations for M.C.B": Var. 1, Tact 60 - Live	\N	undefined	02:40	[]	\N	2024-06-11 09:16:05.865-04	2024-06-11 09:16:05.865-04	\N
+4692	220	Spring and Asura (Jin Kazama Version)	\N	undefined	06:13	[]	\N	2024-06-11 09:16:05.876-04	2024-06-11 09:16:05.876-04	\N
+4693	220	Hatsuyuki	\N	undefined	03:16	[]	\N	2024-06-11 09:16:05.886-04	2024-06-11 09:16:05.886-04	\N
+4694	220	Kasumi	\N	undefined	04:09	[]	\N	2024-06-11 09:16:05.897-04	2024-06-11 09:16:05.897-04	\N
+4695	220	Bashō	\N	undefined	03:09	[]	\N	2024-06-11 09:16:05.909-04	2024-06-11 09:16:05.909-04	\N
+4696	220	春と修羅(栄伝亜夜ヴァージョン)	\N	undefined	06:27	[]	\N	2024-06-11 09:16:05.92-04	2024-06-11 09:16:05.92-04	\N
+4697	220	Dai Fujikura Still Sweet	\N	undefined	04:28	[]	\N	2024-06-11 09:16:05.933-04	2024-06-11 09:16:05.933-04	\N
+4698	220	Scion Stems (Live Recording)	\N	undefined	06:11	[]	\N	2024-06-11 09:16:05.943-04	2024-06-11 09:16:05.943-04	\N
+4699	220	SAKANA (version for tenor saxophone)	\N	undefined	08:03	[]	\N	2024-06-11 09:16:05.95-04	2024-06-11 09:16:05.95-04	\N
+4700	220	Dolphins (version for 2 cellos) (Live Recording)	\N	undefined	08:35	[]	\N	2024-06-11 09:16:05.955-04	2024-06-11 09:16:05.955-04	\N
+4701	220	But, I fly (Live Recording)	\N	undefined	09:55	[]	\N	2024-06-11 09:16:05.961-04	2024-06-11 09:16:05.961-04	\N
+4702	220	"Flare" (Live Recording)	\N	undefined	15:03	[]	\N	2024-06-11 09:16:05.967-04	2024-06-11 09:16:05.967-04	\N
+4703	220	Flux (Live Recording)	\N	undefined	05:26	[]	\N	2024-06-11 09:16:05.975-04	2024-06-11 09:16:05.975-04	\N
+4704	220	Halcyon	\N	undefined	13:52	[]	\N	2024-06-11 09:16:05.981-04	2024-06-11 09:16:05.981-04	\N
+4705	220	Sparking Orbit (2013) for solo electric guitar and live Electronics	\N	undefined	17:18	[]	\N	2024-06-11 09:16:05.988-04	2024-06-11 09:16:05.988-04	\N
+4706	220	Ice (2009-10) for Ensemble	\N	undefined	21:17	[]	\N	2024-06-11 09:16:05.993-04	2024-06-11 09:16:05.993-04	\N
+4707	220	I dreamed on singing flowers (2012) for prerecorded Electronics	\N	undefined	04:22	[]	\N	2024-06-11 09:16:06-04	2024-06-11 09:16:06-04	\N
+4708	220	Abandoned Time (2004-06) for solo electric guitar and Ensembles	\N	undefined	08:57	[]	\N	2024-06-11 09:16:06.007-04	2024-06-11 09:16:06.007-04	\N
+4709	220	Sparks (2011) for solo Guitar	\N	undefined	01:25	[]	\N	2024-06-11 09:16:06.012-04	2024-06-11 09:16:06.012-04	\N
+4710	220	Phantom Splinter (2009) for ensemble and live Electronics	\N	undefined	22:53	[]	\N	2024-06-11 09:16:06.018-04	2024-06-11 09:16:06.018-04	\N
+4711	220	Wondrous Steps	\N	undefined	10:17	[]	\N	2024-06-11 09:16:06.024-04	2024-06-11 09:16:06.024-04	\N
+4712	220	Recorder Concerto	\N	undefined	13:50	[]	\N	2024-06-11 09:16:06.029-04	2024-06-11 09:16:06.029-04	\N
+4713	220	Following	\N	undefined	04:37	[]	\N	2024-06-11 09:16:06.034-04	2024-06-11 09:16:06.034-04	\N
+4714	220	Mina (Live)	\N	undefined	15:00	[]	\N	2024-06-11 09:16:06.04-04	2024-06-11 09:16:06.04-04	\N
+4715	220	The Spirit of Beings	\N	undefined	13:06	[]	\N	2024-06-11 09:16:06.046-04	2024-06-11 09:16:06.046-04	\N
+4716	220	Prism Spectra	\N	undefined	17:48	[]	\N	2024-06-11 09:16:06.05-04	2024-06-11 09:16:06.05-04	\N
+4717	220	Dolphins (Live Recording) [Version for 2 cellos]	\N	undefined	08:35	[]	\N	2024-06-11 09:16:06.056-04	2024-06-11 09:16:06.056-04	\N
+4718	220	Wondrous Steps (Live)	\N	undefined	10:17	[]	\N	2024-06-11 09:16:06.062-04	2024-06-11 09:16:06.062-04	\N
+4719	220	SAKANA (Version for tenor saxophone)	\N	undefined	08:03	[]	\N	2024-06-11 09:16:06.094-04	2024-06-11 09:16:06.094-04	\N
+4720	220	Mina	\N	undefined	15:00	[]	\N	2024-06-11 09:16:06.102-04	2024-06-11 09:16:06.102-04	\N
+4721	220	Recorder Concerto (Live)	\N	undefined	13:50	[]	\N	2024-06-11 09:16:06.111-04	2024-06-11 09:16:06.111-04	\N
+4722	220	Fluid Calligraphy	\N	undefined	09:25	[]	\N	2024-06-11 09:16:06.141-04	2024-06-11 09:16:06.141-04	\N
+4723	220	Poyopoyo	\N	undefined	09:10	[]	\N	2024-06-11 09:16:06.151-04	2024-06-11 09:16:06.151-04	\N
+4724	220	Perla	\N	undefined	08:12	[]	\N	2024-06-11 09:16:06.162-04	2024-06-11 09:16:06.162-04	\N
+4725	221	Foundry	\N	undefined	04:25	[]	\N	2024-06-11 09:16:15.318-04	2024-06-11 09:16:15.318-04	\N
+4726	221	Undertow	\N	undefined	05:24	[]	\N	2024-06-11 09:16:15.333-04	2024-06-11 09:16:15.333-04	\N
+4727	221	Aurora Awakes	\N	undefined	11:03	[]	\N	2024-06-11 09:16:15.348-04	2024-06-11 09:16:15.348-04	\N
+4728	221	Strange Humors	\N	undefined	05:32	[]	\N	2024-06-11 09:16:15.361-04	2024-06-11 09:16:15.361-04	\N
+4729	221	Sheltering Sky	\N	undefined	05:48	[]	\N	2024-06-11 09:16:15.372-04	2024-06-11 09:16:15.372-04	\N
+4730	221	Wine-Dark Sea (Symphony for Band): I. Hubris	\N	undefined	10:51	[]	\N	2024-06-11 09:16:15.386-04	2024-06-11 09:16:15.386-04	\N
+4731	221	Asphalt Cocktail	\N	undefined	05:38	[]	\N	2024-06-11 09:16:15.399-04	2024-06-11 09:16:15.399-04	\N
+4732	221	Wine-Dark Sea (Symphony for Band): III. The attentions of souls	\N	undefined	08:33	[]	\N	2024-06-11 09:16:15.412-04	2024-06-11 09:16:15.412-04	\N
+4733	221	This Cruel Moon (After Symphony for Band "Wine-Dark Sea")	\N	undefined	07:43	[]	\N	2024-06-11 09:16:15.428-04	2024-06-11 09:16:15.428-04	\N
+4734	221	Soprano Saxophone Concerto: I. Prelude	\N	undefined	01:53	[]	\N	2024-06-11 09:16:15.441-04	2024-06-11 09:16:15.441-04	\N
+4735	221	Wine-Dark Sea (Symphony for Band): II. Immortal thread, so weak	\N	undefined	11:45	[]	\N	2024-06-11 09:16:15.452-04	2024-06-11 09:16:15.452-04	\N
+4736	221	Lightning Field	\N	undefined	05:37	[]	\N	2024-06-11 09:16:15.474-04	2024-06-11 09:16:15.474-04	\N
+4737	221	Kingfishers Catch Fire: II. Kingfishers catch fire	\N	undefined	05:46	[]	\N	2024-06-11 09:16:15.486-04	2024-06-11 09:16:15.486-04	\N
+4738	221	The Frozen Cathedral	\N	undefined	14:08	[]	\N	2024-06-11 09:16:15.498-04	2024-06-11 09:16:15.498-04	\N
+4739	221	The Ringmaster''s March	\N	undefined	03:01	[]	\N	2024-06-11 09:16:15.519-04	2024-06-11 09:16:15.519-04	\N
+4740	221	Xerxes	\N	undefined	05:36	[]	\N	2024-06-11 09:16:15.531-04	2024-06-11 09:16:15.531-04	\N
+4741	221	Redline Tango	\N	undefined	09:27	[]	\N	2024-06-11 09:16:15.543-04	2024-06-11 09:16:15.543-04	\N
+4742	221	Hymn to a Blue Hour	\N	undefined	08:50	[]	\N	2024-06-11 09:16:15.554-04	2024-06-11 09:16:15.554-04	\N
+4743	221	Until the Scars (Live)	\N	undefined	05:21	[]	\N	2024-06-11 09:16:15.569-04	2024-06-11 09:16:15.569-04	\N
+4744	221	High Wire	\N	undefined	04:19	[]	\N	2024-06-11 09:16:15.581-04	2024-06-11 09:16:15.581-04	\N
+4745	221	Wine-Dark Sea: III. The attentions of souls	\N	undefined	09:12	[]	\N	2024-06-11 09:16:15.595-04	2024-06-11 09:16:15.595-04	\N
+4746	221	Wine-Dark Sea: I. Hubris	\N	undefined	11:18	[]	\N	2024-06-11 09:16:15.607-04	2024-06-11 09:16:15.607-04	\N
+4747	221	Let Me Be Frank With You (Version for Wind Ensemble) [Live]	\N	undefined	03:25	[]	\N	2024-06-11 09:16:15.63-04	2024-06-11 09:16:15.63-04	\N
+4748	221	Night on Fire (Live)	\N	undefined	03:15	[]	\N	2024-06-11 09:16:15.642-04	2024-06-11 09:16:15.642-04	\N
+4749	221	Wine-Dark Sea: II. Immortal thread, so weak	\N	undefined	10:52	[]	\N	2024-06-11 09:16:15.654-04	2024-06-11 09:16:15.654-04	\N
+4750	221	Sasparilla	\N	undefined	08:54	[]	\N	2024-06-11 09:16:15.67-04	2024-06-11 09:16:15.67-04	\N
+4751	221	Kingfishers Catch Fire: I. Following falls and falls of rain	\N	undefined	05:33	[]	\N	2024-06-11 09:16:15.688-04	2024-06-11 09:16:15.688-04	\N
+4752	221	Some Treasures Are Heavy With Human Tears - Live	\N	undefined	06:14	[]	\N	2024-06-11 09:16:15.696-04	2024-06-11 09:16:15.696-04	\N
+4753	221	Soprano Saxophone Concerto: IV. Wood	\N	undefined	04:01	[]	\N	2024-06-11 09:16:15.702-04	2024-06-11 09:16:15.702-04	\N
+4754	221	Soprano Saxophone Concerto: II. Felt	\N	undefined	05:47	[]	\N	2024-06-11 09:16:15.71-04	2024-06-11 09:16:15.71-04	\N
+4755	221	(Redacted): Redacted	\N	undefined	10:35	[]	\N	2024-06-11 09:16:15.717-04	2024-06-11 09:16:15.717-04	\N
+4756	221	Soprano Saxophone Concerto: V. Finale	\N	undefined	05:15	[]	\N	2024-06-11 09:16:15.731-04	2024-06-11 09:16:15.731-04	\N
+4757	221	Soprano Saxophone Concerto: III. Metal	\N	undefined	07:28	[]	\N	2024-06-11 09:16:15.74-04	2024-06-11 09:16:15.74-04	\N
+4758	221	Divine Mischief: Concerto for Clarinet: III. Spellbound	\N	undefined	07:10	[]	\N	2024-06-11 09:16:15.749-04	2024-06-11 09:16:15.749-04	\N
+4759	221	Divine Mischief: Concerto for Clarinet: II. Disappointment, regret, regression: a waltz	\N	undefined	11:09	[]	\N	2024-06-11 09:16:15.765-04	2024-06-11 09:16:15.765-04	\N
+4760	221	Divine Mischief: Concerto for Clarinet: I. A stranger and a game	\N	undefined	06:33	[]	\N	2024-06-11 09:16:15.774-04	2024-06-11 09:16:15.774-04	\N
+4761	221	Songs for the End of the World: III. At Sea	\N	undefined	08:47	[]	\N	2024-06-11 09:16:15.781-04	2024-06-11 09:16:15.781-04	\N
+4762	221	Songs for the End of the World: I. A Long Time Along	\N	undefined	08:16	[]	\N	2024-06-11 09:16:15.788-04	2024-06-11 09:16:15.788-04	\N
+4763	221	Antique Violences, Concerto for Trumpet: IV. The curtain calls	\N	undefined	04:01	[]	\N	2024-06-11 09:16:15.796-04	2024-06-11 09:16:15.796-04	\N
+4764	221	Songs for the End of the World: II. Raveling	\N	undefined	05:17	[]	\N	2024-06-11 09:16:15.808-04	2024-06-11 09:16:15.808-04	\N
+4765	221	Antique Violences, Concerto for Trumpet: I. The blooded lines	\N	undefined	04:36	[]	\N	2024-06-11 09:16:15.817-04	2024-06-11 09:16:15.817-04	\N
+4766	221	Antique Violences, Concerto for Trumpet: II. Secrets'' teeth	\N	undefined	04:51	[]	\N	2024-06-11 09:16:15.824-04	2024-06-11 09:16:15.824-04	\N
+4767	221	Asphalt Cocktail (Version for Wind Band)	\N	undefined	05:39	[]	\N	2024-06-11 09:16:15.836-04	2024-06-11 09:16:15.836-04	\N
+\.
+
+
+--
+-- Data for Name: performances; Type: TABLE DATA; Schema: public; Owner: jdboss
+--
+
+COPY public.performances (performance_id, composition_id, user_id, recording_date, location, file_url, "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: user_interactions; Type: TABLE DATA; Schema: public; Owner: jdboss
+--
+
+COPY public.user_interactions (interaction_id, user_id, target_id, target_type, interaction_type, content, rating, interaction_date, "createdAt", "updatedAt") FROM stdin;
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: jdboss
+--
+
+COPY public.users (user_id, username, email, password_hash, user_type, firstname, lastname, isadmin) FROM stdin;
+81	jdoerr	ddd@gmail.com	$2b$10$eMN2eyNw1nIC/XvsFfk1Je1OQUjgrxBJxbVyLfZEv8zqlG4PO2U/a	composer	J	D	f
+82	AnnaDddd	annananna@gmail.com	$2b$10$FCRp4yHBCrqQSIzWgzLZSu7ca/ex/k6M2il6KZOyVWH1D/EVbGr0q	normal	Annaaa	Doerrrr	f
+83	Pauuuuuuu	sdfsdfsdfsd@gmail.com	$2b$10$uJSYwpqN99UnlLgRETka0.r4LpJVdQTn3C8PPj43ogagZfG51xh7y	normal	Pa	sdfdf	f
+84	Bonnie	jdoerr13@gmail.com	$2b$10$nakQJ8/ESouMykAuGjziPeMWMsKfkHYOBXthAvmF4bwSoLzQakGIW	normal	JAIME	DOERR	f
+85	David	davidd@gmail.com	$2b$10$8kSYZ0VwZjb6mTwo2DB6jeiKqKQHjkAVFLMlYx3LaqeHrqB4IUkUy	normal	David	Doerr	f
+\.
+
+
+--
+-- Name: api_integrations_integration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jdboss
+--
+
+SELECT pg_catalog.setval(''public.api_integrations_integration_id_seq'', 1, false);
+
+
+--
+-- Name: composers_composer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jdboss
+--
+
+SELECT pg_catalog.setval(''public.composers_composer_id_seq'', 222, true);
+
+
+--
+-- Name: compositions_composition_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jdboss
+--
+
+SELECT pg_catalog.setval(''public.compositions_composition_id_seq'', 4767, true);
+
+
+--
+-- Name: performances_performance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jdboss
+--
+
+SELECT pg_catalog.setval(''public.performances_performance_id_seq'', 1, false);
+
+
+--
+-- Name: user_interactions_interaction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jdboss
+--
+
+SELECT pg_catalog.setval(''public.user_interactions_interaction_id_seq'', 1, false);
+
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jdboss
+--
+
+SELECT pg_catalog.setval(''public.users_user_id_seq'', 85, true);
+
+
+--
+-- Name: api_integrations api_integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.api_integrations
+    ADD CONSTRAINT api_integrations_pkey PRIMARY KEY (integration_id);
+
+
+--
+-- Name: composers composers_pkey; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.composers
+    ADD CONSTRAINT composers_pkey PRIMARY KEY (composer_id);
+
+
+--
+-- Name: compositions compositions_pkey; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.compositions
+    ADD CONSTRAINT compositions_pkey PRIMARY KEY (composition_id);
+
+
+--
+-- Name: performances performances_pkey; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.performances
+    ADD CONSTRAINT performances_pkey PRIMARY KEY (performance_id);
+
+
+--
+-- Name: composers unique_composer_name_user_id; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.composers
+    ADD CONSTRAINT unique_composer_name_user_id UNIQUE (name, user_id);
+
+
+--
+-- Name: user_interactions user_interactions_pkey; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.user_interactions
+    ADD CONSTRAINT user_interactions_pkey PRIMARY KEY (interaction_id);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+
+--
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: api_integrations api_integrations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.api_integrations
+    ADD CONSTRAINT api_integrations_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- Name: compositions compositions_composer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.compositions
+    ADD CONSTRAINT compositions_composer_id_fkey FOREIGN KEY (composer_id) REFERENCES public.composers(composer_id) ON DELETE CASCADE;
+
+
+--
+-- Name: composers fk_user; Type: FK CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.composers
+    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE SET NULL;
+
+
+--
+-- Name: performances performances_composition_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.performances
+    ADD CONSTRAINT performances_composition_id_fkey FOREIGN KEY (composition_id) REFERENCES public.compositions(composition_id);
+
+
+--
+-- Name: performances performances_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.performances
+    ADD CONSTRAINT performances_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- Name: user_interactions user_interactions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jdboss
+--
+
+ALTER TABLE ONLY public.user_interactions
+    ADD CONSTRAINT user_interactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
