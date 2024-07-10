@@ -1,5 +1,13 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+// const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  logging: false,
+  dialectOptions: {
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  }
+});
 
 const User = sequelize.define('User', {
   user_id: {
