@@ -37,7 +37,7 @@ router.post('/', ensureAdmin, async function (req, res, next) {
 
         // GET /users => { users: [...users] }
         // Route for listing all users, admin only
-        router.get('/', ensureAdmin, async function (req, res, next) {
+        router.get('/', async function (req, res, next) {
             try {
                 const users = await User.findAll();
                 return res.json({ users });
