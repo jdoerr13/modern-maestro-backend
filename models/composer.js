@@ -1,6 +1,12 @@
-// Import Sequelize library
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+const { getDatabaseUri } = require('../config');
+const sequelize = new Sequelize(getDatabaseUri(), {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: process.env.NODE_ENV === 'production' ? { require: true, rejectUnauthorized: false } : false,
+  },
+});
 const { Composition } = require('./composition'); 
 const { User } = require('./user'); 
 
@@ -62,13 +68,12 @@ Composer.findById = async function(composerId) {
 
 Composer.findByName = async function(name) {
     return await this.findOne({ where: { name } });
-  };
-
+};
 
 // Sync the model with the database
 async function syncComposerModel() {
     try {
-        await Composer.sync();
+        await Composer.sync({ alter: true });
         console.log('Composer model synced successfully');
     } catch (error) {
         console.error('Error syncing Composer model:', error);

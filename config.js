@@ -9,10 +9,13 @@ const PORT = +process.env.PORT || 3000;
 
 // Database URI
 // In real applications, use environmental variables to manage this URI for different environments (development, test, production)
+// function getDatabaseUri() {
+//     return process.env.NODE_ENV === 'test'
+//         ? 'postgresql://localhost/modernmaestros_test'
+//         : process.env.DATABASE_URL || 'postgresql://localhost/modernmaestros';
+// }
 function getDatabaseUri() {
-    return process.env.NODE_ENV === 'test'
-        ? 'postgresql://localhost/modernmaestros_test'
-        : process.env.DATABASE_URL || 'postgresql://localhost/modernmaestros';
+    return process.env.DATABASE_URL;
 }
 
 // Bcrypt work factor - adjust as needed, higher is more secure but slower
