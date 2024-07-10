@@ -1,5 +1,13 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+const { getDatabaseUri } = require('../config');
+
+const sequelize = new Sequelize(getDatabaseUri(), {
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    },
+});
 
 
 const Composition = sequelize.define('Composition', {
