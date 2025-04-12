@@ -5,7 +5,7 @@ require('colors');
 const SECRET_KEY = process.env.SECRET_KEY || 'development-secret-key';
 
 // Port number for the Express server
-const PORT = +process.env.PORT || 3000;
+const PORT = +process.env.PORT || 8080;
 
 // Database URI
 // In real applications, use environmental variables to manage this URI for different environments (development, test, production)
