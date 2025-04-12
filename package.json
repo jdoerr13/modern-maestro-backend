@@ -25,7 +25,8 @@
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "postman": "^0.2.0",
-    "sequelize": "^6.37.1"
+    "sequelize": "^6.37.1",
+    "umzug": "^3.8.2"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.7.10",
