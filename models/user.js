@@ -1,11 +1,11 @@
 const { Sequelize, DataTypes } = require('sequelize');
-// const sequelize = new Sequelize('postgresql://localhost/modernmaestros');
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   protocol: 'postgres',
   logging: false,
   dialectOptions: {
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
   }
 });
 
@@ -22,13 +22,13 @@ const User = sequelize.define('User', {
   },
   firstName: {
     type: DataTypes.STRING,
-    allowNull: false, // Or false, depending on whether you require names for all users
-    field: 'firstname'
+    allowNull: false,
+    field: 'first_name'
   },
   lastName: {
     type: DataTypes.STRING,
     allowNull: true,
-    field: 'lastname'
+    field: 'last_name'
   },
   email: {
     type: DataTypes.STRING,
@@ -40,23 +40,22 @@ const User = sequelize.define('User', {
     allowNull: false
   },
   user_type: {
-    type: DataTypes.STRING,
+    type: DataTypes.JSONB,
     allowNull: false,
-    defaultValue: 'normal' // Add a default value for user_type
+    defaultValue: { type: 'normal' } // can also be 'normal' string if your app expects it
   },
   isAdmin: {
     type: DataTypes.BOOLEAN,
-    field: 'isadmin',
+    field: 'is_admin',
     allowNull: false,
-    defaultValue: false // Adds the isAdmin field with a default value of false
+    defaultValue: false
   }
 }, {
-  tableName: 'users', // Make sure this matches the case exactly as in your database
-  freezeTableName: true, // This prevents Sequelize from attempting to modify the table name
-  timestamps: false 
+  tableName: 'users',
+  freezeTableName: true,
+  timestamps: false
 });
 
-// Sync the model with the database
 async function syncUserModel() {
   try {
     await User.sync();
@@ -66,5 +65,4 @@ async function syncUserModel() {
   }
 }
 
-// Export the User model
 module.exports = { User, syncUserModel };
