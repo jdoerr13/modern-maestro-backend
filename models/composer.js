@@ -41,6 +41,14 @@ const Composer = sequelize.define('Composer', {
     social_media_links: {
         type: DataTypes.JSONB,
         allowNull: true
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at'
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at'
     }
 }, {
   tableName: 'composers',
