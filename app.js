@@ -16,7 +16,10 @@ const userRoutes = require("./routes/users");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://modernmaestro.netlify.app'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use('/uploads', express.static('uploads'));
