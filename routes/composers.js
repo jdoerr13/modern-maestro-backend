@@ -3,7 +3,7 @@ const router = express.Router();
 const { Composer } = require('../models/composer');
 const { Composition }  = require('../models/composition');
 const { ensureLoggedIn, ensureAdmin, ensureCorrectUserOrAdmin } = require('../middleware/authMiddle');
-const { fetchTracksByComposerName } = require('../dataImport/dataImportSpotify');
+// const { fetchTracksByComposerName } = require('../dataImport/dataImportSpotify');
 
 
 /** GET /composers  =>
@@ -21,17 +21,17 @@ router.get('/', async (req, res, next) => {
 });
 
 
-router.get('/tracks/byComposer/:composerName', async (req, res, next) => {
-  console.log(`Fetching tracks for composer: ${req.params.composerName}`);
-  try {
-    const { composerName } = req.params;
-    const tracks = await fetchTracksByComposerName(composerName);
-    res.json({ tracks }); // Send the fetched tracks back to the client
-  } catch (error) {
-    console.error('Error fetching tracks by composer:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+// router.get('/tracks/byComposer/:composerName', async (req, res, next) => {
+//   console.log(`Fetching tracks for composer: ${req.params.composerName}`);
+//   try {
+//     const { composerName } = req.params;
+//     const tracks = await fetchTracksByComposerName(composerName);
+//     res.json({ tracks }); // Send the fetched tracks back to the client
+//   } catch (error) {
+//     console.error('Error fetching tracks by composer:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 
 /** GET /composers/:id  =>  { composer }
