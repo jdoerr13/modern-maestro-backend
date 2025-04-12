@@ -11,6 +11,7 @@ const { BadRequestError, UnauthorizedError } = require("../expressError");
 
 // Register route
 router.post("/register", async function (req, res, next) {
+  console.log("REGISTER HIT:", req.body);
   try {
     const validator = jsonschema.validate(req.body, userRegisterSchema);
     if (!validator.valid) {
@@ -45,6 +46,7 @@ router.post("/register", async function (req, res, next) {
 
 // Token route
 router.post("/token", async function (req, res, next) {
+  console.log("LOGIN HIT:", req.body);
   try {
     const validator = jsonschema.validate(req.body, userAuthSchema);
     if (!validator.valid) {
