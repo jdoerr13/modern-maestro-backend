@@ -49,7 +49,7 @@ router.get("/instruments", async function (req, res, next) {
  *
  * Authorization required: admin (adjust as necessary)
  */
-router.post("/", upload.single('audioFile'), ensureLoggedIn, async function (req, res, next) {
+router.post("/", upload.single('audioFile'), async function (req, res, next) {
   console.log(req.file);
   try {
     // Convert numeric fields from string to integer
@@ -191,7 +191,8 @@ router.get("/:id", async function (req, res, next) {
  * Authorization required: admin
  */
 
-router.patch("/:id", [ensureLoggedIn, upload.single("audioFile")], async function (req, res, next) {
+// router.patch("/:id", [ensureLoggedIn, upload.single("audioFile")], async function (req, res, next) {
+router.patch("/:id", [upload.single("audioFile")], async function (req, res, next) {
   console.log("PATCH route hit for ID:", req.params.id);
   const compositionId = req.params.id;
 
@@ -247,14 +248,13 @@ router.patch("/:id", [ensureLoggedIn, upload.single("audioFile")], async functio
 
 
 
-
-
 /** DELETE /[id]  =>  { deleted: id }
  *
  * Authorization: admin
  */
 
-router.delete("/:id", ensureAdmin, async function (req, res, next) {
+// router.delete("/:id", ensureAdmin, async function (req, res, next) {
+router.delete("/:id", async function (req, res, next) {
   try {
     await Composition.remove(req.params.id);
     return res.json({ deleted: req.params.id });

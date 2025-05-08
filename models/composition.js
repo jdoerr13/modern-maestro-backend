@@ -49,7 +49,8 @@ const Composition = sequelize.define('Composition', {
       }
 }, {
     tableName: 'compositions', 
-    freezeTableName: true // This option prevents Sequelize from automatically pluralizing the table name
+    freezeTableName: true, // This option prevents Sequelize from automatically pluralizing the table name
+    timestamps: false
   });
 
   Composition.findByTitleAndComposerId = async function(title, composerId) {
