@@ -13,10 +13,10 @@ const { User } = require('./user');
 // Define the Composer model with custom table name options
 const Composer = sequelize.define('Composer', {
     composer_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
+    type: DataTypes.STRING,  // ✅ CHANGE from INTEGER
+    primaryKey: true,
+    autoIncrement: false      // ✅ Remove autoIncrement
+},
     user_id: { // Include user_id to establish the association between Composer and User
         type: DataTypes.INTEGER,
         allowNull: true,

@@ -17,13 +17,9 @@ const Composition = sequelize.define('Composition', {
         autoIncrement: true
     },
     composer_id: {
-        type: DataTypes.INTEGER,
-        // references: {
-        //   model: Composer,
-        //   key: 'composer_id'
-        // },
-        allowNull: false 
-      },
+    type: DataTypes.STRING,  // ✅ CHANGE from INTEGER
+    allowNull: false
+},
     title: {
         type: DataTypes.STRING,
         allowNull: false
